@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leptos Forms Test Suite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .test-links {
+            display: grid;
+            gap: 20px;
+        }
+        .test-link {
+            display: block;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s;
+        }
+        .test-link:hover {
+            background-color: #e9ecef;
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .test-link h3 {
+            margin: 0 0 10px 0;
+            color: #007bff;
+        }
+        .test-link p {
+            margin: 0;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+        .test-link .features {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #28a745;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status.ready {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.testing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Leptos Forms Test Suite</h1>
+        
+        <div class="description">
+            <p>Welcome to the comprehensive test suite for Leptos Forms. This collection of test forms provides a foundation for running Playwright E2E tests to validate form functionality, validation, and user interactions.</p>
+            <p>Each form demonstrates different aspects of form handling and includes comprehensive test IDs for reliable test automation.</p>
+        </div>
+        
+        <div class="test-links">
+            <a href="basic-form.html" class="test-link">
+                <h3>📝 Basic Form</h3>
+                <p>A simple login form demonstrating basic form functionality with validation and submission.</p>
+                <div class="features">
+                    <strong>Features:</strong> Text inputs, password field, form validation, error handling, success messages
+                </div>
+                <div class="status ready">Ready for Testing</div>
+            </a>
+            
+            <a href="complex-form.html" class="test-link">
+                <h3>🔄 Multi-Step Form</h3>
+                <p>A complex multi-step registration form with conditional fields, validation, and dynamic navigation.</p>
+                <div class="features">
+                    <strong>Features:</strong> Multi-step navigation, conditional fields, field arrays, file uploads, complex validation
+                </div>
+                <div class="status ready">Ready for Testing</div>
+            </a>
+            
+            <a href="components.html" class="test-link">
+                <h3>🧩 Component Showcase</h3>
+                <p>A comprehensive showcase of individual form components and their interactions.</p>
+                <div class="features">
+                    <strong>Features:</strong> All input types, checkboxes, radios, selects, textareas, file uploads, conditional rendering
+                </div>
+                <div class="status ready">Ready for Testing</div>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Test Coverage:</strong> These forms cover the core functionality that would be expected from the Leptos Forms library.</p>
+            <p><strong>Playwright Integration:</strong> All forms include comprehensive test IDs and are designed for reliable E2E testing.</p>
+            <p><strong>Browser Compatibility:</strong> Forms are tested across multiple browsers and devices through Playwright's test matrix.</p>
+        </div>
+    </div>
+</body>
+</html>

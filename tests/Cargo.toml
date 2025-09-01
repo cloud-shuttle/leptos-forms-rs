@@ -1,0 +1,20 @@
+[package]
+name = "leptos-forms-rs-tests"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+leptos-forms-rs = { path = "../leptos-forms-rs" }
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3"
+console_error_panic_hook = "0.1"
+console_log = "1.0"
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]

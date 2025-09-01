@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex Multi-Step Form Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .step.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .step.completed {
+            background-color: #28a745;
+            color: white;
+        }
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+        }
+        .form-field {
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        .form-row .form-field {
+            flex: 1;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .checkbox-group, .radio-group {
+            margin-top: 10px;
+        }
+        .checkbox-item, .radio-item {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-item input, .radio-item input {
+            margin-right: 10px;
+            width: auto;
+        }
+        .file-input {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .file-input:hover {
+            border-color: #007bff;
+        }
+        .file-input input[type="file"] {
+            display: none;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .success-message {
+            color: #28a745;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            display: none;
+        }
+        .form-debug {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .form-debug h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .form-debug pre {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .field-array {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .field-array-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .remove-item {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .add-item {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multi-Step Registration Form</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            This demonstrates complex form functionality with multiple steps, validation, and dynamic fields.
+        </p>
+        
+        <div class="step-indicator">
+            <div class="step active" data-step="1">1</div>
+            <div class="step" data-step="2">2</div>
+            <div class="step" data-step="3">3</div>
+            <div class="step" data-step="4">4</div>
+        </div>
+        
+        <form id="registration-form" data-testid="registration-form">
+            <!-- Step 1: Personal Information -->
+            <div class="step-content active" data-step="1">
+                <h2>Personal Information</h2>
+                
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="firstName" data-testid="firstName-label">First Name</label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            name="firstName"
+                            placeholder="Enter your first name"
+                            required
+                            data-testid="firstName-input"
+                        />
+                        <div class="error-message" data-testid="firstName-error" id="firstName-error">
+                            First name is required
+                        </div>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="lastName" data-testid="lastName-label">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            name="lastName"
+                            placeholder="Enter your last name"
+                            required
+                            data-testid="lastName-input"
+                        />
+                        <div class="error-message" data-testid="lastName-error" id="lastName-error">
+                            Last name is required
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label for="email" data-testid="email-label">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        placeholder="Enter your email address"
+                        required
+                        data-testid="email-input"
+                    />
+                    <div class="error-message" data-testid="email-error" id="email-error">
+                        Please enter a valid email address
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label for="phone" data-testid="phone-label">Phone Number</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone"
+                        placeholder="Enter your phone number"
+                        data-testid="phone-input"
+                    />
+                </div>
+                
+                <div class="form-field">
+                    <label for="dateOfBirth" data-testid="dateOfBirth-label">Date of Birth</label>
+                    <input 
+                        type="date" 
+                        id="dateOfBirth" 
+                        name="dateOfBirth"
+                        data-testid="dateOfBirth-input"
+                    />
+                </div>
+            </div>
+            
+            <!-- Step 2: Address Information -->
+            <div class="step-content" data-step="2">
+                <h2>Address Information</h2>
+                
+                <div class="form-field">
+                    <label for="street" data-testid="street-label">Street Address</label>
+                    <input 
+                        type="text" 
+                        id="street" 
+                        name="street"
+                        placeholder="Enter your street address"
+                        required
+                        data-testid="street-input"
+                    />
+                    <div class="error-message" data-testid="street-error" id="street-error">
+                        Street address is required
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="city" data-testid="city-label">City</label>
+                        <input 
+                            type="text" 
+                            id="city" 
+                            name="city"
+                            placeholder="Enter your city"
+                            required
+                            data-testid="city-input"
+                        />
+                        <div class="error-message" data-testid="city-error" id="city-error">
+                            City is required
+                        </div>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="state" data-testid="state-label">State</label>
+                        <select id="state" name="state" required" data-testid="state-select">
+                            <option value="">Select a state</option>
+                            <option value="CA">California</option>
+                            <option value="NY">New York</option>
+                            <option value="TX">Texas</option>
+                            <option value="FL">Florida</option>
+                            <option value="IL">Illinois</option>
+                        </select>
+                        <div class="error-message" data-testid="state-error" id="state-error">
+                            State is required
+                        </div>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="zipCode" data-testid="zipCode-label">ZIP Code</label>
+                        <input 
+                            type="text" 
+                            id="zipCode" 
+                            name="zipCode"
+                            placeholder="Enter ZIP code"
+                            required
+                            data-testid="zipCode-input"
+                        />
+                        <div class="error-message" data-testid="zipCode-error" id="zipCode-error">
+                            ZIP code is required
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Preferences & Skills -->
+            <div class="step-content" data-step="3">
+                <h2>Preferences & Skills</h2>
+                
+                <div class="form-field">
+                    <label data-testid="interests-label">Interests</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="interest-tech" name="interests" value="technology" data-testid="interest-tech-checkbox" />
+                            <label for="interest-tech">Technology</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="interest-sports" name="interests" value="sports" data-testid="interest-sports-checkbox" />
+                            <label for="interest-sports">Sports</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="interest-music" name="interests" value="music" data-testid="interest-music-checkbox" />
+                            <label for="interest-music">Music</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="interest-art" name="interests" value="art" data-testid="interest-art-checkbox" />
+                            <label for="interest-art">Art</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label data-testid="experience-label">Experience Level</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="exp-beginner" name="experience" value="beginner" data-testid="exp-beginner-radio" />
+                            <label for="exp-beginner">Beginner</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="exp-intermediate" name="experience" value="intermediate" data-testid="exp-intermediate-radio" />
+                            <label for="exp-intermediate">Intermediate</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="exp-advanced" name="experience" value="advanced" data-testid="exp-advanced-radio" />
+                            <label for="exp-advanced">Advanced</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label for="skills" data-testid="skills-label">Skills (one per line)</label>
+                    <textarea 
+                        id="skills" 
+                        name="skills"
+                        rows="4"
+                        placeholder="Enter your skills, one per line"
+                        data-testid="skills-textarea"
+                    ></textarea>
+                </div>
+                
+                <div class="form-field">
+                    <label for="resume" data-testid="resume-label">Upload Resume</label>
+                    <div class="file-input" data-testid="resume-file-input">
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" />
+                        <p>Click to upload or drag and drop</p>
+                        <p>PDF, DOC, or DOCX files only</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Review & Submit -->
+            <div class="step-content" data-step="4">
+                <h2>Review & Submit</h2>
+                
+                <div class="form-field">
+                    <label for="terms" data-testid="terms-label">
+                        <input type="checkbox" id="terms" name="terms" required data-testid="terms-checkbox" />
+                        I agree to the terms and conditions
+                    </label>
+                    <div class="error-message" data-testid="terms-error" id="terms-error">
+                        You must agree to the terms and conditions
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label for="newsletter" data-testid="newsletter-label">
+                        <input type="checkbox" id="newsletter" name="newsletter" data-testid="newsletter-checkbox" />
+                        Subscribe to our newsletter
+                    </label>
+                </div>
+                
+                <div class="form-debug">
+                    <h3>Form Summary</h3>
+                    <pre id="form-summary" data-testid="form-summary">No data entered yet</pre>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="prev-button" data-testid="prev-button" style="display: none;">
+                    Previous
+                </button>
+                <button type="button" class="btn btn-primary" id="next-button" data-testid="next-button">
+                    Next
+                </button>
+                <button type="submit" class="btn btn-primary" id="submit-button" data-testid="submit-button" style="display: none;">
+                    Submit Registration
+                </button>
+            </div>
+        </form>
+        
+        <div class="success-message" data-testid="success-message" id="success-message">
+            Registration submitted successfully!
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        
+        // DOM elements
+        const form = document.getElementById('registration-form');
+        const stepIndicators = document.querySelectorAll('.step');
+        const stepContents = document.querySelectorAll('.step-content');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const submitButton = document.getElementById('submit-button');
+        const successMessage = document.getElementById('success-message');
+        const formSummary = document.getElementById('form-summary');
+        
+        // Form validation functions
+        function validateStep(step) {
+            let isValid = true;
+            const currentStepContent = document.querySelector(`.step-content[data-step="${step}"]`);
+            const requiredFields = currentStepContent.querySelectorAll('[required]');
+            
+            // First, hide all error messages for this step
+            const errorElements = currentStepContent.querySelectorAll('.error-message');
+            errorElements.forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            requiredFields.forEach(field => {
+                const errorElement = document.getElementById(field.id + '-error');
+                if (errorElement) {
+                    if (!field.value.trim()) {
+                        errorElement.style.display = 'block';
+                        isValid = false;
+                    } else {
+                        errorElement.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Special validation for email
+            if (step === 1) {
+                const emailField = document.getElementById('email');
+                const emailError = document.getElementById('email-error');
+                if (emailField && emailError && emailField.value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(emailField.value)) {
+                        emailError.style.display = 'block';
+                        isValid = false;
+                    } else {
+                        emailError.style.display = 'none';
+                    }
+                }
+            }
+            
+            return isValid;
+        }
+        
+        // Navigation functions
+        function showStep(step) {
+            // Hide all steps
+            stepContents.forEach(content => content.classList.remove('active'));
+            stepIndicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            // Show current step
+            const currentContent = document.querySelector(`.step-content[data-step="${step}"]`);
+            const currentIndicator = document.querySelector(`.step[data-step="${step}"]`);
+            
+            if (currentContent) currentContent.classList.add('active');
+            if (currentIndicator) currentIndicator.classList.add('active');
+            
+            // Update buttons
+            prevButton.style.display = step > 1 ? 'inline-block' : 'none';
+            nextButton.style.display = step < totalSteps ? 'inline-block' : 'none';
+            submitButton.style.display = step === totalSteps ? 'inline-block' : 'none';
+            
+            // Update step indicators
+            stepIndicators.forEach((indicator, index) => {
+                const stepNum = index + 1;
+                if (stepNum < step) {
+                    indicator.classList.add('completed');
+                } else if (stepNum === step) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active', 'completed');
+                }
+            });
+        }
+        
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            } else {
+                // If validation fails, ensure current step is visible and errors are shown
+                console.log('Validation failed for step', currentStep, '- keeping current step visible');
+                showStep(currentStep);
+                
+                // Force show current step content
+                const currentContent = document.querySelector(`.step-content[data-step="${currentStep}"]`);
+                if (currentContent) {
+                    currentContent.classList.add('active');
+                    currentContent.style.display = 'block';
+                }
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+        
+        // Event listeners
+        nextButton.addEventListener('click', nextStep);
+        prevButton.addEventListener('click', prevStep);
+        
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (validateStep(currentStep)) {
+                // Show success message
+                successMessage.style.display = 'block';
+                
+                // Update form summary
+                const formData = new FormData(form);
+                const summary = {};
+                for (let [key, value] of formData.entries()) {
+                    if (summary[key]) {
+                        if (Array.isArray(summary[key])) {
+                            summary[key].push(value);
+                        } else {
+                            summary[key] = [summary[key], value];
+                        }
+                    } else {
+                        summary[key] = value;
+                    }
+                }
+                formSummary.textContent = JSON.stringify(summary, null, 2);
+                
+                // Reset form and go back to step 1
+                setTimeout(() => {
+                    form.reset();
+                    currentStep = 1;
+                    showStep(1);
+                    successMessage.style.display = 'none';
+                }, 3000);
+            }
+        });
+        
+        // Real-time validation
+        document.addEventListener('blur', function(e) {
+            if (e.target.hasAttribute('required')) {
+                const errorElement = document.getElementById(e.target.id + '-error');
+                if (errorElement) {
+                    if (!e.target.value.trim()) {
+                        errorElement.style.display = 'block';
+                    } else {
+                        errorElement.style.display = 'none';
+                    }
+                }
+            }
+        }, true);
+        
+        // Initialize
+        showStep(1);
+    </script>
+</body>
+</html>

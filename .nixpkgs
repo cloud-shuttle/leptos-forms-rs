@@ -1,0 +1,7 @@
+{
+  description = "Nixpkgs configuration for Leptos Forms";
+  
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/23.11";
+  };
+}

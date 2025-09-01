@@ -1,0 +1,14 @@
+[package]
+name = "leptos-forms-rs-macro"
+version = "0.1.0"
+edition = "2021"
+description = "Procedural macros for Leptos Forms"
+license = "MIT"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }

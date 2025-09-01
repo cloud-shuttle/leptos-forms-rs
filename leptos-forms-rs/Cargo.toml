@@ -1,0 +1,35 @@
+[package]
+name = "leptos-forms-rs"
+version = "0.1.0"
+edition = "2021"
+description = "Type-safe, reactive form handling library for Leptos applications"
+license = "MIT"
+repository = "https://github.com/your-org/leptos-forms-rs"
+keywords = ["leptos", "forms", "validation", "web", "wasm"]
+categories = ["web-programming", "wasm"]
+
+[dependencies]
+leptos = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+leptos-forms-rs-macro = { path = "../leptos-forms-rs-macro" }
+web-sys = { version = "0.3", features = ["Window", "Storage"] }
+wasm-bindgen = { workspace = true }
+chrono = { workspace = true }
+regex = { workspace = true }
+gloo-net = { workspace = true }
+gloo-timers = { workspace = true }
+console_error_panic_hook = { workspace = true }
+console_log = { workspace = true }
+log = { workspace = true }
+lazy_static = { workspace = true }
+
+[features]
+default = ["csr"]
+csr = ["leptos/csr"]
+ssr = ["leptos/ssr"]
+hydrate = ["leptos/hydrate"]
+
+[lib]
+name = "leptos_forms_rs"
+path = "src/lib.rs"

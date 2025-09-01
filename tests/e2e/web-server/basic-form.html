@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Form Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-field {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 24px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block !important;
+        }
+        .success-message {
+            color: #28a745;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            display: none;
+        }
+        .form-debug {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .form-debug h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .form-debug p {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login Form Example</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            This demonstrates the basic functionality of Leptos Forms.
+        </p>
+        
+        <form id="login-form" data-testid="login-form">
+            <div class="form-field">
+                <label for="username" data-testid="username-label">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username"
+                    placeholder="Enter your username"
+                    required
+                    data-testid="username-input"
+                />
+                <div class="error-message" data-testid="username-error" id="username-error">
+                    Username is required
+                </div>
+            </div>
+            
+            <div class="form-field">
+                <label for="password" data-testid="password-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                    data-testid="password-input"
+                />
+                <div class="error-message" data-testid="password-error" id="password-error">
+                    Password is required
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" data-testid="submit-button">
+                    Login
+                </button>
+                <button type="button" class="btn btn-secondary" data-testid="reset-button">
+                    Reset
+                </button>
+            </div>
+        </form>
+        
+        <div class="success-message" data-testid="success-message" id="success-message">
+            Form submitted successfully!
+        </div>
+        
+        <div class="form-debug">
+            <h3>Form Debug Info</h3>
+            <p>Form is working! This is a simplified example.</p>
+            <p>Form values: <span id="form-values" data-testid="form-values">No values yet</span></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const usernameError = document.getElementById('username-error');
+        const passwordError = document.getElementById('password-error');
+        const successMessage = document.getElementById('success-message');
+        const formValues = document.getElementById('form-values');
+        const resetButton = document.getElementById('reset-button');
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Username validation
+            if (!usernameInput.value.trim()) {
+                usernameError.classList.add('show');
+                isValid = false;
+            } else {
+                usernameError.classList.remove('show');
+            }
+            
+            // Password validation
+            if (!passwordInput.value.trim()) {
+                passwordError.textContent = 'Password is required';
+                passwordError.classList.add('show');
+                isValid = false;
+            } else if (passwordInput.value.length < 8) {
+                passwordError.textContent = 'Password must be at least 8 characters';
+                passwordError.classList.add('show');
+                isValid = false;
+            } else {
+                passwordError.classList.remove('show');
+            }
+            
+            return isValid;
+        }
+
+        // Update form values display
+        function updateFormValues() {
+            const values = {
+                username: usernameInput.value,
+                password: passwordInput.value
+            };
+            formValues.textContent = JSON.stringify(values, null, 2);
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Always run validation first
+            const isValid = validateForm();
+            
+            if (isValid) {
+                // Show success message
+                successMessage.style.display = 'block';
+                
+                // Clear form after showing success
+                setTimeout(() => {
+                    form.reset();
+                    successMessage.style.display = 'none';
+                    updateFormValues();
+                }, 3000);
+            }
+            // If not valid, validation errors are already shown by validateForm()
+        });
+
+        // Reset button
+        resetButton.addEventListener('click', function() {
+            form.reset();
+            updateFormValues();
+        });
+        
+        // Also clear errors when form is reset via form.reset()
+        form.addEventListener('reset', function() {
+            usernameError.classList.remove('show');
+            passwordError.classList.remove('show');
+            successMessage.style.display = 'none';
+        });
+
+        // Real-time validation
+        usernameInput.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                usernameError.classList.add('show');
+            } else {
+                usernameError.classList.remove('show');
+            }
+            updateFormValues();
+        });
+
+        passwordInput.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                passwordError.textContent = 'Password is required';
+                passwordError.classList.add('show');
+            } else if (this.value.length < 8) {
+                passwordError.textContent = 'Password must be at least 8 characters';
+                passwordError.classList.add('show');
+            } else {
+                passwordError.classList.remove('show');
+            }
+            updateFormValues();
+        });
+
+        // Initialize form values display
+        updateFormValues();
+    </script>
+</body>
+</html>
