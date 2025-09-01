@@ -13,7 +13,8 @@ console_log = "1.0"
 log = "0.4"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+name = "compatibility_example"
+path = "src/main.rs"
 
 [features]
 default = ["leptos-0-6"]

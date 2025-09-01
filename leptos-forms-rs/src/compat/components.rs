@@ -95,16 +95,16 @@ macro_rules! compat_component_scope_aware {
 pub trait MountCompat {
     /// Mount the component to the DOM
     fn mount_to_body<F>(f: F) 
-    where F: FnOnce() -> impl IntoView + 'static;
+    where F: FnOnce() -> Box<dyn std::any::Any + 'static>;
     
     /// Mount the component to a specific element
     fn mount_to_element<F>(element_id: &str, f: F) -> Result<(), String>
-    where F: FnOnce() -> impl IntoView + 'static;
+    where F: FnOnce() -> Box<dyn std::any::Any + 'static>;
 }
 
 impl MountCompat for () {
     fn mount_to_body<F>(f: F) 
-    where F: FnOnce() -> impl IntoView + 'static {
+    where F: FnOnce() -> Box<dyn std::any::Any + 'static> {
         #[cfg(feature = "leptos-0-6")]
         {
             leptos_06::mount_to_body(f);
@@ -117,7 +117,7 @@ impl MountCompat for () {
     }
     
     fn mount_to_element<F>(element_id: &str, f: F) -> Result<(), String>
-    where F: FnOnce() -> impl IntoView + 'static {
+    where F: FnOnce() -> Box<dyn std::any::Any + 'static> {
         #[cfg(feature = "leptos-0-6")]
         {
             if let Some(element) = web_sys::window()
@@ -157,7 +157,7 @@ impl<T> ComponentBuilder<T> {
     
     /// Build the component with version-agnostic mounting
     pub fn mount_to_body<F>(self, f: F) 
-    where F: FnOnce(T) -> impl IntoView + 'static {
+    where F: FnOnce(T) -> Box<dyn std::any::Any + 'static> {
         #[cfg(feature = "leptos-0-6")]
         {
             leptos_06::mount_to_body(move || f(self.props));
@@ -171,7 +171,7 @@ impl<T> ComponentBuilder<T> {
     
     /// Build the component and mount to a specific element
     pub fn mount_to_element<F>(self, element_id: &str, f: F) -> Result<(), String>
-    where F: FnOnce(T) -> impl IntoView + 'static {
+    where F: FnOnce(T) -> Box<dyn std::any::Any + 'static> {
         #[cfg(feature = "leptos-0-6")]
         {
             if let Some(element) = web_sys::window()
@@ -207,10 +207,10 @@ pub fn component<T>(props: T) -> ComponentBuilder<T> {
 pub trait ComponentRegistry {
     /// Register a component with the given name
     fn register_component<F>(&mut self, name: &str, component: F) -> Result<(), String>
-    where F: Fn() -> impl IntoView + 'static;
+    where F: Fn() -> Box<dyn std::any::Any + 'static>;
     
     /// Get a component by name
-    fn get_component(&self, name: &str) -> Option<Box<dyn Fn() -> impl IntoView + 'static>>;
+    fn get_component(&self, name: &str) -> Option<Box<dyn Fn() -> Box<dyn std::any::Any + 'static>>>;
 }
 
 /// Simple component registry implementation
@@ -229,16 +229,14 @@ impl SimpleComponentRegistry {
 
 impl ComponentRegistry for SimpleComponentRegistry {
     fn register_component<F>(&mut self, name: &str, component: F) -> Result<(), String>
-    where F: Fn() -> impl IntoView + 'static {
-        // Note: This is a simplified implementation
-        // In practice, you'd want to handle the IntoView trait object properly
+    where F: Fn() -> Box<dyn std::any::Any + 'static> {
         self.components.insert(name.to_string(), Box::new(component));
         Ok(())
     }
     
-    fn get_component(&self, name: &str) -> Option<Box<dyn Fn() -> impl IntoView + 'static>> {
+    fn get_component(&self, name: &str) -> Option<Box<dyn Fn() -> Box<dyn std::any::Any + 'static>>> {
         // Note: This is a simplified implementation
-        // In practice, you'd want to handle the IntoView trait object properly
+        // In practice, you'd want to handle the component types properly
         None
     }
 }
@@ -259,7 +257,7 @@ mod tests {
         let mut registry = SimpleComponentRegistry::new();
         let result = registry.register_component("test", || {
             // Dummy component
-            leptos::view! { <div>"Test"</div> }
+            Box::new("test")
         });
         assert!(result.is_ok());
     }

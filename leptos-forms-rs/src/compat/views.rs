@@ -5,7 +5,7 @@
 /// Trait for version-agnostic view operations
 pub trait ViewCompat {
     /// Convert to view
-    fn into_view(self) -> impl IntoView;
+    fn into_view(self) -> Box<dyn std::any::Any + 'static>;
 }
 
 /// Version-agnostic conditional view rendering
@@ -13,27 +13,26 @@ pub fn conditional_view_compat<T, F>(
     condition: impl Fn() -> bool + 'static,
     true_view: T,
     false_view: F,
-) -> impl IntoView
+) -> Box<dyn std::any::Any + 'static>
 where
-    T: IntoView,
-    F: IntoView,
+    T: Clone + 'static,
+    F: Clone + 'static,
 {
     #[cfg(feature = "leptos-0-6")]
     {
         if condition() {
-            true_view.into_view()
+            Box::new(true_view)
         } else {
-            false_view.into_view()
+            Box::new(false_view)
         }
     }
     
     #[cfg(feature = "leptos-0-8")]
     {
-        use leptos_08::prelude::either::Either;
         if condition() {
-            Either::Left(true_view)
+            Box::new(true_view)
         } else {
-            Either::Right(false_view)
+            Box::new(false_view)
         }
     }
 }
@@ -42,54 +41,25 @@ where
 pub fn list_view_compat<T, F>(
     items: impl IntoIterator<Item = T>,
     render_fn: F,
-) -> impl IntoView
+) -> Box<dyn std::any::Any + 'static>
 where
     T: Clone + 'static,
-    F: Fn(T) -> impl IntoView + Clone + 'static,
+    F: Fn(T) -> Box<dyn std::any::Any + 'static> + Clone + 'static,
 {
-    #[cfg(feature = "leptos-0-6")]
-    {
-        use leptos_06::*;
-        let items = items.into_iter().collect::<Vec<_>>();
-        view! {
-            <>
-                {items.into_iter().map(|item| render_fn(item.clone()))}
-            </>
-        }
-    }
-    
-    #[cfg(feature = "leptos-0-8")]
-    {
-        use leptos_08::prelude::*;
-        let items = items.into_iter().collect::<Vec<_>>();
-        view! {
-            <>
-                {items.into_iter().map(|item| render_fn(item.clone()))}
-            </>
-        }
-    }
+    let items = items.into_iter().collect::<Vec<_>>();
+    Box::new(items.into_iter().map(|item| render_fn(item.clone())).collect::<Vec<_>>())
 }
 
 /// Version-agnostic dynamic view rendering
 pub fn dynamic_view_compat<T, F>(
     value: T,
     render_fn: F,
-) -> impl IntoView
+) -> Box<dyn std::any::Any + 'static>
 where
     T: Clone + 'static,
-    F: Fn(T) -> impl IntoView + Clone + 'static,
+    F: Fn(T) -> Box<dyn std::any::Any + 'static> + Clone + 'static,
 {
-    #[cfg(feature = "leptos-0-6")]
-    {
-        use leptos_06::*;
-        create_memo(move |_| render_fn(value.clone()))
-    }
-    
-    #[cfg(feature = "leptos-0-8")]
-    {
-        use leptos_08::prelude::*;
-        Memo::new(move |_| render_fn(value.clone()))
-    }
+    Box::new(render_fn(value.clone()))
 }
 
 /// Version-agnostic view builder
@@ -104,25 +74,13 @@ impl ViewBuilder {
     }
     
     /// Add a view to the builder
-    pub fn add<V: IntoView + 'static>(&mut self, view: V) {
-        // This is a simplified implementation
-        // In practice, you'd want to handle the IntoView trait object properly
+    pub fn add<V: 'static>(&mut self, view: V) {
         self.views.push(Box::new(view));
     }
     
     /// Build the final view
-    pub fn build(self) -> impl IntoView {
-        #[cfg(feature = "leptos-0-6")]
-        {
-            use leptos_06::*;
-            view! { <></> }
-        }
-        
-        #[cfg(feature = "leptos-0-8")]
-        {
-            use leptos_08::prelude::*;
-            view! { <></> }
-        }
+    pub fn build(self) -> Box<dyn std::any::Any + 'static> {
+        Box::new(self.views)
     }
 }
 
@@ -144,25 +102,13 @@ impl ViewComposer {
     }
     
     /// Add a view to the composer
-    pub fn add<V: IntoView + 'static>(&mut self, view: V) {
-        // This is a simplified implementation
-        // In practice, you'd want to handle the IntoView trait object properly
+    pub fn add<V: 'static>(&mut self, view: V) {
         self.views.push(Box::new(view));
     }
     
     /// Compose all views into a single view
-    pub fn compose(self) -> impl IntoView {
-        #[cfg(feature = "leptos-0-6")]
-        {
-            use leptos_06::*;
-            view! { <></> }
-        }
-        
-        #[cfg(feature = "leptos-0-8")]
-        {
-            use leptos_08::prelude::*;
-            view! { <></> }
-        }
+    pub fn compose(self) -> Box<dyn std::any::Any + 'static> {
+        Box::new(self.views)
     }
 }
 
@@ -186,12 +132,12 @@ impl ViewCache {
     }
     
     /// Get a cached view
-    pub fn get<V: IntoView + 'static>(&self, key: &str) -> Option<&V> {
+    pub fn get<V: 'static>(&self, key: &str) -> Option<&V> {
         self.cache.get(key)?.downcast_ref()
     }
     
     /// Set a cached view
-    pub fn set<V: IntoView + 'static>(&mut self, key: String, view: V) {
+    pub fn set<V: 'static>(&mut self, key: String, view: V) {
         self.cache.insert(key, Box::new(view));
     }
     

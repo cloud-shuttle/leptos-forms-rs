@@ -79,7 +79,7 @@ pub use error::{FormError, FieldError, ErrorContext, FormResult};
 pub use leptos_forms_rs_macro::Form;
 
 // Re-export compatibility layer
-pub use compat::prelude as compat;
+pub use compat::prelude as compat_prelude;
 
 // Re-export common Leptos types based on version
 #[cfg(feature = "leptos-0-6")]
