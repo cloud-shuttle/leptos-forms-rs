@@ -1,0 +1,48 @@
+version: 2
+updates:
+  # Rust dependencies
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "petehanssens"
+    assignees:
+      - "petehanssens"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+    ignore:
+      # Ignore major version updates for critical dependencies
+      - dependency-name: "leptos"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "wasm-bindgen"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "petehanssens"
+    assignees:
+      - "petehanssens"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Note: Intentionally excluding npm/yarn to prevent dependency conflicts
+  # We only use pnpm for development tooling, not for runtime dependencies
