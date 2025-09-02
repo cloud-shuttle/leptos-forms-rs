@@ -148,7 +148,7 @@ fn LoginPage() -> impl IntoView {
     view! {
         <div class="container">
             <h1>"Login Form Example"</h1>
-            <p>"This demonstrates the basic functionality of Leptos Forms RS."</p>
+            <p>"This demonstrates the basic functionality of Leptos Forms RS with Leptos 0.8."</p>
             
             <div class="form">
                 <div class="form-field">

@@ -9,9 +9,8 @@ keywords = ["leptos", "forms", "validation", "web", "wasm"]
 categories = ["web-programming", "wasm"]
 
 [dependencies]
-# Leptos version compatibility
-leptos_06 = { package = "leptos", version = "0.6", optional = true, features = ["csr"] }
-leptos_08 = { package = "leptos", version = "0.8", optional = true, features = ["csr"] }
+# Leptos 0.8
+leptos = { version = "0.8", features = ["csr"] }
 
 # Common dependencies
 serde = { workspace = true }
@@ -29,19 +28,10 @@ log = { workspace = true }
 lazy_static = { workspace = true }
 
 [features]
-default = ["leptos-0-6", "csr"]
-leptos-0-6 = ["leptos_06"]
-leptos-0-8 = ["leptos_08"]
-
-# Leptos 0.6 features
-csr = ["leptos-0-6", "leptos_06/csr"]
-ssr = ["leptos-0-6", "leptos_06/ssr"]
-hydrate = ["leptos-0-6", "leptos_06/hydrate"]
-
-# Leptos 0.8 features
-csr-08 = ["leptos-0-8", "leptos_08/csr"]
-ssr-08 = ["leptos-0-8", "leptos_08/ssr"]
-hydrate-08 = ["leptos-0-8", "leptos_08/hydrate"]
+default = ["csr"]
+csr = ["leptos/csr"]
+ssr = ["leptos/ssr"]
+hydrate = ["leptos/hydrate"]
 
 [lib]
 name = "leptos_forms_rs"

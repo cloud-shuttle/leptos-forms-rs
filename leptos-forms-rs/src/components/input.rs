@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use crate::core::types::*;
 
 /// Text input component
@@ -86,15 +86,15 @@ pub fn SelectInput(
             required=required
             class="form-select"
         >
-            {if let Some(placeholder_text) = placeholder {
-                view! {
-                    <option value="" disabled=true selected=true>
-                        {placeholder_text}
-                    </option>
-                }
-            } else {
-                view! { <option style="display: none;"></option> }
-            }}
+                            {if let Some(placeholder_text) = placeholder {
+                    view! {
+                        <option value="" disabled=true selected=true>
+                            {placeholder_text}
+                        </option>
+                    }
+                } else {
+                    view! { <option value="" disabled=true selected=true>{String::new()}</option> }
+                }}
             
             {options.iter().map(|option| {
                 view! {
