@@ -18,6 +18,10 @@ impl ValidationErrors {
         self.field_errors.is_empty() && self.form_errors.is_empty()
     }
     
+    pub fn has_errors(&self) -> bool {
+        !self.is_empty()
+    }
+    
     pub fn add_field_error(&mut self, field: String, message: String) {
         self.field_errors.insert(field, message);
     }

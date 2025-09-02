@@ -1,13 +1,8 @@
-//! Leptos Forms - Type-safe, reactive form handling library for Leptos applications
+//! # Leptos Forms RS
 //! 
-//! This library provides a comprehensive form handling solution with:
-//! - Type-safe form definitions with procedural macros
-//! - Reactive form state management
-//! - Built-in validation system
-//! - Accessibility-first design
-//! - Performance optimized for WASM
+//! A type-safe, reactive form handling library for Leptos applications.
 //! 
-//! # Quick Start
+//! ## Quick Start
 //! 
 //! ```rust,ignore
 //! use leptos::*;
@@ -37,6 +32,15 @@
 //!     }
 //! }
 //! ```
+//! 
+//! ## Features
+//! 
+//! - **Type-safe forms** with compile-time validation
+//! - **Reactive state management** with Leptos signals
+//! - **Built-in validation** with customizable rules
+//! - **Form persistence** with localStorage support
+//! - **Accessibility** with proper ARIA attributes
+//! - **Mobile-friendly** with touch event handling
 
 pub mod core;
 pub mod validation;
@@ -55,8 +59,8 @@ pub use error::{FormError, FieldError, ErrorContext, FormResult};
 // Re-export the Form derive macro
 pub use leptos_forms_rs_macro::Form;
 
-// Re-export common Leptos types
-pub use leptos::*;
+// Re-export Leptos for convenience
+pub use leptos;
 
 // Re-export serde for form serialization
 pub use serde::{Deserialize, Serialize};
@@ -68,6 +72,9 @@ pub mod prelude {
     pub use crate::{use_form, use_form_with_values, use_field_value, use_field_error, use_form_validation};
     pub use crate::{FormComponent, FormField, FormErrors, FormSubmit, FormReset, FormProgress, FormDebug};
     pub use crate::{FormError, FieldError, ErrorContext, FormResult};
+    
+    // Re-export Leptos
     pub use leptos::*;
+    
     pub use serde::{Deserialize, Serialize};
 }

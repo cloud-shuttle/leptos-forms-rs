@@ -35,16 +35,30 @@ build: ## Build the entire project
 	wasm-pack build leptos-forms-rs --target web
 
 test: ## Run all tests
-	@echo "$(GREEN)Running Rust tests...$(NC)"
-	cargo test
-	@echo "$(GREEN)Running WASM tests in Node.js...$(NC)"
-	wasm-pack test --node
+	@echo "$(GREEN)Running all tests...$(NC)"
+	./tests/run_tests.sh all
 
-test:wasm: ## Run WASM tests in browser
+test-unit: ## Run unit tests only
+	@echo "$(GREEN)Running unit tests...$(NC)"
+	./tests/run_tests.sh unit
+
+test-integration: ## Run integration tests only
+	@echo "$(GREEN)Running integration tests...$(NC)"
+	./tests/run_tests.sh integration
+
+test-e2e: ## Run end-to-end tests only
+	@echo "$(GREEN)Running end-to-end tests...$(NC)"
+	./tests/run_tests.sh e2e
+
+test-benchmarks: ## Run performance benchmarks
+	@echo "$(GREEN)Running performance benchmarks...$(NC)"
+	./tests/run_tests.sh benchmarks
+
+test-wasm: ## Run WASM tests in browser
 	@echo "$(GREEN)Running WASM tests in Firefox...$(NC)"
 	wasm-pack test --headless --firefox
 
-test:wasm:chrome: ## Run WASM tests in Chrome
+test-wasm-chrome: ## Run WASM tests in Chrome
 	@echo "$(GREEN)Running WASM tests in Chrome...$(NC)"
 	wasm-pack test --headless --chrome
 
@@ -52,7 +66,7 @@ dev: ## Start development server for basic form example
 	@echo "$(GREEN)Starting development server...$(NC)"
 	cargo watch -x 'run --package basic-form-example'
 
-dev:complex: ## Start development server for complex form example
+dev-complex: ## Start development server for complex form example
 	@echo "$(GREEN)Starting complex form development server...$(NC)"
 	cargo watch -x 'run --package complex-form-example'
 
@@ -97,38 +111,38 @@ ci: ## Run CI checks
 	@echo "$(GREEN)CI checks passed!$(NC)"
 
 # Nix development environment
-nix:shell: ## Enter Nix development shell
+nix-shell: ## Enter Nix development shell
 	@echo "$(GREEN)Entering Nix development shell...$(NC)"
 	nix develop
 
-nix:shell:ci: ## Enter Nix CI shell
+nix-shell-ci: ## Enter Nix CI shell
 	@echo "$(GREEN)Entering Nix CI shell...$(NC)"
 	nix develop .#ci
 
 # WASM specific commands
-wasm:build: ## Build WASM package
+wasm-build: ## Build WASM package
 	@echo "$(GREEN)Building WASM package...$(NC)"
 	wasm-pack build leptos-forms-rs --target web
 
-wasm:test: ## Test WASM package
+wasm-test: ## Test WASM package
 	@echo "$(GREEN)Testing WASM package...$(NC)"
 	wasm-pack test --node
 
-wasm:pack: ## Pack WASM package for npm
+wasm-pack: ## Pack WASM package for npm
 	@echo "$(GREEN)Packing WASM package...$(NC)"
 	wasm-pack pack leptos-forms-rs
 
 # Examples
-examples:build: ## Build all examples
+examples-build: ## Build all examples
 	@echo "$(GREEN)Building basic form example...$(NC)"
 	cargo build --package basic-form-example
 	@echo "$(GREEN)Building complex form example...$(NC)"
 	cargo build --package complex-form-example
 
-examples:run:basic: ## Run basic form example
+examples-run-basic: ## Run basic form example
 	@echo "$(GREEN)Running basic form example...$(NC)"
 	cargo run --package basic-form-example
 
-examples:run:complex: ## Run complex form example
+examples-run-complex: ## Run complex form example
 	@echo "$(GREEN)Running complex form example...$(NC)"
 	cargo run --package complex-form-example

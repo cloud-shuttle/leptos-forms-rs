@@ -1,0 +1,25 @@
+# Global owners
+* @petehanssens
+
+# Rust code
+*.rs @petehanssens
+Cargo.toml @petehanssens
+Cargo.lock @petehanssens
+
+# GitHub Actions
+.github/ @petehanssens
+
+# Documentation
+docs/ @petehanssens
+README.md @petehanssens
+
+# Examples
+examples/ @petehanssens
+
+# Tests
+tests/ @petehanssens
+
+# Node.js configuration (pnpm only)
+package.json @petehanssens
+pnpm-lock.yaml @petehanssens
+pnpm-workspace.yaml @petehanssens

@@ -4,7 +4,7 @@ use crate::validation::ValidationErrors;
 use crate::core::types::*;
 
 /// Core trait that all forms must implement
-pub trait Form: Clone + Serialize + for<'de> Deserialize<'de> + 'static {
+pub trait Form: Clone + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static {
     /// Get field metadata for runtime introspection
     fn field_metadata() -> Vec<FieldMetadata>;
     
@@ -117,7 +117,7 @@ pub trait FormStateManager<T: Form> {
     fn update_state(&self, state: FormState<T>);
     
     /// Subscribe to form state changes
-    fn subscribe(&self, callback: Box<dyn Fn(FormState<T>) + 'static>);
+    fn subscribe(&self, callback: Box<dyn Fn(FormState<T>) + Send + Sync + 'static>);
     
     /// Unsubscribe from form state changes
     fn unsubscribe(&self, id: SubscriptionId);

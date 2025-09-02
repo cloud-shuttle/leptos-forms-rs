@@ -1,14 +1,11 @@
-name: Browser and WASM Tests
+name: WASM Tests (Legacy)
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  workflow_dispatch: # Only run manually if needed
 
 jobs:
-  test:
-    name: wasm-bindgen tests (node + chrome + firefox)
+  wasm-test:
+    name: WASM Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,6 +13,8 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
 
       - name: Cache cargo registry
         uses: actions/cache@v4

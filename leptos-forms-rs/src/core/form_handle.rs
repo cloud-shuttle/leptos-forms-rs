@@ -1,4 +1,5 @@
-use leptos::prelude::*;
+
+use leptos::prelude::{ReadSignal, WriteSignal, signal, Memo, Get, Set};
 use std::collections::HashMap;
 use crate::core::traits::*;
 use crate::core::types::*;
@@ -24,7 +25,7 @@ pub struct FormHandle<T: Form> {
     /// Field-specific signals
     field_signals: HashMap<String, FieldSignal>,
     /// Subscribers for state changes
-    subscribers: Vec<Box<dyn Fn(FormState<T>) + 'static>>,
+    subscribers: Vec<Box<dyn Fn(FormState<T>) + Send + Sync + 'static>>,
 }
 
 /// Signal wrapper for individual field state
@@ -36,13 +37,13 @@ pub struct FieldSignal {
     pub is_touched: ReadSignal<bool>,
 }
 
-impl<T: Form + PartialEq + Clone> FormHandle<T> {
+impl<T: Form + PartialEq + Clone + Send + Sync> FormHandle<T> {
     /// Create a new form handle with default values
     pub fn new() -> Self {
         let default_values = T::default_values();
         let schema = T::schema();
         
-        let (read, write) = create_signal(FormState::new(default_values));
+        let (read, write) = signal(FormState::new(default_values));
         Self {
             state: read,
             write_state: write,
@@ -60,7 +61,7 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     pub fn with_values(values: T) -> Self {
         let schema = T::schema();
         
-        let (read, write) = create_signal(FormState::new(values));
+        let (read, write) = signal(FormState::new(values));
         Self {
             state: read,
             write_state: write,
@@ -82,7 +83,7 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     /// Get the form values
     pub fn get_values(&self) -> Memo<T> {
         let state_signal = self.state;
-        create_memo(move |_| {
+        Memo::new(move |_| {
             let state = state_signal.get();
             state.values.clone()
         })
@@ -91,7 +92,7 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     /// Get form errors
     pub fn get_errors(&self) -> Memo<ValidationErrors> {
         let state_signal = self.state;
-        create_memo(move |_| {
+        Memo::new(move |_| {
             let state = state_signal.get();
             state.errors.clone()
         })
@@ -100,7 +101,7 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     /// Check if form is valid
     pub fn is_valid(&self) -> Memo<bool> {
         let state_signal = self.state;
-        create_memo(move |_| {
+        Memo::new(move |_| {
             let state = state_signal.get();
             state.is_valid
         })
@@ -109,7 +110,7 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     /// Check if form is dirty (has been modified)
     pub fn is_dirty(&self) -> Memo<bool> {
         let state_signal = self.state;
-        create_memo(move |_| {
+        Memo::new(move |_| {
             let state = state_signal.get();
             state.is_dirty
         })
@@ -118,9 +119,8 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     /// Check if form is submitting
     pub fn is_submitting(&self) -> Memo<bool> {
         let state_signal = self.state;
-        create_memo(move |_| {
-            let state = state_signal.get();
-            state.is_submitting
+        Memo::new(move |_| {
+            state_signal.get().is_submitting
         })
     }
     
@@ -136,10 +136,10 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     fn create_field_signal(&mut self, field_name: &str) {
         // For now, we'll create simple signals
         // In a real implementation, you'd want to create derived signals
-        let (value_signal, _) = create_signal(None::<FieldValue>);
-        let (error_signal, _) = create_signal(None::<String>);
-        let (is_dirty_signal, _) = create_signal(false);
-        let (is_touched_signal, _) = create_signal(false);
+        let (value_signal, _) = signal(None::<FieldValue>);
+        let (error_signal, _) = signal(None::<String>);
+        let (is_dirty_signal, _) = signal(false);
+        let (is_touched_signal, _) = signal(false);
         
         let field_signal = FieldSignal {
             value: value_signal,
@@ -328,7 +328,7 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     }
     
     /// Subscribe to form state changes
-    pub fn subscribe(&mut self, callback: Box<dyn Fn(FormState<T>) + 'static>) {
+    pub fn subscribe(&mut self, callback: Box<dyn Fn(FormState<T>) + Send + Sync + 'static>) {
         self.subscribers.push(callback);
     }
     
@@ -361,7 +361,7 @@ impl<T: Form + PartialEq + Clone> FormHandle<T> {
     }
 }
 
-impl<T: Form + PartialEq + Clone> Clone for FormHandle<T> {
+impl<T: Form + PartialEq + Clone + Send + Sync> Clone for FormHandle<T> {
     fn clone(&self) -> Self {
         Self {
             state: self.state,
@@ -377,7 +377,7 @@ impl<T: Form + PartialEq + Clone> Clone for FormHandle<T> {
     }
 }
 
-impl<T: Form + PartialEq + Clone> Default for FormHandle<T> {
+impl<T: Form + PartialEq + Clone + Send + Sync> Default for FormHandle<T> {
     fn default() -> Self {
         Self::new()
     }

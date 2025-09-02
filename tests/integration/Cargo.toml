@@ -1,0 +1,19 @@
+[package]
+name = "leptos-forms-rs-integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+leptos = "0.8"
+leptos-forms-rs = { path = "../../leptos-forms-rs" }
+wasm-bindgen-test = "0.3"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[test]]
+name = "lib"
+path = "src/lib.rs"
+harness = false

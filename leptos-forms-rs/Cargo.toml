@@ -1,6 +1,6 @@
 [package]
 name = "leptos-forms-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Type-safe, reactive form handling library for Leptos applications"
 license = "MIT"
@@ -9,10 +9,13 @@ keywords = ["leptos", "forms", "validation", "web", "wasm"]
 categories = ["web-programming", "wasm"]
 
 [dependencies]
-leptos = { workspace = true }
+# Leptos 0.8
+leptos = { version = "0.8", features = ["csr"] }
+
+# Common dependencies
 serde = { workspace = true }
 serde_json = { workspace = true }
-leptos-forms-rs-macro = { path = "../leptos-forms-rs-macro" }
+leptos-forms-rs-macro = "0.2.0"
 web-sys = { version = "0.3", features = ["Window", "Storage"] }
 wasm-bindgen = { workspace = true }
 chrono = { workspace = true }

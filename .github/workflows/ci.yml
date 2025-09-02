@@ -1,0 +1,196 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Rust build and test job
+  rust:
+    name: Rust Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Show Rust toolchain versions
+        run: |
+          rustc --version
+          cargo --version
+          wasm-pack --version
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Build workspace
+        run: cargo build --workspace --all-targets
+
+      - name: Run Rust tests
+        run: cargo test --workspace
+
+      - name: Run WASM tests (Node)
+        run: wasm-pack test --node
+
+      - name: Run WASM tests (Headless Chrome)
+        env:
+          CHROME: google-chrome
+        run: wasm-pack test --headless --chrome
+
+      - name: Run WASM tests (Headless Firefox)
+        run: wasm-pack test --headless --firefox
+
+  # Node.js and E2E testing job
+  node:
+    name: Node.js & E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify pnpm usage
+        run: |
+          echo "Using pnpm version:"
+          pnpm --version
+          echo "Package manager in package.json:"
+          cat package.json | grep "packageManager"
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Security and audit job
+  security:
+    name: Security & Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run Cargo audit
+        run: cargo audit
+
+      - name: Check for known vulnerabilities
+        run: cargo audit --deny warnings
+
+  # Documentation job
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build documentation
+        run: cargo doc --workspace --no-deps
+
+      - name: Check documentation builds
+        run: cargo doc --workspace --no-deps --open
+
+  # Release job (only on main/master)
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    needs: [rust, node, security, docs]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build release
+        run: cargo build --release --workspace
+
+      - name: Create release artifacts
+        run: |
+          mkdir -p release
+          cp target/release/basic-form-example release/
+          cp target/release/complex-form-example release/
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-binaries
+          path: release/
+          retention-days: 90

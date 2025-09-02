@@ -1,0 +1,14 @@
+[package]
+name = "leptos-forms-rs-unit-tests"
+version = "0.2.0"
+edition = "2021"
+
+[dependencies]
+leptos = { workspace = true }
+leptos-forms-rs = { path = "../../leptos-forms-rs" }
+serde = { workspace = true }
+
+[[test]]
+name = "main"
+path = "src/main.rs"
+harness = false

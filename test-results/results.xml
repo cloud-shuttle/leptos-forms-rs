@@ -1,0 +1,579 @@
+<testsuites id="" name="" tests="245" failures="0" skipped="0" errors="0" time="55.665207">
+<testsuite name="basic-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="chromium" tests="11" failures="0" skipped="0" time="12.817" errors="0">
+<testcase name="Basic Form Example › should display the login form with all fields" classname="basic-form.spec.ts" time="0.596">
+</testcase>
+<testcase name="Basic Form Example › should show validation errors for empty required fields" classname="basic-form.spec.ts" time="0.798">
+</testcase>
+<testcase name="Basic Form Example › should validate username field requirements" classname="basic-form.spec.ts" time="0.862">
+</testcase>
+<testcase name="Basic Form Example › should validate password field requirements" classname="basic-form.spec.ts" time="0.824">
+</testcase>
+<testcase name="Basic Form Example › should accept valid form data and submit successfully" classname="basic-form.spec.ts" time="4.418">
+</testcase>
+<testcase name="Basic Form Example › should handle field focus and blur events" classname="basic-form.spec.ts" time="0.87">
+</testcase>
+<testcase name="Basic Form Example › should handle keyboard navigation" classname="basic-form.spec.ts" time="0.668">
+</testcase>
+<testcase name="Basic Form Example › should be accessible with screen readers" classname="basic-form.spec.ts" time="0.534">
+</testcase>
+<testcase name="Basic Form Example › should work on mobile devices" classname="basic-form.spec.ts" time="1.393">
+</testcase>
+<testcase name="Basic Form Example › should handle rapid form interactions" classname="basic-form.spec.ts" time="1.559">
+</testcase>
+<testcase name="Basic Form Example › should preserve form state during navigation" classname="basic-form.spec.ts" time="0.295">
+</testcase>
+</testsuite>
+<testsuite name="complex-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="chromium" tests="11" failures="0" skipped="0" time="10.203" errors="0">
+<testcase name="Complex Form Example › should display the multi-step registration form" classname="complex-form.spec.ts" time="0.289">
+</testcase>
+<testcase name="Complex Form Example › should navigate between form steps" classname="complex-form.spec.ts" time="0.627">
+</testcase>
+<testcase name="Complex Form Example › should validate each step before allowing progression" classname="complex-form.spec.ts" time="0.618">
+</testcase>
+<testcase name="Complex Form Example › should handle address fields in step 2" classname="complex-form.spec.ts" time="0.608">
+</testcase>
+<testcase name="Complex Form Example › should handle conditional fields" classname="complex-form.spec.ts" time="0.765">
+</testcase>
+<testcase name="Complex Form Example › should validate complex field relationships" classname="complex-form.spec.ts" time="1.849">
+</testcase>
+<testcase name="Complex Form Example › should handle file uploads" classname="complex-form.spec.ts" time="0.705">
+</testcase>
+<testcase name="Complex Form Example › should handle form persistence and recovery" classname="complex-form.spec.ts" time="0.752">
+</testcase>
+<testcase name="Complex Form Example › should handle keyboard navigation across steps" classname="complex-form.spec.ts" time="0.559">
+</testcase>
+<testcase name="Complex Form Example › should handle mobile interactions" classname="complex-form.spec.ts" time="0.453">
+</testcase>
+<testcase name="Complex Form Example › should handle form submission with all steps completed" classname="complex-form.spec.ts" time="2.978">
+</testcase>
+</testsuite>
+<testsuite name="form-components.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="chromium" tests="17" failures="0" skipped="0" time="10.031" errors="0">
+<testcase name="Form Library Components › should render TextInput component correctly" classname="form-components.spec.ts" time="0.283">
+</testcase>
+<testcase name="Form Library Components › should render NumberInput component correctly" classname="form-components.spec.ts" time="0.341">
+</testcase>
+<testcase name="Form Library Components › should render CheckboxInput component correctly" classname="form-components.spec.ts" time="0.451">
+</testcase>
+<testcase name="Form Library Components › should render SelectInput component correctly" classname="form-components.spec.ts" time="0.361">
+</testcase>
+<testcase name="Form Library Components › should render TextareaInput component correctly" classname="form-components.spec.ts" time="0.331">
+</testcase>
+<testcase name="Form Library Components › should render RadioInput component correctly" classname="form-components.spec.ts" time="0.481">
+</testcase>
+<testcase name="Form Library Components › should render FileInput component correctly" classname="form-components.spec.ts" time="0.298">
+</testcase>
+<testcase name="Form Library Components › should handle form validation correctly" classname="form-components.spec.ts" time="0.479">
+</testcase>
+<testcase name="Form Library Components › should handle form submission correctly" classname="form-components.spec.ts" time="4.458">
+</testcase>
+<testcase name="Form Library Components › should handle field state changes correctly" classname="form-components.spec.ts" time="0.39">
+</testcase>
+<testcase name="Form Library Components › should handle conditional field rendering" classname="form-components.spec.ts" time="0.445">
+</testcase>
+<testcase name="Form Library Components › should handle field arrays correctly" classname="form-components.spec.ts" time="0.237">
+</testcase>
+<testcase name="Form Library Components › should handle form persistence" classname="form-components.spec.ts" time="0.259">
+</testcase>
+<testcase name="Form Library Components › should handle keyboard navigation" classname="form-components.spec.ts" time="0.334">
+</testcase>
+<testcase name="Form Library Components › should handle mobile interactions" classname="form-components.spec.ts" time="0.382">
+</testcase>
+<testcase name="Form Library Components › should handle accessibility features" classname="form-components.spec.ts" time="0.219">
+</testcase>
+<testcase name="Form Library Components › should handle form reset correctly" classname="form-components.spec.ts" time="0.282">
+</testcase>
+</testsuite>
+<testsuite name="setup-test.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="chromium" tests="4" failures="0" skipped="0" time="1.605" errors="0">
+<testcase name="Playwright Setup Verification › should have working Playwright environment" classname="setup-test.spec.ts" time="0.309">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle basic browser interactions" classname="setup-test.spec.ts" time="0.222">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle viewport changes" classname="setup-test.spec.ts" time="0.848">
+<system-out>
+<![CDATA[Current width reported: 375
+Actual window.innerWidth: [33m375[39m
+]]>
+</system-out>
+</testcase>
+<testcase name="Playwright Setup Verification › should handle async operations" classname="setup-test.spec.ts" time="0.226">
+</testcase>
+</testsuite>
+<testsuite name="smoke.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="chromium" tests="3" failures="0" skipped="0" time="1.154" errors="0">
+<testcase name="Smoke Tests › should load the test suite index" classname="smoke.spec.ts" time="0.141">
+</testcase>
+<testcase name="Smoke Tests › should have test suite navigation" classname="smoke.spec.ts" time="0.668">
+</testcase>
+<testcase name="Smoke Tests › should handle basic page interactions" classname="smoke.spec.ts" time="0.345">
+</testcase>
+</testsuite>
+<testsuite name="utils/test-helpers.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="chromium" tests="3" failures="0" skipped="0" time="0.029" errors="0">
+<testcase name="Test Helpers › should provide common form selectors" classname="utils/test-helpers.spec.ts" time="0.01">
+</testcase>
+<testcase name="Test Helpers › should provide test data constants" classname="utils/test-helpers.spec.ts" time="0.003">
+</testcase>
+<testcase name="Test Helpers › should provide utility methods" classname="utils/test-helpers.spec.ts" time="0.016">
+</testcase>
+</testsuite>
+<testsuite name="basic-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="firefox" tests="11" failures="0" skipped="0" time="29.347" errors="0">
+<testcase name="Basic Form Example › should display the login form with all fields" classname="basic-form.spec.ts" time="2.05">
+</testcase>
+<testcase name="Basic Form Example › should show validation errors for empty required fields" classname="basic-form.spec.ts" time="2.537">
+</testcase>
+<testcase name="Basic Form Example › should validate username field requirements" classname="basic-form.spec.ts" time="3.93">
+</testcase>
+<testcase name="Basic Form Example › should validate password field requirements" classname="basic-form.spec.ts" time="3.343">
+</testcase>
+<testcase name="Basic Form Example › should accept valid form data and submit successfully" classname="basic-form.spec.ts" time="7.343">
+</testcase>
+<testcase name="Basic Form Example › should handle field focus and blur events" classname="basic-form.spec.ts" time="1.379">
+</testcase>
+<testcase name="Basic Form Example › should handle keyboard navigation" classname="basic-form.spec.ts" time="1.285">
+</testcase>
+<testcase name="Basic Form Example › should be accessible with screen readers" classname="basic-form.spec.ts" time="0.994">
+</testcase>
+<testcase name="Basic Form Example › should work on mobile devices" classname="basic-form.spec.ts" time="2.24">
+</testcase>
+<testcase name="Basic Form Example › should handle rapid form interactions" classname="basic-form.spec.ts" time="2.703">
+</testcase>
+<testcase name="Basic Form Example › should preserve form state during navigation" classname="basic-form.spec.ts" time="1.543">
+</testcase>
+</testsuite>
+<testsuite name="complex-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="firefox" tests="11" failures="0" skipped="0" time="20.137" errors="0">
+<testcase name="Complex Form Example › should display the multi-step registration form" classname="complex-form.spec.ts" time="1.076">
+</testcase>
+<testcase name="Complex Form Example › should navigate between form steps" classname="complex-form.spec.ts" time="1.25">
+</testcase>
+<testcase name="Complex Form Example › should validate each step before allowing progression" classname="complex-form.spec.ts" time="1.44">
+</testcase>
+<testcase name="Complex Form Example › should handle address fields in step 2" classname="complex-form.spec.ts" time="1.215">
+</testcase>
+<testcase name="Complex Form Example › should handle conditional fields" classname="complex-form.spec.ts" time="1.491">
+</testcase>
+<testcase name="Complex Form Example › should validate complex field relationships" classname="complex-form.spec.ts" time="2.603">
+</testcase>
+<testcase name="Complex Form Example › should handle file uploads" classname="complex-form.spec.ts" time="1.101">
+</testcase>
+<testcase name="Complex Form Example › should handle form persistence and recovery" classname="complex-form.spec.ts" time="2.314">
+</testcase>
+<testcase name="Complex Form Example › should handle keyboard navigation across steps" classname="complex-form.spec.ts" time="1.112">
+</testcase>
+<testcase name="Complex Form Example › should handle mobile interactions" classname="complex-form.spec.ts" time="2.071">
+</testcase>
+<testcase name="Complex Form Example › should handle form submission with all steps completed" classname="complex-form.spec.ts" time="4.464">
+</testcase>
+</testsuite>
+<testsuite name="form-components.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="firefox" tests="17" failures="0" skipped="0" time="19.536" errors="0">
+<testcase name="Form Library Components › should render TextInput component correctly" classname="form-components.spec.ts" time="1.086">
+</testcase>
+<testcase name="Form Library Components › should render NumberInput component correctly" classname="form-components.spec.ts" time="1.041">
+</testcase>
+<testcase name="Form Library Components › should render CheckboxInput component correctly" classname="form-components.spec.ts" time="1.04">
+</testcase>
+<testcase name="Form Library Components › should render SelectInput component correctly" classname="form-components.spec.ts" time="0.922">
+</testcase>
+<testcase name="Form Library Components › should render TextareaInput component correctly" classname="form-components.spec.ts" time="1.062">
+</testcase>
+<testcase name="Form Library Components › should render RadioInput component correctly" classname="form-components.spec.ts" time="1.018">
+</testcase>
+<testcase name="Form Library Components › should render FileInput component correctly" classname="form-components.spec.ts" time="1.432">
+</testcase>
+<testcase name="Form Library Components › should handle form validation correctly" classname="form-components.spec.ts" time="1.017">
+</testcase>
+<testcase name="Form Library Components › should handle form submission correctly" classname="form-components.spec.ts" time="4.957">
+</testcase>
+<testcase name="Form Library Components › should handle field state changes correctly" classname="form-components.spec.ts" time="0.668">
+</testcase>
+<testcase name="Form Library Components › should handle conditional field rendering" classname="form-components.spec.ts" time="0.61">
+</testcase>
+<testcase name="Form Library Components › should handle field arrays correctly" classname="form-components.spec.ts" time="0.644">
+</testcase>
+<testcase name="Form Library Components › should handle form persistence" classname="form-components.spec.ts" time="0.98">
+</testcase>
+<testcase name="Form Library Components › should handle keyboard navigation" classname="form-components.spec.ts" time="0.696">
+</testcase>
+<testcase name="Form Library Components › should handle mobile interactions" classname="form-components.spec.ts" time="0.958">
+</testcase>
+<testcase name="Form Library Components › should handle accessibility features" classname="form-components.spec.ts" time="0.625">
+</testcase>
+<testcase name="Form Library Components › should handle form reset correctly" classname="form-components.spec.ts" time="0.78">
+</testcase>
+</testsuite>
+<testsuite name="setup-test.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="firefox" tests="4" failures="0" skipped="0" time="2.832" errors="0">
+<testcase name="Playwright Setup Verification › should have working Playwright environment" classname="setup-test.spec.ts" time="0.69">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle basic browser interactions" classname="setup-test.spec.ts" time="0.472">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle viewport changes" classname="setup-test.spec.ts" time="1.208">
+<system-out>
+<![CDATA[Current width reported: 375
+Actual window.innerWidth: [33m375[39m
+]]>
+</system-out>
+</testcase>
+<testcase name="Playwright Setup Verification › should handle async operations" classname="setup-test.spec.ts" time="0.462">
+</testcase>
+</testsuite>
+<testsuite name="smoke.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="firefox" tests="3" failures="0" skipped="0" time="2.064" errors="0">
+<testcase name="Smoke Tests › should load the test suite index" classname="smoke.spec.ts" time="0.43">
+</testcase>
+<testcase name="Smoke Tests › should have test suite navigation" classname="smoke.spec.ts" time="1.038">
+</testcase>
+<testcase name="Smoke Tests › should handle basic page interactions" classname="smoke.spec.ts" time="0.596">
+</testcase>
+</testsuite>
+<testsuite name="utils/test-helpers.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="firefox" tests="3" failures="0" skipped="0" time="0.029" errors="0">
+<testcase name="Test Helpers › should provide common form selectors" classname="utils/test-helpers.spec.ts" time="0.01">
+</testcase>
+<testcase name="Test Helpers › should provide test data constants" classname="utils/test-helpers.spec.ts" time="0.005">
+</testcase>
+<testcase name="Test Helpers › should provide utility methods" classname="utils/test-helpers.spec.ts" time="0.014">
+</testcase>
+</testsuite>
+<testsuite name="basic-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="webkit" tests="11" failures="0" skipped="0" time="13.628" errors="0">
+<testcase name="Basic Form Example › should display the login form with all fields" classname="basic-form.spec.ts" time="1.068">
+</testcase>
+<testcase name="Basic Form Example › should show validation errors for empty required fields" classname="basic-form.spec.ts" time="1.089">
+</testcase>
+<testcase name="Basic Form Example › should validate username field requirements" classname="basic-form.spec.ts" time="1.095">
+</testcase>
+<testcase name="Basic Form Example › should validate password field requirements" classname="basic-form.spec.ts" time="0.953">
+</testcase>
+<testcase name="Basic Form Example › should accept valid form data and submit successfully" classname="basic-form.spec.ts" time="4.386">
+</testcase>
+<testcase name="Basic Form Example › should handle field focus and blur events" classname="basic-form.spec.ts" time="0.895">
+</testcase>
+<testcase name="Basic Form Example › should handle keyboard navigation" classname="basic-form.spec.ts" time="0.601">
+</testcase>
+<testcase name="Basic Form Example › should be accessible with screen readers" classname="basic-form.spec.ts" time="0.404">
+</testcase>
+<testcase name="Basic Form Example › should work on mobile devices" classname="basic-form.spec.ts" time="1.06">
+</testcase>
+<testcase name="Basic Form Example › should handle rapid form interactions" classname="basic-form.spec.ts" time="1.599">
+</testcase>
+<testcase name="Basic Form Example › should preserve form state during navigation" classname="basic-form.spec.ts" time="0.478">
+</testcase>
+</testsuite>
+<testsuite name="complex-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="webkit" tests="11" failures="0" skipped="0" time="11.302" errors="0">
+<testcase name="Complex Form Example › should display the multi-step registration form" classname="complex-form.spec.ts" time="0.396">
+</testcase>
+<testcase name="Complex Form Example › should navigate between form steps" classname="complex-form.spec.ts" time="0.635">
+</testcase>
+<testcase name="Complex Form Example › should validate each step before allowing progression" classname="complex-form.spec.ts" time="0.656">
+</testcase>
+<testcase name="Complex Form Example › should handle address fields in step 2" classname="complex-form.spec.ts" time="0.744">
+</testcase>
+<testcase name="Complex Form Example › should handle conditional fields" classname="complex-form.spec.ts" time="1.025">
+</testcase>
+<testcase name="Complex Form Example › should validate complex field relationships" classname="complex-form.spec.ts" time="2.158">
+</testcase>
+<testcase name="Complex Form Example › should handle file uploads" classname="complex-form.spec.ts" time="0.789">
+</testcase>
+<testcase name="Complex Form Example › should handle form persistence and recovery" classname="complex-form.spec.ts" time="0.862">
+</testcase>
+<testcase name="Complex Form Example › should handle keyboard navigation across steps" classname="complex-form.spec.ts" time="0.468">
+</testcase>
+<testcase name="Complex Form Example › should handle mobile interactions" classname="complex-form.spec.ts" time="0.5">
+</testcase>
+<testcase name="Complex Form Example › should handle form submission with all steps completed" classname="complex-form.spec.ts" time="3.069">
+</testcase>
+</testsuite>
+<testsuite name="form-components.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="webkit" tests="17" failures="0" skipped="0" time="10.731" errors="0">
+<testcase name="Form Library Components › should render TextInput component correctly" classname="form-components.spec.ts" time="0.35">
+</testcase>
+<testcase name="Form Library Components › should render NumberInput component correctly" classname="form-components.spec.ts" time="0.353">
+</testcase>
+<testcase name="Form Library Components › should render CheckboxInput component correctly" classname="form-components.spec.ts" time="0.386">
+</testcase>
+<testcase name="Form Library Components › should render SelectInput component correctly" classname="form-components.spec.ts" time="0.355">
+</testcase>
+<testcase name="Form Library Components › should render TextareaInput component correctly" classname="form-components.spec.ts" time="0.412">
+</testcase>
+<testcase name="Form Library Components › should render RadioInput component correctly" classname="form-components.spec.ts" time="0.491">
+</testcase>
+<testcase name="Form Library Components › should render FileInput component correctly" classname="form-components.spec.ts" time="0.353">
+</testcase>
+<testcase name="Form Library Components › should handle form validation correctly" classname="form-components.spec.ts" time="0.371">
+</testcase>
+<testcase name="Form Library Components › should handle form submission correctly" classname="form-components.spec.ts" time="4.389">
+</testcase>
+<testcase name="Form Library Components › should handle field state changes correctly" classname="form-components.spec.ts" time="0.379">
+</testcase>
+<testcase name="Form Library Components › should handle conditional field rendering" classname="form-components.spec.ts" time="0.391">
+</testcase>
+<testcase name="Form Library Components › should handle field arrays correctly" classname="form-components.spec.ts" time="0.314">
+</testcase>
+<testcase name="Form Library Components › should handle form persistence" classname="form-components.spec.ts" time="0.338">
+</testcase>
+<testcase name="Form Library Components › should handle keyboard navigation" classname="form-components.spec.ts" time="0.291">
+</testcase>
+<testcase name="Form Library Components › should handle mobile interactions" classname="form-components.spec.ts" time="0.454">
+</testcase>
+<testcase name="Form Library Components › should handle accessibility features" classname="form-components.spec.ts" time="0.423">
+</testcase>
+<testcase name="Form Library Components › should handle form reset correctly" classname="form-components.spec.ts" time="0.681">
+</testcase>
+</testsuite>
+<testsuite name="setup-test.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="webkit" tests="4" failures="0" skipped="0" time="2.352" errors="0">
+<testcase name="Playwright Setup Verification › should have working Playwright environment" classname="setup-test.spec.ts" time="0.524">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle basic browser interactions" classname="setup-test.spec.ts" time="0.426">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle viewport changes" classname="setup-test.spec.ts" time="1.059">
+<system-out>
+<![CDATA[Current width reported: 375
+Actual window.innerWidth: [33m375[39m
+]]>
+</system-out>
+</testcase>
+<testcase name="Playwright Setup Verification › should handle async operations" classname="setup-test.spec.ts" time="0.343">
+</testcase>
+</testsuite>
+<testsuite name="smoke.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="webkit" tests="3" failures="0" skipped="0" time="1.473" errors="0">
+<testcase name="Smoke Tests › should load the test suite index" classname="smoke.spec.ts" time="0.292">
+</testcase>
+<testcase name="Smoke Tests › should have test suite navigation" classname="smoke.spec.ts" time="0.857">
+</testcase>
+<testcase name="Smoke Tests › should handle basic page interactions" classname="smoke.spec.ts" time="0.324">
+</testcase>
+</testsuite>
+<testsuite name="utils/test-helpers.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="webkit" tests="3" failures="0" skipped="0" time="0.041" errors="0">
+<testcase name="Test Helpers › should provide common form selectors" classname="utils/test-helpers.spec.ts" time="0.009">
+</testcase>
+<testcase name="Test Helpers › should provide test data constants" classname="utils/test-helpers.spec.ts" time="0.006">
+</testcase>
+<testcase name="Test Helpers › should provide utility methods" classname="utils/test-helpers.spec.ts" time="0.026">
+</testcase>
+</testsuite>
+<testsuite name="basic-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Chrome" tests="11" failures="0" skipped="0" time="9.49" errors="0">
+<testcase name="Basic Form Example › should display the login form with all fields" classname="basic-form.spec.ts" time="0.487">
+</testcase>
+<testcase name="Basic Form Example › should show validation errors for empty required fields" classname="basic-form.spec.ts" time="0.528">
+</testcase>
+<testcase name="Basic Form Example › should validate username field requirements" classname="basic-form.spec.ts" time="0.544">
+</testcase>
+<testcase name="Basic Form Example › should validate password field requirements" classname="basic-form.spec.ts" time="0.477">
+</testcase>
+<testcase name="Basic Form Example › should accept valid form data and submit successfully" classname="basic-form.spec.ts" time="3.716">
+</testcase>
+<testcase name="Basic Form Example › should handle field focus and blur events" classname="basic-form.spec.ts" time="0.551">
+</testcase>
+<testcase name="Basic Form Example › should handle keyboard navigation" classname="basic-form.spec.ts" time="0.419">
+</testcase>
+<testcase name="Basic Form Example › should be accessible with screen readers" classname="basic-form.spec.ts" time="0.217">
+</testcase>
+<testcase name="Basic Form Example › should work on mobile devices" classname="basic-form.spec.ts" time="0.887">
+</testcase>
+<testcase name="Basic Form Example › should handle rapid form interactions" classname="basic-form.spec.ts" time="1.432">
+</testcase>
+<testcase name="Basic Form Example › should preserve form state during navigation" classname="basic-form.spec.ts" time="0.232">
+</testcase>
+</testsuite>
+<testsuite name="complex-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Chrome" tests="11" failures="0" skipped="0" time="7.959" errors="0">
+<testcase name="Complex Form Example › should display the multi-step registration form" classname="complex-form.spec.ts" time="0.222">
+</testcase>
+<testcase name="Complex Form Example › should navigate between form steps" classname="complex-form.spec.ts" time="0.358">
+</testcase>
+<testcase name="Complex Form Example › should validate each step before allowing progression" classname="complex-form.spec.ts" time="0.385">
+</testcase>
+<testcase name="Complex Form Example › should handle address fields in step 2" classname="complex-form.spec.ts" time="0.355">
+</testcase>
+<testcase name="Complex Form Example › should handle conditional fields" classname="complex-form.spec.ts" time="0.575">
+</testcase>
+<testcase name="Complex Form Example › should validate complex field relationships" classname="complex-form.spec.ts" time="1.667">
+</testcase>
+<testcase name="Complex Form Example › should handle file uploads" classname="complex-form.spec.ts" time="0.446">
+</testcase>
+<testcase name="Complex Form Example › should handle form persistence and recovery" classname="complex-form.spec.ts" time="0.532">
+</testcase>
+<testcase name="Complex Form Example › should handle keyboard navigation across steps" classname="complex-form.spec.ts" time="0.35">
+</testcase>
+<testcase name="Complex Form Example › should handle mobile interactions" classname="complex-form.spec.ts" time="0.392">
+</testcase>
+<testcase name="Complex Form Example › should handle form submission with all steps completed" classname="complex-form.spec.ts" time="2.677">
+</testcase>
+</testsuite>
+<testsuite name="form-components.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Chrome" tests="17" failures="0" skipped="0" time="14.596" errors="0">
+<testcase name="Form Library Components › should render TextInput component correctly" classname="form-components.spec.ts" time="0.213">
+</testcase>
+<testcase name="Form Library Components › should render NumberInput component correctly" classname="form-components.spec.ts" time="0.233">
+</testcase>
+<testcase name="Form Library Components › should render CheckboxInput component correctly" classname="form-components.spec.ts" time="1.095">
+</testcase>
+<testcase name="Form Library Components › should render SelectInput component correctly" classname="form-components.spec.ts" time="0.194">
+</testcase>
+<testcase name="Form Library Components › should render TextareaInput component correctly" classname="form-components.spec.ts" time="0.201">
+</testcase>
+<testcase name="Form Library Components › should render RadioInput component correctly" classname="form-components.spec.ts" time="1.975">
+</testcase>
+<testcase name="Form Library Components › should render FileInput component correctly" classname="form-components.spec.ts" time="0.158">
+</testcase>
+<testcase name="Form Library Components › should handle form validation correctly" classname="form-components.spec.ts" time="0.266">
+</testcase>
+<testcase name="Form Library Components › should handle form submission correctly" classname="form-components.spec.ts" time="5.955">
+</testcase>
+<testcase name="Form Library Components › should handle field state changes correctly" classname="form-components.spec.ts" time="0.205">
+</testcase>
+<testcase name="Form Library Components › should handle conditional field rendering" classname="form-components.spec.ts" time="1.095">
+</testcase>
+<testcase name="Form Library Components › should handle field arrays correctly" classname="form-components.spec.ts" time="0.168">
+</testcase>
+<testcase name="Form Library Components › should handle form persistence" classname="form-components.spec.ts" time="0.182">
+</testcase>
+<testcase name="Form Library Components › should handle keyboard navigation" classname="form-components.spec.ts" time="0.21">
+</testcase>
+<testcase name="Form Library Components › should handle mobile interactions" classname="form-components.spec.ts" time="1.106">
+</testcase>
+<testcase name="Form Library Components › should handle accessibility features" classname="form-components.spec.ts" time="0.192">
+</testcase>
+<testcase name="Form Library Components › should handle form reset correctly" classname="form-components.spec.ts" time="1.148">
+</testcase>
+</testsuite>
+<testsuite name="setup-test.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Chrome" tests="4" failures="0" skipped="0" time="1.58" errors="0">
+<testcase name="Playwright Setup Verification › should have working Playwright environment" classname="setup-test.spec.ts" time="0.285">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle basic browser interactions" classname="setup-test.spec.ts" time="0.196">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle viewport changes" classname="setup-test.spec.ts" time="0.844">
+<system-out>
+<![CDATA[Current width reported: 981
+Actual window.innerWidth: [33m981[39m
+Skipping mobile test - viewport emulation not working
+]]>
+</system-out>
+</testcase>
+<testcase name="Playwright Setup Verification › should handle async operations" classname="setup-test.spec.ts" time="0.255">
+</testcase>
+</testsuite>
+<testsuite name="smoke.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Chrome" tests="3" failures="0" skipped="0" time="1.066" errors="0">
+<testcase name="Smoke Tests › should load the test suite index" classname="smoke.spec.ts" time="0.172">
+</testcase>
+<testcase name="Smoke Tests › should have test suite navigation" classname="smoke.spec.ts" time="0.676">
+</testcase>
+<testcase name="Smoke Tests › should handle basic page interactions" classname="smoke.spec.ts" time="0.218">
+</testcase>
+</testsuite>
+<testsuite name="utils/test-helpers.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Chrome" tests="3" failures="0" skipped="0" time="0.021" errors="0">
+<testcase name="Test Helpers › should provide common form selectors" classname="utils/test-helpers.spec.ts" time="0.008">
+</testcase>
+<testcase name="Test Helpers › should provide test data constants" classname="utils/test-helpers.spec.ts" time="0.005">
+</testcase>
+<testcase name="Test Helpers › should provide utility methods" classname="utils/test-helpers.spec.ts" time="0.008">
+</testcase>
+</testsuite>
+<testsuite name="basic-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Safari" tests="11" failures="0" skipped="0" time="11.52" errors="0">
+<testcase name="Basic Form Example › should display the login form with all fields" classname="basic-form.spec.ts" time="0.664">
+</testcase>
+<testcase name="Basic Form Example › should show validation errors for empty required fields" classname="basic-form.spec.ts" time="0.842">
+</testcase>
+<testcase name="Basic Form Example › should validate username field requirements" classname="basic-form.spec.ts" time="0.979">
+</testcase>
+<testcase name="Basic Form Example › should validate password field requirements" classname="basic-form.spec.ts" time="0.904">
+</testcase>
+<testcase name="Basic Form Example › should accept valid form data and submit successfully" classname="basic-form.spec.ts" time="3.96">
+</testcase>
+<testcase name="Basic Form Example › should handle field focus and blur events" classname="basic-form.spec.ts" time="0.656">
+</testcase>
+<testcase name="Basic Form Example › should handle keyboard navigation" classname="basic-form.spec.ts" time="0.47">
+</testcase>
+<testcase name="Basic Form Example › should be accessible with screen readers" classname="basic-form.spec.ts" time="0.326">
+</testcase>
+<testcase name="Basic Form Example › should work on mobile devices" classname="basic-form.spec.ts" time="0.955">
+</testcase>
+<testcase name="Basic Form Example › should handle rapid form interactions" classname="basic-form.spec.ts" time="1.451">
+</testcase>
+<testcase name="Basic Form Example › should preserve form state during navigation" classname="basic-form.spec.ts" time="0.313">
+</testcase>
+</testsuite>
+<testsuite name="complex-form.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Safari" tests="11" failures="0" skipped="0" time="9.77" errors="0">
+<testcase name="Complex Form Example › should display the multi-step registration form" classname="complex-form.spec.ts" time="0.225">
+</testcase>
+<testcase name="Complex Form Example › should navigate between form steps" classname="complex-form.spec.ts" time="0.355">
+</testcase>
+<testcase name="Complex Form Example › should validate each step before allowing progression" classname="complex-form.spec.ts" time="0.381">
+</testcase>
+<testcase name="Complex Form Example › should handle address fields in step 2" classname="complex-form.spec.ts" time="0.969">
+</testcase>
+<testcase name="Complex Form Example › should handle conditional fields" classname="complex-form.spec.ts" time="0.629">
+</testcase>
+<testcase name="Complex Form Example › should validate complex field relationships" classname="complex-form.spec.ts" time="1.852">
+</testcase>
+<testcase name="Complex Form Example › should handle file uploads" classname="complex-form.spec.ts" time="0.592">
+</testcase>
+<testcase name="Complex Form Example › should handle form persistence and recovery" classname="complex-form.spec.ts" time="0.662">
+</testcase>
+<testcase name="Complex Form Example › should handle keyboard navigation across steps" classname="complex-form.spec.ts" time="0.385">
+</testcase>
+<testcase name="Complex Form Example › should handle mobile interactions" classname="complex-form.spec.ts" time="0.605">
+</testcase>
+<testcase name="Complex Form Example › should handle form submission with all steps completed" classname="complex-form.spec.ts" time="3.115">
+</testcase>
+</testsuite>
+<testsuite name="form-components.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Safari" tests="17" failures="0" skipped="0" time="10.985" errors="0">
+<testcase name="Form Library Components › should render TextInput component correctly" classname="form-components.spec.ts" time="0.502">
+</testcase>
+<testcase name="Form Library Components › should render NumberInput component correctly" classname="form-components.spec.ts" time="0.433">
+</testcase>
+<testcase name="Form Library Components › should render CheckboxInput component correctly" classname="form-components.spec.ts" time="0.456">
+</testcase>
+<testcase name="Form Library Components › should render SelectInput component correctly" classname="form-components.spec.ts" time="0.401">
+</testcase>
+<testcase name="Form Library Components › should render TextareaInput component correctly" classname="form-components.spec.ts" time="0.419">
+</testcase>
+<testcase name="Form Library Components › should render RadioInput component correctly" classname="form-components.spec.ts" time="0.508">
+</testcase>
+<testcase name="Form Library Components › should render FileInput component correctly" classname="form-components.spec.ts" time="0.366">
+</testcase>
+<testcase name="Form Library Components › should handle form validation correctly" classname="form-components.spec.ts" time="0.41">
+</testcase>
+<testcase name="Form Library Components › should handle form submission correctly" classname="form-components.spec.ts" time="4.454">
+</testcase>
+<testcase name="Form Library Components › should handle field state changes correctly" classname="form-components.spec.ts" time="0.438">
+</testcase>
+<testcase name="Form Library Components › should handle conditional field rendering" classname="form-components.spec.ts" time="0.443">
+</testcase>
+<testcase name="Form Library Components › should handle field arrays correctly" classname="form-components.spec.ts" time="0.39">
+</testcase>
+<testcase name="Form Library Components › should handle form persistence" classname="form-components.spec.ts" time="0.366">
+</testcase>
+<testcase name="Form Library Components › should handle keyboard navigation" classname="form-components.spec.ts" time="0.325">
+</testcase>
+<testcase name="Form Library Components › should handle mobile interactions" classname="form-components.spec.ts" time="0.435">
+</testcase>
+<testcase name="Form Library Components › should handle accessibility features" classname="form-components.spec.ts" time="0.281">
+</testcase>
+<testcase name="Form Library Components › should handle form reset correctly" classname="form-components.spec.ts" time="0.358">
+</testcase>
+</testsuite>
+<testsuite name="setup-test.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Safari" tests="4" failures="0" skipped="0" time="1.986" errors="0">
+<testcase name="Playwright Setup Verification › should have working Playwright environment" classname="setup-test.spec.ts" time="0.433">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle basic browser interactions" classname="setup-test.spec.ts" time="0.287">
+</testcase>
+<testcase name="Playwright Setup Verification › should handle viewport changes" classname="setup-test.spec.ts" time="0.934">
+<system-out>
+<![CDATA[Current width reported: 980
+Actual window.innerWidth: [33m980[39m
+Skipping mobile test - viewport emulation not working
+]]>
+</system-out>
+</testcase>
+<testcase name="Playwright Setup Verification › should handle async operations" classname="setup-test.spec.ts" time="0.332">
+</testcase>
+</testsuite>
+<testsuite name="smoke.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Safari" tests="3" failures="0" skipped="0" time="1.311" errors="0">
+<testcase name="Smoke Tests › should load the test suite index" classname="smoke.spec.ts" time="0.29">
+</testcase>
+<testcase name="Smoke Tests › should have test suite navigation" classname="smoke.spec.ts" time="0.751">
+</testcase>
+<testcase name="Smoke Tests › should handle basic page interactions" classname="smoke.spec.ts" time="0.27">
+</testcase>
+</testsuite>
+<testsuite name="utils/test-helpers.spec.ts" timestamp="2025-09-02T02:43:57.677Z" hostname="Mobile Safari" tests="3" failures="0" skipped="0" time="0.028" errors="0">
+<testcase name="Test Helpers › should provide common form selectors" classname="utils/test-helpers.spec.ts" time="0.011">
+</testcase>
+<testcase name="Test Helpers › should provide test data constants" classname="utils/test-helpers.spec.ts" time="0.006">
+</testcase>
+<testcase name="Test Helpers › should provide utility methods" classname="utils/test-helpers.spec.ts" time="0.011">
+</testcase>
+</testsuite>
+</testsuites>

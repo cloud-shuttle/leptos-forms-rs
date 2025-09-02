@@ -1,60 +1,64 @@
-use leptos::*;
+use leptos::prelude::{
+    Callback, Memo, ReadSignal, 
+    signal, Get, Set, Update, Callable
+};
+use leptos::task::spawn_local;
 use serde::{Serialize, Deserialize};
 use crate::core::*;
 use crate::validation::ValidationErrors;
 
 /// Main hook for form management
-pub fn use_form<T: Form + PartialEq>() -> FormHandle<T> {
+pub fn use_form<T: Form + PartialEq + Clone + Send + Sync>() -> FormHandle<T> {
     FormHandle::new()
 }
 
 /// Hook for form with initial values
-pub fn use_form_with_values<T: Form + PartialEq>(values: T) -> FormHandle<T> {
+pub fn use_form_with_values<T: Form + PartialEq + Clone + Send + Sync>(values: T) -> FormHandle<T> {
     FormHandle::with_values(values)
 }
 
 /// Hook for form field value
-pub fn use_field_value<T: Form + PartialEq>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<Option<FieldValue>> {
+pub fn use_field_value<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<Option<FieldValue>> {
     let field_signal = form.get_field_signal(field_name);
     if let Some(signal) = field_signal {
         signal.value
     } else {
-        create_signal(None).0
+        signal(None).0
     }
 }
 
 /// Hook for form field error
-pub fn use_field_error<T: Form + PartialEq>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<Option<String>> {
+pub fn use_field_error<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<Option<String>> {
     let field_signal = form.get_field_signal(field_name);
     if let Some(signal) = field_signal {
         signal.error
     } else {
-        create_signal(None).0
+        signal(None).0
     }
 }
 
 /// Hook for form field dirty state
-pub fn use_field_dirty<T: Form + PartialEq>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<bool> {
+pub fn use_field_dirty<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<bool> {
     let field_signal = form.get_field_signal(field_name);
     if let Some(signal) = field_signal {
         signal.is_dirty
     } else {
-        create_signal(false).0
+        signal(false).0
     }
 }
 
 /// Hook for form field touched state
-pub fn use_field_touched<T: Form + PartialEq>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<bool> {
+pub fn use_field_touched<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<bool> {
     let field_signal = form.get_field_signal(field_name);
     if let Some(signal) = field_signal {
         signal.is_touched
     } else {
-        create_signal(false).0
+        signal(false).0
     }
 }
 
 /// Hook for form validation
-pub fn use_form_validation<T: Form + PartialEq>(form: &FormHandle<T>) -> (
+pub fn use_form_validation<T: Form + PartialEq + Send + Sync>(form: &FormHandle<T>) -> (
     Memo<ValidationErrors>,
     Memo<bool>,
     Callback<(), ()>
@@ -70,7 +74,7 @@ pub fn use_form_validation<T: Form + PartialEq>(form: &FormHandle<T>) -> (
 }
 
 /// Hook for form submission
-pub fn use_form_submission<T: Form + PartialEq, F>(form: &FormHandle<T>, _handler: F) -> (
+pub fn use_form_submission<T: Form + PartialEq + Send + Sync, F>(form: &FormHandle<T>, _handler: F) -> (
     Memo<bool>,
     Callback<(), ()>
 ) 
@@ -90,7 +94,7 @@ where
 }
 
 /// Hook for form persistence
-pub fn use_form_persistence<T: Form + PartialEq>(_form: &FormHandle<T>, _storage_key: Option<String>) -> (
+pub fn use_form_persistence<T: Form + PartialEq + Send + Sync>(_form: &FormHandle<T>, _storage_key: Option<String>) -> (
     Callback<(), ()>,
     Callback<(), ()>,
     Callback<(), ()>
@@ -111,7 +115,7 @@ pub fn use_form_persistence<T: Form + PartialEq>(_form: &FormHandle<T>, _storage
 }
 
 /// Hook for form analytics
-pub fn use_form_analytics<T: Form + PartialEq>(_form: &FormHandle<T>) -> FormAnalyticsHandle {
+pub fn use_form_analytics<T: Form + PartialEq + Send + Sync>(_form: &FormHandle<T>) -> FormAnalyticsHandle {
     FormAnalyticsHandle::new()
 }
 
@@ -134,26 +138,26 @@ impl FormAnalyticsHandle {
     }
     
     pub fn track_view(&self, form_name: String) {
-        self.track_view.call(form_name);
+        self.track_view.run(form_name);
     }
     
     pub fn track_field_interaction(&self, form_name: String, field_name: String, action: String) {
-        self.track_field_interaction.call((form_name, field_name, action));
+        self.track_field_interaction.run((form_name, field_name, action));
     }
     
     pub fn track_submission(&self, form_name: String, success: bool) {
-        self.track_submission.call((form_name, success));
+        self.track_submission.run((form_name, success));
     }
     
     pub fn track_validation_errors(&self, form_name: String, errors: ValidationErrors) {
-        self.track_validation_errors.call((form_name, errors));
+        self.track_validation_errors.run((form_name, errors));
     }
 }
 
 /// Hook for form field array management
-pub fn use_field_array<T: Form + PartialEq, U>(form: &FormHandle<T>, field_name: &str) -> FieldArrayHandle<U> 
+pub fn use_field_array<T: Form + PartialEq + Send + Sync, U>(form: &FormHandle<T>, field_name: &str) -> FieldArrayHandle<U> 
 where
-    U: Clone + Serialize + for<'de> Deserialize<'de> + 'static,
+    U: Clone + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static,
 {
     FieldArrayHandle::new(form, field_name)
 }
@@ -167,9 +171,9 @@ pub struct FieldArrayHandle<T: 'static> {
     clear: Callback<(), ()>,
 }
 
-impl<T: Clone + Serialize + for<'de> Deserialize<'de> + 'static> FieldArrayHandle<T> {
+impl<T: Clone + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static> FieldArrayHandle<T> {
     pub fn new<U: Form>(_form: &FormHandle<U>, _field_name: &str) -> Self {
-        let (items, set_items) = create_signal(Vec::<T>::new());
+        let (items, set_items) = signal(Vec::<T>::new());
         
         let add = Callback::new(move |item: T| {
             set_items.update(|items| items.push(item));
@@ -210,34 +214,34 @@ impl<T: Clone + Serialize + for<'de> Deserialize<'de> + 'static> FieldArrayHandl
     }
     
     pub fn add(&self, item: T) {
-        self.add.call(item);
+        self.add.run(item);
     }
     
     pub fn remove(&self, index: usize) {
-        self.remove.call(index);
+        self.remove.run(index);
     }
     
     pub fn move_item(&self, from: usize, to: usize) {
-        self.move_item.call((from, to));
+        self.move_item.run((from, to));
     }
     
     pub fn clear(&self) {
-        self.clear.call(());
+        self.clear.run(());
     }
     
     pub fn len(&self) -> Memo<usize> {
         let items_signal = self.items;
-        create_memo(move |_| items_signal.get().len())
+        Memo::new(move |_| items_signal.get().len())
     }
     
     pub fn is_empty(&self) -> Memo<bool> {
         let items_signal = self.items;
-        create_memo(move |_| items_signal.get().is_empty())
+        Memo::new(move |_| items_signal.get().is_empty())
     }
 }
 
 /// Hook for form wizard/multi-step forms
-pub fn use_form_wizard<T: Form + PartialEq>(_form: &FormHandle<T>, steps: Vec<String>) -> FormWizardHandle {
+pub fn use_form_wizard<T: Form + PartialEq + Send + Sync>(_form: &FormHandle<T>, steps: Vec<String>) -> FormWizardHandle {
     FormWizardHandle::new(steps)
 }
 
@@ -254,7 +258,7 @@ pub struct FormWizardHandle {
 
 impl FormWizardHandle {
     pub fn new(steps: Vec<String>) -> Self {
-        let (current_step, set_current_step) = create_signal(0);
+        let (current_step, set_current_step) = signal(0);
         let steps_clone1 = steps.clone();
         let steps_clone2 = steps.clone();
         let steps_clone3 = steps.clone();
@@ -280,8 +284,8 @@ impl FormWizardHandle {
         });
         
         let current_step_signal = current_step;
-        let is_first_step = create_memo(move |_| current_step_signal.get() == 0);
-        let is_last_step = create_memo(move |_| current_step_signal.get() == steps_clone3.len() - 1);
+        let is_first_step = Memo::new(move |_| current_step_signal.get() == 0);
+        let is_last_step = Memo::new(move |_| current_step_signal.get() == steps_clone3.len() - 1);
         
         Self {
             current_step,
@@ -301,7 +305,7 @@ impl FormWizardHandle {
     pub fn current_step_name(&self) -> Memo<String> {
         let current_step_signal = self.current_step;
         let steps_clone = self.steps.clone();
-        create_memo(move |_| {
+        Memo::new(move |_| {
             let step = current_step_signal.get();
             if step < steps_clone.len() {
                 steps_clone[step].clone()
@@ -316,15 +320,15 @@ impl FormWizardHandle {
     }
     
     pub fn next(&self) {
-        self.next.call(());
+        self.next.run(());
     }
     
     pub fn previous(&self) {
-        self.previous.call(());
+        self.previous.run(());
     }
     
     pub fn go_to_step(&self, step: usize) {
-        self.go_to_step.call(step);
+        self.go_to_step.run(step);
     }
     
     pub fn is_first_step(&self) -> Memo<bool> {
@@ -338,7 +342,7 @@ impl FormWizardHandle {
     pub fn progress(&self) -> Memo<f64> {
         let current_step_signal = self.current_step;
         let total_steps = self.steps.len();
-        create_memo(move |_| {
+        Memo::new(move |_| {
             let step = current_step_signal.get();
             if total_steps > 0 {
                 (step as f64) / (total_steps as f64)
