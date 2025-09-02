@@ -3,14 +3,17 @@ name = "leptos-forms-rs-unit-tests"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+
 [dependencies]
-leptos = { workspace = true }
-leptos-forms-rs = { workspace = true }
-wasm-bindgen-test = { workspace = true }
+leptos = "0.8"
+leptos-forms-rs = { path = "../../leptos-forms-rs" }
+wasm-bindgen-test = "0.3"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [[test]]
-name = "unit_tests"
+name = "lib"
+path = "src/lib.rs"
 harness = false

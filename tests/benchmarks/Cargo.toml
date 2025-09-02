@@ -3,19 +3,14 @@ name = "leptos-forms-rs-benchmarks"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+
 [dependencies]
-leptos = { workspace = true }
-leptos-forms-rs = { workspace = true }
-criterion = { workspace = true }
+leptos = "0.8"
+leptos-forms-rs = { path = "../../leptos-forms-rs" }
+criterion = { version = "0.5", features = ["html_reports"] }
 
 [[bench]]
 name = "form_creation"
-harness = false
-
-[[bench]]
-name = "form_validation"
-harness = false
-
-[[bench]]
-name = "form_field_operations"
+path = "benches/form_creation.rs"
 harness = false
