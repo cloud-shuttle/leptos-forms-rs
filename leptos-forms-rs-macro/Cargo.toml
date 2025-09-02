@@ -1,9 +1,12 @@
 [package]
 name = "leptos-forms-rs-macro"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-description = "Procedural macros for Leptos Forms"
+description = "Procedural macros for leptos-forms-rs"
 license = "MIT"
+repository = "https://github.com/your-org/leptos-forms-rs"
+keywords = ["leptos", "forms", "macro", "procedural-macro"]
+categories = ["web-programming", "wasm"]
 
 [lib]
 proc-macro = true

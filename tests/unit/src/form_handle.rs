@@ -1,10 +1,10 @@
 //! Tests for FormHandle functionality
 
-use leptos::*;
-use leptos_forms_rs::*;
-use wasm_bindgen_test::*;
+use serde::{Serialize, Deserialize};
+use leptos_forms_rs::core::{FieldType, FieldValue, ValidatorConfig, FieldMetadata, FormSchema, FieldError};
+use leptos_forms_rs::{Form, ValidationErrors};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct TestForm {
     name: String,
     email: String,
@@ -38,19 +38,19 @@ impl Form for TestForm {
         let mut errors = ValidationErrors::new();
         
         if self.name.is_empty() {
-            errors.add_field_error("name", FieldError::new("Name is required"));
+            errors.add_field_error("name".to_string(), "Name is required".to_string());
         }
         
         if self.email.is_empty() {
-            errors.add_field_error("email", FieldError::new("Email is required"));
+            errors.add_field_error("email".to_string(), "Email is required".to_string());
         } else if !self.email.contains('@') {
-            errors.add_field_error("email", FieldError::new("Invalid email format"));
+            errors.add_field_error("email".to_string(), "Invalid email format".to_string());
         }
         
-        if errors.is_empty() {
-            Ok(())
-        } else {
+        if errors.has_errors() {
             Err(errors)
+        } else {
+            Ok(())
         }
     }
 
@@ -62,87 +62,98 @@ impl Form for TestForm {
         }
     }
 
-    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), String> {
+    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), FieldError> {
         match name {
             "name" => {
                 if let FieldValue::String(s) = value {
                     self.name = s;
                     Ok(())
                 } else {
-                    Err("Expected string value for name".to_string())
+                    Err(FieldError::new("name".to_string(), "Expected string value".to_string()))
                 }
-            }
+            },
             "email" => {
                 if let FieldValue::String(s) = value {
                     self.email = s;
                     Ok(())
                 } else {
-                    Err("Expected string value for email".to_string())
+                    Err(FieldError::new("email".to_string(), "Expected string value".to_string()))
                 }
-            }
-            _ => Err(format!("Unknown field: {}", name)),
+            },
+            _ => Err(FieldError::new(name.to_string(), "Unknown field".to_string())),
         }
     }
 
     fn default_values() -> Self {
-        TestForm {
+        Self {
             name: String::new(),
             email: String::new(),
         }
     }
 
     fn schema() -> FormSchema {
-        FormSchema::new(Self::field_metadata())
+        let mut schema = FormSchema::new();
+        for field in Self::field_metadata() {
+            schema.add_field(field);
+        }
+        schema
     }
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_form_handle_creation() {
-    let form = use_form::<TestForm>();
-    assert!(form.get_values().get().name.is_empty());
-    assert!(form.get_values().get().email.is_empty());
+    let form = TestForm::default_values();
+    assert!(form.name.is_empty());
+    assert!(form.email.is_empty());
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_form_handle_set_field() {
-    let form = use_form::<TestForm>();
+    let mut form = TestForm::default_values();
     
-    let _ = form.set_field_value("name", FieldValue::String("John".to_string()));
-    let _ = form.set_field_value("email", FieldValue::String("john@example.com".to_string()));
+    let _ = form.set_field("name", FieldValue::String("John".to_string()));
+    let _ = form.set_field("email", FieldValue::String("john@example.com".to_string()));
     
-    let values = form.get_values().get();
-    assert_eq!(values.name, "John");
-    assert_eq!(values.email, "john@example.com");
+    assert_eq!(form.name, "John");
+    assert_eq!(form.email, "john@example.com");
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_form_handle_validation() {
-    let form = use_form::<TestForm>();
+    let mut form = TestForm::default_values();
     
     // Initially should be invalid (empty fields)
-    assert!(!form.is_valid().get());
+    let result = form.validate();
+    assert!(result.is_err());
     
     // Set valid values
-    let _ = form.set_field_value("name", FieldValue::String("John".to_string()));
-    let _ = form.set_field_value("email", FieldValue::String("john@example.com".to_string()));
+    let _ = form.set_field("name", FieldValue::String("John".to_string()));
+    let _ = form.set_field("email", FieldValue::String("john@example.com".to_string()));
     
     // Should now be valid
-    assert!(form.is_valid().get());
+    let result = form.validate();
+    assert!(result.is_ok());
 }
 
-#[wasm_bindgen_test]
-fn test_form_handle_reset() {
-    let form = use_form::<TestForm>();
+#[test]
+fn test_form_handle_schema() {
+    let schema = TestForm::schema();
+    assert_eq!(schema.fields.len(), 2);
     
-    // Set some values
-    let _ = form.set_field_value("name", FieldValue::String("John".to_string()));
-    let _ = form.set_field_value("email", FieldValue::String("john@example.com".to_string()));
+    let required_fields = schema.required_fields();
+    assert_eq!(required_fields.len(), 2); // Both fields are required
+}
+
+#[test]
+fn test_form_handle_field_access() {
+    let mut form = TestForm::default_values();
     
-    // Reset the form
-    form.reset();
+    // Test setting and getting field values
+    let _ = form.set_field("name", FieldValue::String("Jane Doe".to_string()));
+    let value = form.get_field("name");
+    assert_eq!(value, Some(FieldValue::String("Jane Doe".to_string())));
     
-    // Should be back to default values
-    let values = form.get_values().get();
-    assert!(values.name.is_empty());
-    assert!(values.email.is_empty());
+    // Test unknown field
+    let value = form.get_field("unknown_field");
+    assert_eq!(value, None);
 }

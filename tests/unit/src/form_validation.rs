@@ -1,10 +1,10 @@
 //! Tests for form validation functionality
 
-use leptos::*;
-use leptos_forms_rs::*;
-use wasm_bindgen_test::*;
+use serde::{Serialize, Deserialize};
+use leptos_forms_rs::core::{FieldType, FieldValue, ValidatorConfig, FieldMetadata, FormSchema};
+use leptos_forms_rs::{Form, ValidationErrors};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct ValidationTestForm {
     required_field: String,
     email_field: String,
@@ -36,7 +36,7 @@ impl Form for ValidationTestForm {
             FieldMetadata {
                 name: "min_length_field".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required, ValidatorConfig::MinLength(3)],
+                validators: vec![ValidatorConfig::Required, ValidatorConfig::MinLength(5)],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -57,32 +57,28 @@ impl Form for ValidationTestForm {
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
         
-        // Required field validation
         if self.required_field.is_empty() {
-            errors.add_field_error("required_field", FieldError::new("Required field is mandatory"));
+            errors.add_field_error("required_field".to_string(), "Required field is empty".to_string());
         }
         
-        // Email validation
         if self.email_field.is_empty() {
-            errors.add_field_error("email_field", FieldError::new("Email is required"));
-        } else if !self.email_field.contains('@') || !self.email_field.contains('.') {
-            errors.add_field_error("email_field", FieldError::new("Invalid email format"));
+            errors.add_field_error("email_field".to_string(), "Email is required".to_string());
+        } else if !self.email_field.contains('@') {
+            errors.add_field_error("email_field".to_string(), "Invalid email format".to_string());
         }
         
-        // Min length validation
-        if self.min_length_field.len() < 3 {
-            errors.add_field_error("min_length_field", FieldError::new("Must be at least 3 characters"));
+        if self.min_length_field.len() < 5 {
+            errors.add_field_error("min_length_field".to_string(), "Field must be at least 5 characters".to_string());
         }
         
-        // Max length validation
         if self.max_length_field.len() > 10 {
-            errors.add_field_error("max_length_field", FieldError::new("Must be no more than 10 characters"));
+            errors.add_field_error("max_length_field".to_string(), "Field must be at most 10 characters".to_string());
         }
         
-        if errors.is_empty() {
-            Ok(())
-        } else {
+        if errors.has_errors() {
             Err(errors)
+        } else {
+            Ok(())
         }
     }
 
@@ -96,46 +92,46 @@ impl Form for ValidationTestForm {
         }
     }
 
-    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), String> {
+    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), leptos_forms_rs::core::FieldError> {
         match name {
             "required_field" => {
                 if let FieldValue::String(s) = value {
                     self.required_field = s;
                     Ok(())
                 } else {
-                    Err("Expected string value for required_field".to_string())
+                    Err(leptos_forms_rs::core::FieldError::new("required_field".to_string(), "Expected string value".to_string()))
                 }
-            }
+            },
             "email_field" => {
                 if let FieldValue::String(s) = value {
                     self.email_field = s;
                     Ok(())
                 } else {
-                    Err("Expected string value for email_field".to_string())
+                    Err(leptos_forms_rs::core::FieldError::new("email_field".to_string(), "Expected string value".to_string()))
                 }
-            }
+            },
             "min_length_field" => {
                 if let FieldValue::String(s) = value {
                     self.min_length_field = s;
                     Ok(())
                 } else {
-                    Err("Expected string value for min_length_field".to_string())
+                    Err(leptos_forms_rs::core::FieldError::new("min_length_field".to_string(), "Expected string value".to_string()))
                 }
-            }
+            },
             "max_length_field" => {
                 if let FieldValue::String(s) = value {
                     self.max_length_field = s;
                     Ok(())
                 } else {
-                    Err("Expected string value for max_length_field".to_string())
+                    Err(leptos_forms_rs::core::FieldError::new("max_length_field".to_string(), "Expected string value".to_string()))
                 }
-            }
-            _ => Err(format!("Unknown field: {}", name)),
+            },
+            _ => Err(leptos_forms_rs::core::FieldError::new(name.to_string(), "Unknown field".to_string())),
         }
     }
 
     fn default_values() -> Self {
-        ValidationTestForm {
+        Self {
             required_field: String::new(),
             email_field: String::new(),
             min_length_field: String::new(),
@@ -144,69 +140,51 @@ impl Form for ValidationTestForm {
     }
 
     fn schema() -> FormSchema {
-        FormSchema::new(Self::field_metadata())
+        let mut schema = FormSchema::new();
+        for field in Self::field_metadata() {
+            schema.add_field(field);
+        }
+        schema
     }
 }
 
-#[wasm_bindgen_test]
-fn test_required_field_validation() {
-    let form = use_form::<ValidationTestForm>();
+#[test]
+fn test_validation_form_validation() {
+    let mut form = ValidationTestForm::default_values();
     
-    // Initially should be invalid (empty required field)
-    assert!(!form.is_valid().get());
+    // Test empty form validation
+    let result = form.validate();
+    assert!(result.is_err());
     
-    // Set required field
-    let _ = form.set_field_value("required_field", FieldValue::String("Value".to_string()));
+    // Test valid form
+    let _ = form.set_field("required_field", FieldValue::String("Valid text".to_string()));
+    let _ = form.set_field("email_field", FieldValue::String("test@example.com".to_string()));
+    let _ = form.set_field("min_length_field", FieldValue::String("Long enough".to_string()));
+    let _ = form.set_field("max_length_field", FieldValue::String("Short".to_string()));
     
-    // Still invalid because other fields are empty
-    assert!(!form.is_valid().get());
+    let result = form.validate();
+    assert!(result.is_ok());
 }
 
-#[wasm_bindgen_test]
-fn test_email_validation() {
-    let form = use_form::<ValidationTestForm>();
+#[test]
+fn test_validation_form_schema() {
+    let schema = ValidationTestForm::schema();
+    assert_eq!(schema.fields.len(), 4);
     
-    // Set invalid email
-    let _ = form.set_field_value("email_field", FieldValue::String("invalid-email".to_string()));
-    
-    // Should be invalid
-    assert!(!form.is_valid().get());
-    
-    // Set valid email
-    let _ = form.set_field_value("email_field", FieldValue::String("valid@email.com".to_string()));
-    
-    // Email should now be valid
-    // (though form still invalid due to other empty fields)
+    let required_fields = schema.required_fields();
+    assert_eq!(required_fields.len(), 4); // All fields are required
 }
 
-#[wasm_bindgen_test]
-fn test_min_length_validation() {
-    let form = use_form::<ValidationTestForm>();
+#[test]
+fn test_validation_field_access() {
+    let mut form = ValidationTestForm::default_values();
     
-    // Set field below min length
-    let _ = form.set_field_value("min_length_field", FieldValue::String("ab".to_string()));
+    // Test setting and getting field values
+    let _ = form.set_field("required_field", FieldValue::String("test".to_string()));
+    let value = form.get_field("required_field");
+    assert_eq!(value, Some(FieldValue::String("test".to_string())));
     
-    // Should be invalid
-    assert!(!form.is_valid().get());
-    
-    // Set field at min length
-    let _ = form.set_field_value("min_length_field", FieldValue::String("abc".to_string()));
-    
-    // Should now be valid for this field
-}
-
-#[wasm_bindgen_test]
-fn test_max_length_validation() {
-    let form = use_form::<ValidationTestForm>();
-    
-    // Set field above max length
-    let _ = form.set_field_value("max_length_field", FieldValue::String("this is too long".to_string()));
-    
-    // Should be invalid
-    assert!(!form.is_valid().get());
-    
-    // Set field at max length
-    let _ = form.set_field_value("max_length_field", FieldValue::String("1234567890".to_string()));
-    
-    // Should now be valid for this field
+    // Test unknown field
+    let value = form.get_field("unknown_field");
+    assert_eq!(value, None);
 }

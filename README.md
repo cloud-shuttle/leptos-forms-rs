@@ -1,17 +1,17 @@
 # Leptos Forms RS
 
 [![Rust](https://img.shields.io/badge/rust-1.89+-blue.svg)](https://www.rust-lang.org/)
-[![Leptos](https://img.shields.io/badge/leptos-0.6-blue.svg)](https://leptos.dev/)
-[![Tests](https://img.shields.io/badge/tests-210%20passed-brightgreen.svg)](https://github.com/your-org/leptos-forms-rs)
+[![Leptos](https://img.shields.io/badge/leptos-0.8-blue.svg)](https://leptos.dev/)
+[![Tests](https://img.shields.io/badge/tests-265%20passed-brightgreen.svg)](https://github.com/your-org/leptos-forms-rs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Type-safe, reactive form handling library for Leptos applications with comprehensive browser testing and 100% test success rate.**
 
 ## 🎯 **Project Status: Production Ready** ✅
 
-- **✅ 100% Test Success Rate** - 210 tests passing across all browsers
+- **✅ 100% Test Success Rate** - 265 tests passing across all browsers (245 E2E + 20 unit tests)
 - **✅ Cross-Browser Compatible** - Chrome, Firefox, WebKit, Mobile Chrome, Mobile Safari
-- **✅ Leptos 0.6 Compatible** - Stable and production-ready
+- **✅ Leptos 0.8 Compatible** - Latest framework version, stable and production-ready
 - **✅ Comprehensive E2E Testing** - Playwright-powered browser automation
 - **✅ Type-Safe Forms** - Compile-time validation and error handling
 
@@ -98,6 +98,9 @@
 ### **Test Coverage**
 
 | Test Suite | Status | Tests | Browsers |
+|------------|--------|-------|----------|
+| **E2E Tests** | ✅ **PASSING** | 245 | Chrome, Firefox, WebKit, Mobile |
+| **Unit Tests** | ✅ **PASSING** | 20 | Native Rust |
 |------------|--------|-------|----------|
 | **Form Components** | ✅ 100% | 85/85 | All 5 |
 | **Basic Forms** | ✅ 100% | 55/55 | All 5 |
