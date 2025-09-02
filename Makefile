@@ -35,10 +35,28 @@ build: ## Build the entire project
 	wasm-pack build leptos-forms-rs --target web
 
 test: ## Run all tests
-	@echo "$(GREEN)Running Rust tests...$(NC)"
-	cargo test
-	@echo "$(GREEN)Running WASM tests in Node.js...$(NC)"
-	wasm-pack test --node
+	@echo "$(GREEN)Running all tests...$(NC)"
+	./tests/run_tests.sh all
+
+test:unit: ## Run unit tests only
+	@echo "$(GREEN)Running unit tests...$(NC)"
+	./tests/run_tests.sh unit
+
+test:integration: ## Run integration tests only
+	@echo "$(GREEN)Running integration tests...$(NC)"
+	./tests/run_tests.sh integration
+
+test:e2e: ## Run end-to-end tests only
+	@echo "$(GREEN)Running end-to-end tests...$(NC)"
+	./tests/run_tests.sh e2e
+
+test:benchmarks: ## Run performance benchmarks
+	@echo "$(GREEN)Running performance benchmarks...$(NC)"
+	./tests/run_tests.sh benchmarks
+
+test:wasm: ## Run WASM tests in browser
+	@echo "$(GREEN)Running WASM tests in Firefox...$(NC)"
+	wasm-pack test --headless --firefox
 
 test:wasm: ## Run WASM tests in browser
 	@echo "$(GREEN)Running WASM tests in Firefox...$(NC)"
