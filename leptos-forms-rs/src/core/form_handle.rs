@@ -359,6 +359,138 @@ impl<T: Form + PartialEq + Clone + Send + Sync> FormHandle<T> {
             custom_tracking("submission_attempt", "form", if success { "success" } else { "failure" });
         }
     }
+    
+    /// Field Array Management Methods
+    
+    /// Add a new item to a field array
+    pub fn add_field_array_item(&mut self, field_name: &str) -> Result<(), FormError> {
+        let mut current_state = self.state.get();
+        
+        // Get the field metadata to understand the array structure
+        if let Some(field_meta) = self.schema.get_field(field_name) {
+            if let FieldType::Array(item_type) = &field_meta.field_type {
+                // Create a default value for the new item
+                let default_value = self.create_default_value_for_type(&item_type);
+                
+                // Add to the array field
+                if let Some(FieldValue::Array(ref mut array)) = current_state.values.get_field(field_name) {
+                    array.push(default_value);
+                } else {
+                    // Initialize array if it doesn't exist
+                    let mut new_array = Vec::new();
+                    new_array.push(default_value);
+                    current_state.values.set_field(field_name, FieldValue::Array(new_array))
+                        .map_err(|e| FormError::field_error(field_name.to_string(), e.message))?;
+                }
+                
+                // Clear any existing errors for this field
+                current_state.errors.field_errors.remove(field_name);
+                
+                // Update state
+                self.write_state.set(current_state);
+                
+                // Notify subscribers
+                self.notify_subscribers();
+                
+                Ok(())
+            } else {
+                Err(FormError::field_error(
+                    format!("Field '{}' is not an array type", field_name),
+                    field_name.to_string(),
+                ))
+            }
+        } else {
+            Err(FormError::field_error(
+                format!("Field '{}' not found in schema", field_name),
+                field_name.to_string(),
+            ))
+        }
+    }
+    
+    /// Remove an item from a field array
+    pub fn remove_field_array_item(&mut self, field_name: &str, index: usize) -> Result<(), FormError> {
+        let mut current_state = self.state.get();
+        
+        if let Some(FieldValue::Array(ref mut array)) = current_state.values.get_field(field_name) {
+            if index < array.len() {
+                array.remove(index);
+                
+                // Clear any existing errors for this field
+                current_state.errors.field_errors.remove(field_name);
+                
+                // Update state
+                self.write_state.set(current_state);
+                
+                // Notify subscribers
+                self.notify_subscribers();
+                
+                Ok(())
+            } else {
+                Err(FormError::field_error(
+                    format!("Index {} out of bounds for array field '{}'", index, field_name),
+                    field_name.to_string(),
+                ))
+            }
+        } else {
+            Err(FormError::field_error(
+                format!("Field '{}' is not an array or doesn't exist", field_name),
+                field_name.to_string(),
+            ))
+        }
+    }
+    
+    /// Get field array items
+    pub fn field_array(&self, field_name: &str) -> Option<Vec<FieldValue>> {
+        let current_state = self.state.get();
+        if let Some(FieldValue::Array(array)) = current_state.values.get_field(field_name) {
+            Some(array.clone())
+        } else {
+            None
+        }
+    }
+    
+    /// Set field array item value
+    pub fn set_field_array_item_value(&mut self, field_name: &str, index: usize, value: FieldValue) -> Result<(), FormError> {
+        let current_state = self.state.get();
+        if let Some(FieldValue::Array(ref mut array)) = current_state.values.get_field(field_name) {
+            if index < array.len() {
+                array[index] = value;
+                self.write_state.set(current_state);
+                self.notify_subscribers();
+                Ok(())
+            } else {
+                Err(FormError::field_error(format!("Index {} out of bounds for array field '{}'", index, field_name), field_name.to_string()))
+            }
+        } else {
+            Err(FormError::field_error(format!("Field '{}' is not an array or doesn't exist", field_name), field_name.to_string()))
+        }
+    }
+    
+    /// Helper method to create default values for different field types
+    fn create_default_value_for_type(&self, field_type: &FieldType) -> FieldValue {
+        match field_type {
+            FieldType::Text => FieldValue::String(String::new()),
+            FieldType::Email => FieldValue::String(String::new()),
+            FieldType::Password => FieldValue::String(String::new()),
+            FieldType::Number(_) => FieldValue::Number(0.0),
+            FieldType::Boolean => FieldValue::Boolean(false),
+            FieldType::Select(_) => FieldValue::String(String::new()),
+            FieldType::MultiSelect(_) => FieldValue::Array(Vec::new()),
+            FieldType::Date => FieldValue::Date(chrono::NaiveDate::from_ymd_opt(2024, 1, 1).unwrap()),
+            FieldType::DateTime => FieldValue::DateTime(chrono::Utc::now()),
+            FieldType::File(_) => FieldValue::Null,
+            FieldType::Array(_) => FieldValue::Array(Vec::new()),
+            FieldType::Nested(_) => FieldValue::Object(std::collections::HashMap::new()),
+        }
+    }
+    
+    /// Notify all subscribers of state changes
+    fn notify_subscribers(&self) {
+        let current_state = self.state.get();
+        for subscriber in &self.subscribers {
+            subscriber(current_state.clone());
+        }
+    }
 }
 
 impl<T: Form + PartialEq + Clone + Send + Sync> Clone for FormHandle<T> {

@@ -1,0 +1,471 @@
+/* Form Wizard Component Styles */
+.form-wizard {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress Bar */
+.wizard-progress-bar {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #64748b;
+}
+
+/* Step Indicators */
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.wizard-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+
+.wizard-step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    border-radius: 8px;
+    min-width: 80px;
+}
+
+.wizard-step:hover {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+}
+
+.wizard-step.current {
+    background: #eff6ff;
+}
+
+.wizard-step.completed {
+    background: #f0fdf4;
+}
+
+.wizard-step.has-errors {
+    background: #fef2f2;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.wizard-step.current .step-number {
+    background: #3b82f6;
+    color: white;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.wizard-step.completed .step-number {
+    background: #10b981;
+    color: white;
+    border-color: #059669;
+}
+
+.wizard-step.has-errors .step-number {
+    background: #ef4444;
+    color: white;
+    border-color: #dc2626;
+}
+
+.step-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+    text-align: center;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.step-description {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 100px;
+}
+
+.step-error-indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Step Content */
+.wizard-content {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.step-content {
+    margin-bottom: 2rem;
+    min-height: 200px;
+}
+
+/* Validation Errors */
+.step-validation-errors {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.step-validation-errors h4 {
+    color: #dc2626;
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.step-validation-errors ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.validation-error {
+    color: #dc2626;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.validation-error strong {
+    font-weight: 600;
+}
+
+/* Navigation */
+.wizard-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: #3b82f6;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-wizard {
+        padding: 1rem;
+        margin: 1rem;
+    }
+    
+    .wizard-steps {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .wizard-steps::before {
+        display: none;
+    }
+    
+    .wizard-step {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+    }
+    
+    .step-number {
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .step-title {
+        text-align: left;
+        margin-bottom: 0.25rem;
+    }
+    
+    .step-description {
+        text-align: left;
+        max-width: none;
+    }
+    
+    .wizard-navigation {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .wizard-content {
+        padding: 1rem;
+    }
+    
+    .step-content {
+        min-height: 150px;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .form-wizard {
+        background: #1e293b;
+        color: #f1f5f9;
+    }
+    
+    .wizard-progress-bar {
+        background: #334155;
+        border-color: #475569;
+    }
+    
+    .progress-track {
+        background: #475569;
+    }
+    
+    .wizard-steps::before {
+        background: #475569;
+    }
+    
+    .wizard-step {
+        color: #f1f5f9;
+    }
+    
+    .wizard-step:hover {
+        background: #475569;
+    }
+    
+    .wizard-step.current {
+        background: #1e40af;
+    }
+    
+    .wizard-step.completed {
+        background: #065f46;
+    }
+    
+    .wizard-step.has-errors {
+        background: #7f1d1d;
+    }
+    
+    .step-number {
+        background: #475569;
+        color: #94a3b8;
+    }
+    
+    .step-title {
+        color: #f1f5f9;
+    }
+    
+    .step-description {
+        color: #94a3b8;
+    }
+    
+    .wizard-content {
+        background: #334155;
+        border-color: #475569;
+    }
+    
+    .step-validation-errors {
+        background: #7f1d1d;
+        border-color: #dc2626;
+    }
+    
+    .btn-secondary {
+        background: #475569;
+        color: #f1f5f9;
+        border-color: #64748b;
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+        background: #64748b;
+        border-color: #94a3b8;
+    }
+}
+
+/* Animation for step transitions */
+.step-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.wizard-step:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Loading states */
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

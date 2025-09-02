@@ -17,6 +17,7 @@ pub mod field_array;
 pub mod form_wizard;
 
 pub use input::*;
+pub use field_array::FieldArray;
 
 /// Main Form component
 #[component]

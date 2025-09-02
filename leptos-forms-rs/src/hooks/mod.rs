@@ -163,6 +163,7 @@ where
 }
 
 /// Handle for field array operations
+#[derive(Clone)]
 pub struct FieldArrayHandle<T: 'static> {
     items: ReadSignal<Vec<T>>,
     add: Callback<T, ()>,

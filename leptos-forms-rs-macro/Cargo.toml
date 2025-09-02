@@ -1,6 +1,6 @@
 [package]
 name = "leptos-forms-rs-macro"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "Procedural macros for leptos-forms-rs"
 license = "MIT"

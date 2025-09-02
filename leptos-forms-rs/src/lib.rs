@@ -49,6 +49,9 @@ pub mod components;
 pub mod error;
 pub mod utils;
 
+#[cfg(test)]
+pub mod tests;
+
 // Re-export main types for convenience
 pub use core::{Form, FormHandle, FormState, FieldMetadata, FormSchema};
 pub use validation::{ValidationErrors, Validators, register_validator, validate_custom};

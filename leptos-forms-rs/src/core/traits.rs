@@ -1,27 +1,79 @@
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use crate::core::types::{FieldValue, FieldError, FieldType, ValidatorConfig, FormError};
 use crate::validation::ValidationErrors;
-use crate::core::types::*;
+use std::collections::HashMap;
 
-/// Core trait that all forms must implement
-pub trait Form: Clone + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static {
-    /// Get field metadata for runtime introspection
-    fn field_metadata() -> Vec<FieldMetadata>;
+/// Core trait that all form types must implement
+pub trait Form: Clone + serde::Serialize + for<'de> serde::Deserialize<'de> + Send + Sync + 'static {
+    /// Get field metadata for this form
+    fn field_metadata() -> Vec<FieldMetadata> where Self: Sized;
     
-    /// Validate the entire form
+    /// Validate the form data
     fn validate(&self) -> Result<(), ValidationErrors>;
     
     /// Get a field value by name (for dynamic access)
-    fn get_field(&self, name: &str) -> Option<FieldValue>;
-    
+    fn get_field(&self, _name: &str) -> Option<FieldValue> {
+        None // Placeholder - will be implemented by derive macro
+    }
+
     /// Set a field value by name (for dynamic updates)
-    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), FieldError>;
+    fn set_field(&mut self, _name: &str, _value: FieldValue) -> Result<(), FieldError> {
+        Err(FieldError::new(
+            _name.to_string(),
+            "Field not found or not settable".to_string(),
+        ))
+    }
     
-    /// Get default values
-    fn default_values() -> Self;
+    /// Get default values for the form
+    fn default_values() -> Self where Self: Sized;
     
-    /// Get the form schema (for validation and UI generation)
-    fn schema() -> FormSchema;
+    /// Get the form schema
+    fn schema() -> FormSchema where Self: Sized;
+}
+
+/// Form state representation
+#[derive(Debug, Clone)]
+pub struct FormState<T: Form> {
+    pub values: T,
+    pub errors: ValidationErrors,
+    pub is_dirty: bool,
+    pub is_submitting: bool,
+    pub is_valid: bool,
+    pub touched_fields: std::collections::HashSet<String>,
+}
+
+impl<T: Form> FormState<T> {
+    pub fn new(values: T) -> Self {
+        Self {
+            values,
+            errors: ValidationErrors::new(),
+            is_dirty: false,
+            is_submitting: false,
+            is_valid: true,
+            touched_fields: std::collections::HashSet::new(),
+        }
+    }
+    
+    pub fn with_errors(mut self, errors: ValidationErrors) -> Self {
+        let is_empty = errors.is_empty();
+        self.errors = errors;
+        self.is_valid = is_empty;
+        self
+    }
+    
+    pub fn mark_dirty(mut self) -> Self {
+        self.is_dirty = true;
+        self
+    }
+    
+    pub fn mark_submitting(mut self) -> Self {
+        self.is_submitting = true;
+        self
+    }
+    
+    pub fn mark_touched(mut self, field_name: String) -> Self {
+        self.touched_fields.insert(field_name);
+        self
+    }
 }
 
 /// Metadata about a form field
@@ -65,7 +117,6 @@ impl FormSchema {
         self.fields.iter().filter(|f| f.is_required).collect()
     }
 }
-
 /// Trait for form field components
 pub trait FormFieldComponent {
     /// Get the field name
@@ -123,52 +174,6 @@ pub trait FormStateManager<T: Form> {
     fn unsubscribe(&self, id: SubscriptionId);
 }
 
-/// Form state representation
-#[derive(Debug, Clone)]
-pub struct FormState<T: Form> {
-    pub values: T,
-    pub errors: ValidationErrors,
-    pub is_dirty: bool,
-    pub is_submitting: bool,
-    pub is_valid: bool,
-    pub touched_fields: std::collections::HashSet<String>,
-}
-
-impl<T: Form> FormState<T> {
-    pub fn new(values: T) -> Self {
-        Self {
-            values,
-            errors: ValidationErrors::new(),
-            is_dirty: false,
-            is_submitting: false,
-            is_valid: true,
-            touched_fields: std::collections::HashSet::new(),
-        }
-    }
-    
-    pub fn with_errors(mut self, errors: ValidationErrors) -> Self {
-        let is_empty = errors.is_empty();
-        self.errors = errors;
-        self.is_valid = is_empty;
-        self
-    }
-    
-    pub fn mark_dirty(mut self) -> Self {
-        self.is_dirty = true;
-        self
-    }
-    
-    pub fn mark_submitting(mut self) -> Self {
-        self.is_submitting = true;
-        self
-    }
-    
-    pub fn mark_touched(mut self, field_name: String) -> Self {
-        self.touched_fields.insert(field_name);
-        self
-    }
-}
-
 /// Subscription ID for form state changes
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SubscriptionId(usize);
@@ -208,3 +213,4 @@ pub trait FormAnalytics<T: Form> {
     /// Track validation errors
     fn track_validation_errors(&self, form_name: &str, errors: &ValidationErrors);
 }
+
