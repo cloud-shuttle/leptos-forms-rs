@@ -74,19 +74,37 @@ pub fn use_form_validation<T: Form + PartialEq + Send + Sync>(form: &FormHandle<
 }
 
 /// Hook for form submission
-pub fn use_form_submission<T: Form + PartialEq + Send + Sync, F>(form: &FormHandle<T>, _handler: F) -> (
+pub fn use_form_submission<T: Form + PartialEq + Send + Sync, F>(form: &FormHandle<T>, handler: F) -> (
     Memo<bool>,
     Callback<(), ()>
 ) 
 where
-    F: Fn(&T) -> Result<(), FormError> + 'static,
+    F: Fn(&T) -> Result<(), FormError> + 'static + Clone + Send + Sync,
 {
     let is_submitting = form.is_submitting();
+    let form_clone = form.clone();
     
     let submit = Callback::new(move |_| {
+        let form_handle = form_clone.clone();
+        let handler_clone = handler.clone();
+        
         spawn_local(async move {
-            // This would need to be implemented with proper async handling
-            // For now, we'll just call the handler synchronously
+            // Get the current form values
+            let form_data = form_handle.get_values();
+            
+            // Call the handler with the form data
+            let result = handler_clone(&form_data.get());
+            
+            // Handle the result
+            match result {
+                Ok(_) => {
+                    // Success - could emit a success signal here
+                }
+                Err(error) => {
+                    // Error - could emit an error signal here
+                    log::error!("Form submission error: {:?}", error);
+                }
+            }
         });
     });
     
@@ -94,21 +112,53 @@ where
 }
 
 /// Hook for form persistence
-pub fn use_form_persistence<T: Form + PartialEq + Send + Sync>(_form: &FormHandle<T>, _storage_key: Option<String>) -> (
+pub fn use_form_persistence<T: Form + PartialEq + Send + Sync>(form: &FormHandle<T>, storage_key: Option<String>) -> (
     Callback<(), ()>,
     Callback<(), ()>,
     Callback<(), ()>
 ) {
+    let form_clone1 = form.clone();
+    let form_clone2 = form.clone();
+    let storage_key = storage_key.unwrap_or_else(|| format!("form-{}", std::any::type_name::<T>()));
+    let key1 = storage_key.clone();
+    let key2 = storage_key.clone();
+    let key3 = storage_key;
+    
     let save = Callback::new(move |_| {
-        // Implementation for saving form state
+        let form_handle = form_clone1.clone();
+        let key = key1.clone();
+        
+        spawn_local(async move {
+            // Get current form values
+            let form_data = form_handle.get_values();
+            
+            // Serialize to JSON
+            if let Ok(_json) = serde_json::to_string(&form_data) {
+                // Save to localStorage (in a real implementation, this would use web_sys)
+                log::info!("Saving form data for key: {}", key);
+                // For now, just log - in a real implementation, you'd use web_sys::Storage
+            }
+        });
     });
     
     let load = Callback::new(move |_| {
-        // Implementation for loading form state
+        let _form_handle = form_clone2.clone();
+        let key = key2.clone();
+        
+        spawn_local(async move {
+            log::info!("Loading form data for key: {}", key);
+            // In a real implementation, you'd load from web_sys::Storage
+            // and update the form with the loaded values
+        });
     });
     
     let clear = Callback::new(move |_| {
-        // Implementation for clearing saved form state
+        let key = key3.clone();
+        
+        spawn_local(async move {
+            log::info!("Clearing form data for key: {}", key);
+            // In a real implementation, you'd clear from web_sys::Storage
+        });
     });
     
     (save, load, clear)

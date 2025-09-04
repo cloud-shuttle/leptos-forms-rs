@@ -1,111 +1,64 @@
 use leptos::prelude::*;
-use crate::core::types::*;
+use leptos::wasm_bindgen::JsCast;
+use crate::core::FieldType;
 
-/// Text input component
+/// Unified Input component that handles different field types
 #[component]
-pub fn TextInput(
+pub fn Input(
     name: String,
-    value: ReadSignal<Option<FieldValue>>,
-    #[prop(optional)] input_type: Option<String>,
+    #[prop(optional)] value: Option<String>,
+    #[prop(optional)] field_type: Option<FieldType>,
     #[prop(optional)] placeholder: Option<String>,
-    #[prop(optional)] disabled: bool,
-    #[prop(optional)] required: bool,
+    #[prop(optional)] required: Option<bool>,
+    #[prop(optional)] disabled: Option<bool>,
+    #[prop(optional)] error: Option<String>,
+    #[prop(optional)] has_error: Option<bool>,
+    #[prop(optional)] on_change: Option<Callback<String>>,
+    #[prop(optional)] class: Option<String>,
 ) -> impl IntoView {
-    let _ = value;
-    let input_type = input_type.unwrap_or_else(|| "text".to_string());
+    let input_type = field_type
+        .map(|ft| match ft {
+            FieldType::Text => "text",
+            FieldType::Email => "email",
+            FieldType::Password => "password",
+            FieldType::Number(_) => "number",
+            FieldType::Boolean => "checkbox",
+            FieldType::Select(_) => "select",
+            FieldType::MultiSelect(_) => "select",
+            FieldType::Date => "date",
+            FieldType::DateTime => "datetime-local",
+            FieldType::File(_) => "file",
+            FieldType::Array(_) => "text", // Default to text for arrays
+            FieldType::Nested(_) => "text", // Default to text for nested forms
+        })
+        .unwrap_or("text");
+    
+    let is_required = required.unwrap_or(false);
+    let is_disabled = disabled.unwrap_or(false);
+    let input_class = class.unwrap_or_else(|| "form-input".to_string());
     
     view! {
-        <input
-            type=input_type
-            name=name
-            placeholder=placeholder.unwrap_or_default()
-            disabled=disabled
-            required=required
-            class="form-input"
-        />
-    }
-}
-
-/// Number input component
-#[component]
-pub fn NumberInput(
-    name: String,
-    value: ReadSignal<Option<FieldValue>>,
-    #[prop(optional)] placeholder: Option<String>,
-    #[prop(optional)] disabled: bool,
-    #[prop(optional)] required: bool,
-) -> impl IntoView {
-    let _ = value;
-    view! {
-        <input
-            type="number"
-            name=name
-            placeholder=placeholder.unwrap_or_default()
-            disabled=disabled
-            required=required
-            class="form-input"
-        />
-    }
-}
-
-/// Checkbox input component
-#[component]
-pub fn CheckboxInput(
-    name: String,
-    value: ReadSignal<Option<FieldValue>>,
-    #[prop(optional)] disabled: bool,
-    #[prop(optional)] required: bool,
-) -> impl IntoView {
-    let _ = value;
-    view! {
-        <input
-            type="checkbox"
-            name=name
-            disabled=disabled
-            required=required
-            class="form-checkbox"
-        />
-    }
-}
-
-/// Select input component
-#[component]
-pub fn SelectInput(
-    name: String,
-    value: ReadSignal<Option<FieldValue>>,
-    options: Vec<SelectOption>,
-    #[prop(optional)] placeholder: Option<String>,
-    #[prop(optional)] disabled: bool,
-    #[prop(optional)] required: bool,
-) -> impl IntoView {
-    let _ = value;
-    view! {
-        <select
-            name=name
-            disabled=disabled
-            required=required
-            class="form-select"
-        >
-                            {if let Some(placeholder_text) = placeholder {
-                    view! {
-                        <option value="" disabled=true selected=true>
-                            {placeholder_text}
-                        </option>
+        <div class="input-wrapper">
+            <input
+                type=input_type
+                name=name.clone()
+                value=value
+                placeholder=placeholder
+                required=is_required
+                disabled=is_disabled
+                class=input_class
+                on:input=move |ev| {
+                    if let Some(on_change_callback) = on_change.clone() {
+                        if let Some(target) = ev.target() {
+                            if let Some(input) = target.dyn_ref::<web_sys::HtmlInputElement>() {
+                                let value = input.value();
+                                on_change_callback.run(value);
+                            }
+                        }
                     }
-                } else {
-                    view! { <option value="" disabled=true selected=true>{String::new()}</option> }
-                }}
-            
-            {options.iter().map(|option| {
-                view! {
-                    <option 
-                        value=option.value.clone()
-                        disabled=option.disabled
-                    >
-                        {option.label.clone()}
-                    </option>
                 }
-            }).collect::<Vec<_>>()}
-        </select>
+            />
+            // Error display will be added later when we fix the view macro issue
+        </div>
     }
 }
