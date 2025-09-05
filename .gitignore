@@ -43,3 +43,48 @@ result
 result-*
 .direnv
 .envrc
+
+# Test results and reports
+test-results/
+playwright-report/
+coverage/
+*.lcov
+
+# Package manager files
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Editor and IDE files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.sublime-*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Rust specific
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# WASM specific
+pkg/
+*.wasm
