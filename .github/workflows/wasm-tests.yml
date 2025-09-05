@@ -61,5 +61,3 @@ jobs:
       - name: Run WASM tests (Headless Firefox)
         working-directory: tests
         run: wasm-pack test --headless --firefox
-
-

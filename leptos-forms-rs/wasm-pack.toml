@@ -1,0 +1,20 @@
+[package]
+name = "leptos-forms-rs"
+version = "1.0.0"
+
+[build]
+target = "web"
+out-dir = "pkg"
+scope = "leptos-forms"
+
+[build.release]
+# Optimize for size
+opt-level = "s"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[build.dev]
+# Keep debug info for development
+opt-level = 0
+debug = true

@@ -14,6 +14,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 ### ✨ **Added**
 
 #### **Core Features**
+
 - **Type-safe Form Handling**: Complete form state management with compile-time type safety
 - **Comprehensive Validation Engine**: Built-in validators (required, email, min/max length, pattern matching, custom validators)
 - **Reactive Form State**: Real-time form state updates using Leptos signals
@@ -21,6 +22,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 - **Nested Field Arrays**: Support for complex nested array structures
 
 #### **Advanced Features**
+
 - **Multi-step Forms**: Wizard navigation with step validation and progress tracking
 - **DevTools Integration**: Form state inspector, performance monitoring, and debug utilities
 - **Real-time Validation**: Live validation as users type with customizable debouncing
@@ -29,6 +31,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 - **Performance Monitoring**: Built-in performance metrics and benchmarking
 
 #### **Rich Input Components**
+
 - **Text Inputs**: Standard text, email, password, number inputs
 - **Rich Text Editor**: Full-featured rich text editing capabilities
 - **Markdown Editor**: Markdown input with live preview
@@ -38,6 +41,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 - **Select/MultiSelect**: Dropdown and multi-select components
 
 #### **Developer Experience**
+
 - **Comprehensive Hooks**: `use_form`, `use_field_value`, `use_field_error`, and more
 - **Procedural Macros**: `#[derive(Form)]` for automatic form implementation
 - **Type-safe Field Access**: Compile-time field name validation
@@ -47,18 +51,21 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 ### 🔧 **Technical Implementation**
 
 #### **Leptos 0.8 Compatibility**
+
 - Full compatibility with Leptos 0.8 APIs
 - Updated signal usage (`RwSignal::new()`, `signal()`, `Memo::new()`)
 - Proper `GetUntracked` trait implementation
 - Thread-safe data structures (`Send + Sync`)
 
 #### **Performance Optimizations**
+
 - Efficient memory usage with minimal allocations
 - Optimized validation engine with early returns
 - Lazy loading of heavy components
 - Stress-tested with forms containing 1000+ fields
 
 #### **Testing Infrastructure**
+
 - **174 Unit Tests**: 100% pass rate across all functionality
 - **Integration Tests**: Cross-module functionality verification
 - **E2E Tests**: Playwright-powered browser automation
@@ -67,6 +74,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 - **Cross-browser Testing**: Chrome, Firefox, WebKit, Mobile browsers
 
 ### 📊 **Quality Metrics**
+
 - **100% Test Coverage**: All core functionality tested
 - **Zero Compilation Errors**: Clean, warning-free builds
 - **API Consistency**: Uniform method signatures and patterns
@@ -74,6 +82,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 - **Example Applications**: Working basic and complex examples
 
 ### 🚀 **Ready for Production**
+
 - **Stable API**: No breaking changes expected in v1.x
 - **Comprehensive Testing**: Extensive test suite ensures reliability
 - **Performance Verified**: Optimized for production workloads
@@ -81,12 +90,14 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 - **Well Documented**: Complete documentation and examples
 
 ### 📦 **Packages**
+
 - `leptos-forms-rs` (v1.0.0): Main library
 - `leptos-forms-rs-macro` (v1.0.0): Procedural macros
 - `basic-form-example` (v1.0.0): Basic usage example
 - `complex-form-example` (v1.0.0): Advanced features example
 
 ### 🔗 **Dependencies**
+
 - **Leptos**: 0.8 (latest stable)
 - **Serde**: 1.0 (serialization)
 - **Chrono**: 0.4 (date/time handling)
@@ -98,12 +109,14 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 ## [0.4.0] - 2024-12-18
 
 ### Added
+
 - Initial release with core form functionality
 - Basic validation engine
 - Form handle implementation
 - Procedural macros for form derivation
 
 ### Changed
+
 - Updated to Leptos 0.8 compatibility
 - Improved API consistency
 - Enhanced error handling
@@ -113,6 +126,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 ## [0.2.0] - 2024-12-17
 
 ### Added
+
 - Basic form components
 - Initial validation system
 - Example applications
@@ -122,6 +136,7 @@ This is the first stable release of leptos-forms-rs, featuring a complete, produ
 ## [0.1.0] - 2024-12-16
 
 ### Added
+
 - Initial project setup
 - Basic form structure
 - Core traits and types

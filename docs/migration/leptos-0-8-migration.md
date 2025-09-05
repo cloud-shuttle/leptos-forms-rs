@@ -3,17 +3,20 @@
 ## Quick Migration
 
 ### 1. Update Dependencies
+
 ```toml
 [dependencies]
 leptos-forms-rs = { version = "0.1", features = ["leptos-0-8"] }
 ```
 
 ### 2. Add Recursion Limit
+
 ```rust
 #![recursion_limit = "256"]
 ```
 
 ### 3. Use Compatibility Layer
+
 ```rust
 use leptos_forms_rs::compat::*;
 
@@ -38,6 +41,7 @@ compat_component! {
 ## Migration Examples
 
 ### Before (0.6)
+
 ```rust
 #[component]
 fn Counter(cx: Scope) -> impl IntoView {
@@ -47,6 +51,7 @@ fn Counter(cx: Scope) -> impl IntoView {
 ```
 
 ### After (0.8 with Compatibility)
+
 ```rust
 compat_component! {
     fn Counter() -> impl IntoView {
@@ -62,7 +67,7 @@ compat_component! {
 # Test with Leptos 0.6
 cargo test --features leptos-0-6
 
-# Test with Leptos 0.8  
+# Test with Leptos 0.8
 cargo test --features leptos-0-8
 ```
 

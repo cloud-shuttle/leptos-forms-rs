@@ -1,6 +1,6 @@
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{NaiveDate, DateTime, Utc};
 
 /// Supported field types
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -66,7 +66,7 @@ impl FieldValue {
             _ => None,
         }
     }
-    
+
     pub fn to_string(&self) -> String {
         match self {
             FieldValue::String(s) => s.clone(),
@@ -81,7 +81,7 @@ impl FieldValue {
             FieldValue::Null => "null".to_string(),
         }
     }
-    
+
     pub fn as_number(&self) -> Option<f64> {
         match self {
             FieldValue::Number(n) => Some(*n),
@@ -89,32 +89,32 @@ impl FieldValue {
             _ => None,
         }
     }
-    
+
     pub fn as_boolean(&self) -> Option<bool> {
         match self {
             FieldValue::Boolean(b) => Some(*b),
             _ => None,
         }
     }
-    
+
     pub fn as_array(&self) -> Option<&Vec<FieldValue>> {
         match self {
             FieldValue::Array(arr) => Some(arr),
             _ => None,
         }
     }
-    
+
     pub fn as_object(&self) -> Option<&HashMap<String, FieldValue>> {
         match self {
             FieldValue::Object(obj) => Some(obj),
             _ => None,
         }
     }
-    
+
     pub fn is_null(&self) -> bool {
         matches!(self, FieldValue::Null)
     }
-    
+
     pub fn is_empty(&self) -> bool {
         match self {
             FieldValue::String(s) => s.is_empty(),
@@ -164,7 +164,7 @@ impl FieldError {
             code: None,
         }
     }
-    
+
     pub fn with_code(mut self, code: String) -> Self {
         self.code = Some(code);
         self
@@ -195,12 +195,12 @@ impl FormError {
             field_errors: Vec::new(),
         }
     }
-    
+
     pub fn with_code(mut self, code: String) -> Self {
         self.code = Some(code);
         self
     }
-    
+
     pub fn with_field_errors(mut self, field_errors: Vec<FieldError>) -> Self {
         self.field_errors = field_errors;
         self
@@ -241,37 +241,37 @@ impl FieldConfig {
             attributes: HashMap::new(),
         }
     }
-    
+
     pub fn with_label(mut self, label: String) -> Self {
         self.label = Some(label);
         self
     }
-    
+
     pub fn with_placeholder(mut self, placeholder: String) -> Self {
         self.placeholder = Some(placeholder);
         self
     }
-    
+
     pub fn with_help_text(mut self, help_text: String) -> Self {
         self.help_text = Some(help_text);
         self
     }
-    
+
     pub fn disabled(mut self) -> Self {
         self.disabled = true;
         self
     }
-    
+
     pub fn readonly(mut self) -> Self {
         self.readonly = true;
         self
     }
-    
+
     pub fn hidden(mut self) -> Self {
         self.hidden = true;
         self
     }
-    
+
     pub fn with_attribute(mut self, key: String, value: String) -> Self {
         self.attributes.insert(key, value);
         self
@@ -296,7 +296,7 @@ impl<T> FormSubmissionResult<T> {
             warnings: Vec::new(),
         }
     }
-    
+
     pub fn failure(errors: Vec<FormError>) -> Self {
         Self {
             success: false,
@@ -305,7 +305,7 @@ impl<T> FormSubmissionResult<T> {
             warnings: Vec::new(),
         }
     }
-    
+
     pub fn with_warnings(mut self, warnings: Vec<String>) -> Self {
         self.warnings = warnings;
         self
@@ -386,7 +386,14 @@ impl std::fmt::Debug for AnalyticsOptions {
             .field("track_field_interactions", &self.track_field_interactions)
             .field("track_validation_errors", &self.track_validation_errors)
             .field("track_submission_attempts", &self.track_submission_attempts)
-            .field("custom_tracking", &if self.custom_tracking.is_some() { "Some(Fn)" } else { "None" })
+            .field(
+                "custom_tracking",
+                &if self.custom_tracking.is_some() {
+                    "Some(Fn)"
+                } else {
+                    "None"
+                },
+            )
             .finish()
     }
 }
@@ -402,5 +409,3 @@ impl Clone for AnalyticsOptions {
         }
     }
 }
-
-

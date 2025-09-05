@@ -1,9 +1,9 @@
 use leptos::prelude::*;
 use leptos_forms_rs::core::types::FieldValue;
-use leptos_forms_rs::hooks::use_conditional_validation;
-use leptos_forms_rs::core::FormHandle;
 use leptos_forms_rs::core::Form;
-use serde::{Serialize, Deserialize};
+use leptos_forms_rs::core::FormHandle;
+use leptos_forms_rs::hooks::use_conditional_validation;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct TestForm {
@@ -54,27 +54,39 @@ impl Form for TestForm {
             },
         ]
     }
-    
+
     fn validate(&self) -> Result<(), leptos_forms_rs::validation::ValidationErrors> {
         let mut errors = leptos_forms_rs::validation::ValidationErrors::new();
-        
+
         if self.account_type.trim().is_empty() {
             errors.add_field_error("account_type", "Account type is required".to_string());
         }
-        
+
         if errors.is_empty() {
             Ok(())
         } else {
             Err(errors)
         }
     }
-    
+
     fn get_field_value(&self, name: &str) -> FieldValue {
         match name {
             "account_type" => FieldValue::String(self.account_type.clone()),
-            "company_name" => self.company_name.as_ref().map(|s| FieldValue::String(s.clone())).unwrap_or(FieldValue::String(String::new())),
-            "tax_id" => self.tax_id.as_ref().map(|s| FieldValue::String(s.clone())).unwrap_or(FieldValue::String(String::new())),
-            "personal_id" => self.personal_id.as_ref().map(|s| FieldValue::String(s.clone())).unwrap_or(FieldValue::String(String::new())),
+            "company_name" => self
+                .company_name
+                .as_ref()
+                .map(|s| FieldValue::String(s.clone()))
+                .unwrap_or(FieldValue::String(String::new())),
+            "tax_id" => self
+                .tax_id
+                .as_ref()
+                .map(|s| FieldValue::String(s.clone()))
+                .unwrap_or(FieldValue::String(String::new())),
+            "personal_id" => self
+                .personal_id
+                .as_ref()
+                .map(|s| FieldValue::String(s.clone()))
+                .unwrap_or(FieldValue::String(String::new())),
             _ => FieldValue::String(String::new()),
         }
     }
@@ -87,7 +99,7 @@ impl Form for TestForm {
             personal_id: None,
         }
     }
-    
+
     fn schema() -> leptos_forms_rs::core::FormSchema {
         leptos_forms_rs::core::FormSchema {
             name: "TestForm".to_string(),
@@ -100,8 +112,9 @@ impl Form for TestForm {
 fn test_conditional_validation_hook_creation() {
     // Test that we can create the conditional validation hook
     let form: FormHandle<TestForm> = FormHandle::new(TestForm::default_values());
-    let is_condition_met = use_conditional_validation(&form, "account_type", |form| form.account_type.len() > 5);
-    
+    let is_condition_met =
+        use_conditional_validation(&form, "account_type", |form| form.account_type.len() > 5);
+
     // If we get here, the hook compiles and can be created
     assert!(true);
 }
@@ -110,18 +123,19 @@ fn test_conditional_validation_hook_creation() {
 fn test_conditional_validation_hook_types() {
     // Test that the hook returns the correct types
     let form: FormHandle<TestForm> = FormHandle::new(TestForm::default_values());
-    let is_condition_met = use_conditional_validation(&form, "account_type", |form| form.account_type.len() > 5);
-    
+    let is_condition_met =
+        use_conditional_validation(&form, "account_type", |form| form.account_type.len() > 5);
+
     // Test that we can create the callbacks (without running them to avoid async issues)
     let field_name = "company_name".to_string();
     let field_value = FieldValue::String("Acme Corp".to_string());
-    
+
     // Just verify the callback types are correct
     let _callback_input = (field_name, field_value);
-    
+
     // Test that we can call the clear validation callback (synchronous)
     // clear_validation.run(());
-    
+
     // If we get here, all types are correct and callbacks work
     assert!(true);
 }
@@ -130,11 +144,12 @@ fn test_conditional_validation_hook_types() {
 fn test_conditional_validation_error_handling() {
     // Test that the hook can handle validation errors
     let form: FormHandle<TestForm> = FormHandle::new(TestForm::default_values());
-    let is_condition_met = use_conditional_validation(&form, "account_type", |form| form.account_type.len() > 5);
-    
+    let is_condition_met =
+        use_conditional_validation(&form, "account_type", |form| form.account_type.len() > 5);
+
     // Initially, there should be no validation errors
     // assert!(validation_errors.get().is_empty());
-    
+
     // If we get here, the hook handles errors correctly
     assert!(true);
 }

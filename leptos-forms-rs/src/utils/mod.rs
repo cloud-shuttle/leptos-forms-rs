@@ -1,7 +1,7 @@
 use crate::core::traits::Form;
 use crate::core::types::FieldValue;
 use crate::validation::ValidationErrors;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Utility functions for form operations
@@ -14,24 +14,24 @@ pub fn form_to_map<T: Form>(form: &T) -> HashMap<String, FieldValue> {
 /// Convert a HashMap of field values to a form
 pub fn map_to_form<T: Form>(map: &HashMap<String, FieldValue>) -> Result<T, String> {
     let form = T::default_values();
-    
+
     for (field_name, value) in map {
         // For now, we'll just log the operation
         // In a real implementation, you'd need to mutate the form
         log::info!("Setting field {} to {:?}", field_name, value);
     }
-    
+
     Ok(form)
 }
 
 /// Merge validation errors from multiple sources
 pub fn merge_validation_errors(errors: Vec<ValidationErrors>) -> ValidationErrors {
     let mut merged = ValidationErrors::new();
-    
+
     for error_set in errors {
         merged.merge(error_set);
     }
-    
+
     merged
 }
 
@@ -79,22 +79,23 @@ pub fn get_field_type<T: Form>(field_name: &str) -> Option<crate::core::types::F
 pub fn validate_field_value<T: Form>(
     _form: &T,
     field_name: &str,
-    value: &FieldValue
+    value: &FieldValue,
 ) -> Result<(), String> {
     let metadata = T::field_metadata();
-    
+
     // Find field metadata
-    let field_meta = metadata.iter()
+    let field_meta = metadata
+        .iter()
         .find(|meta| meta.name == field_name)
         .ok_or_else(|| "Field not found".to_string())?;
-    
+
     // Validate against field validators
     for validator in &field_meta.validators {
         if let Err(error) = validate_value_against_validator(value, validator) {
             return Err(error);
         }
     }
-    
+
     // Check if field is required
     if field_meta.is_required {
         if let FieldValue::String(s) = value {
@@ -103,26 +104,26 @@ pub fn validate_field_value<T: Form>(
             }
         }
     }
-    
+
     Ok(())
 }
 
 /// Validate a value against a specific validator
 fn validate_value_against_validator(
     value: &FieldValue,
-    validator: &crate::validation::Validator
+    validator: &crate::validation::Validator,
 ) -> Result<(), String> {
     use crate::validation::Validator;
-    
+
     match validator {
-        Validator::Required => {
-            match value {
-                FieldValue::String(s) if s.trim().is_empty() => Err("This field is required".to_string()),
-                FieldValue::Null => Err("This field is required".to_string()),
-                FieldValue::Array(arr) if arr.is_empty() => Err("This field is required".to_string()),
-                _ => Ok(()),
+        Validator::Required => match value {
+            FieldValue::String(s) if s.trim().is_empty() => {
+                Err("This field is required".to_string())
             }
-        }
+            FieldValue::Null => Err("This field is required".to_string()),
+            FieldValue::Array(arr) if arr.is_empty() => Err("This field is required".to_string()),
+            _ => Ok(()),
+        },
         Validator::Email => {
             if let FieldValue::String(email) = value {
                 let email_regex = regex::Regex::new(r"^[^\s@]+@[^\s@]+\.[^\s@]+$").unwrap();
@@ -171,7 +172,8 @@ fn validate_value_against_validator(
         }
         Validator::Pattern(pattern) => {
             if let FieldValue::String(s) = value {
-                let regex = regex::Regex::new(pattern).map_err(|_| "Invalid pattern".to_string())?;
+                let regex =
+                    regex::Regex::new(pattern).map_err(|_| "Invalid pattern".to_string())?;
                 if regex.is_match(s) {
                     Ok(())
                 } else {
@@ -223,26 +225,22 @@ fn validate_value_against_validator(
 
 /// Serialize a form to JSON
 pub fn serialize_form<T: Form>(form: &T) -> Result<String, String> {
-    serde_json::to_string(form)
-        .map_err(|e| format!("Failed to serialize form: {}", e))
+    serde_json::to_string(form).map_err(|e| format!("Failed to serialize form: {}", e))
 }
 
 /// Deserialize a form from JSON
 pub fn deserialize_form<T: Form>(json: &str) -> Result<T, String> {
-    serde_json::from_str(json)
-        .map_err(|e| format!("Failed to deserialize form: {}", e))
+    serde_json::from_str(json).map_err(|e| format!("Failed to deserialize form: {}", e))
 }
 
 /// Create a form from a JSON object
 pub fn form_from_json<T: Form>(json: serde_json::Value) -> Result<T, String> {
-    serde_json::from_value(json)
-        .map_err(|e| format!("Failed to create form from JSON: {}", e))
+    serde_json::from_value(json).map_err(|e| format!("Failed to create form from JSON: {}", e))
 }
 
 /// Convert a form to a JSON object
 pub fn form_to_json<T: Form>(form: &T) -> Result<serde_json::Value, String> {
-    serde_json::to_value(form)
-        .map_err(|e| format!("Failed to convert form to JSON: {}", e))
+    serde_json::to_value(form).map_err(|e| format!("Failed to convert form to JSON: {}", e))
 }
 
 /// Check if two forms are equal
@@ -256,7 +254,7 @@ pub fn get_form_stats<T: Form>(_form: &T) -> FormStats {
     let total_fields = metadata.len();
     let required_fields = metadata.iter().filter(|meta| meta.is_required).count();
     let optional_fields = total_fields - required_fields;
-    
+
     FormStats {
         total_fields,
         required_fields,
@@ -290,7 +288,7 @@ impl FormValidationResult {
             error_count: 0,
         }
     }
-    
+
     pub fn with_errors(errors: ValidationErrors) -> Self {
         let error_count = errors.field_errors.len() + errors.form_errors.len();
         Self {
@@ -300,7 +298,7 @@ impl FormValidationResult {
             error_count,
         }
     }
-    
+
     pub fn with_field_count(field_count: usize) -> Self {
         Self {
             is_valid: true,
@@ -315,7 +313,7 @@ impl FormValidationResult {
 pub fn validate_form_detailed<T: Form>(form: &T) -> FormValidationResult {
     let field_count = T::field_metadata().len();
     let validation_result = form.validate();
-    
+
     match validation_result {
         Ok(_) => FormValidationResult::with_field_count(field_count),
         Err(errors) => {

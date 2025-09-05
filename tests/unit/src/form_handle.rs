@@ -1,9 +1,9 @@
 //! Tests for FormHandle functionality
 
-use serde::{Serialize, Deserialize};
-use leptos_forms_rs::core::{FieldType, FieldValue, FieldMetadata, FormSchema, FieldError};
+use leptos_forms_rs::core::{FieldError, FieldMetadata, FieldType, FieldValue, FormSchema};
 use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::{Form, ValidationErrors};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct TestForm {
@@ -37,17 +37,17 @@ impl Form for TestForm {
 
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         if self.name.is_empty() {
             errors.add_field_error("name", "Name is required".to_string());
         }
-        
+
         if self.email.is_empty() {
             errors.add_field_error("email", "Email is required".to_string());
         } else if !self.email.contains('@') {
             errors.add_field_error("email", "Invalid email format".to_string());
         }
-        
+
         if errors.has_errors() {
             Err(errors)
         } else {
@@ -88,10 +88,10 @@ fn test_form_handle_creation() {
 #[test]
 fn test_form_handle_set_field() {
     let mut form = TestForm::default_values();
-    
+
     form.name = "John".to_string();
     form.email = "john@example.com".to_string();
-    
+
     assert_eq!(form.name, "John");
     assert_eq!(form.email, "john@example.com");
 }
@@ -99,15 +99,15 @@ fn test_form_handle_set_field() {
 #[test]
 fn test_form_handle_validation() {
     let mut form = TestForm::default_values();
-    
+
     // Initially should be invalid (empty fields)
     let result = form.validate();
     assert!(result.is_err());
-    
+
     // Set valid values
     form.name = "John".to_string();
     form.email = "john@example.com".to_string();
-    
+
     // Should now be valid
     let result = form.validate();
     assert!(result.is_ok());
@@ -117,7 +117,7 @@ fn test_form_handle_validation() {
 fn test_form_handle_schema() {
     let schema = TestForm::schema();
     assert_eq!(schema.field_metadata.len(), 2);
-    
+
     // Note: required_fields() method doesn't exist in current API
     // let required_fields = schema.required_fields();
     // assert_eq!(required_fields.len(), 2); // Both fields are required
@@ -126,12 +126,12 @@ fn test_form_handle_schema() {
 #[test]
 fn test_form_handle_field_access() {
     let mut form = TestForm::default_values();
-    
+
     // Test setting and getting field values
     form.name = "Jane Doe".to_string();
     let value = form.get_field_value("name");
     assert_eq!(value, FieldValue::String("Jane Doe".to_string()));
-    
+
     // Test unknown field
     let value = form.get_field_value("unknown_field");
     assert_eq!(value, FieldValue::String(String::new()));

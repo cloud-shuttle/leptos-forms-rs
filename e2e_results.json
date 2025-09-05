@@ -1,5 +1,0 @@
-
-> leptos-forms-rs@0.1.0 test:e2e
-> playwright test --reporter=json
-
-✅ Test suite loaded: 🧪 Leptos Forms Test Suite

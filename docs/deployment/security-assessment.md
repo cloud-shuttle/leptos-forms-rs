@@ -1,13 +1,15 @@
 # Security Assessment - Leptos Forms
-**Project**: Leptos Forms Library  
-**Version**: 1.0  
-**Date**: 2025-01-02  
-**Status**: Security Strategy  
-**Classification**: Internal Security Review  
+
+**Project**: Leptos Forms Library
+**Version**: 1.0
+**Date**: 2025-01-02
+**Status**: Security Strategy
+**Classification**: Internal Security Review
 
 ## 1. Security Overview
 
 ### 1.1 Security Objectives
+
 - **Data Protection**: Secure handling of form data and sensitive information
 - **Input Validation**: Comprehensive client and server-side validation
 - **XSS Prevention**: Protection against cross-site scripting attacks
@@ -16,16 +18,18 @@
 - **Privacy Compliance**: GDPR, CCPA, and other privacy regulation compliance
 
 ### 1.2 Security Scope
-| Component | Security Level | Threat Model |
-|-----------|---------------|--------------|
-| Form Data Handling | High | Data injection, XSS, CSRF |
-| Validation System | High | Bypass, injection, DoS |
-| Cache Layer | Medium | Data leakage, tampering |
-| File Upload | High | Malware, path traversal, DoS |
-| Session Management | High | Session hijacking, fixation |
-| Dependencies | High | Supply chain attacks |
+
+| Component          | Security Level | Threat Model                 |
+| ------------------ | -------------- | ---------------------------- |
+| Form Data Handling | High           | Data injection, XSS, CSRF    |
+| Validation System  | High           | Bypass, injection, DoS       |
+| Cache Layer        | Medium         | Data leakage, tampering      |
+| File Upload        | High           | Malware, path traversal, DoS |
+| Session Management | High           | Session hijacking, fixation  |
+| Dependencies       | High           | Supply chain attacks         |
 
 ### 1.3 Compliance Requirements
+
 - **OWASP Top 10**: Address all critical web security risks
 - **GDPR Article 32**: Technical and organizational security measures
 - **SOC 2 Type II**: Security controls and monitoring
@@ -36,6 +40,7 @@
 ### 2.1 Attack Surface Analysis
 
 #### Client-Side Attack Vectors
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Browser Environment                      │
@@ -63,6 +68,7 @@
 ```
 
 #### Network Attack Vectors
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Network Layer                           │
@@ -86,22 +92,23 @@
 
 ### 2.2 Risk Assessment Matrix
 
-| Threat | Likelihood | Impact | Risk Level | Mitigation Priority |
-|--------|------------|---------|------------|-------------------|
-| XSS via form inputs | High | High | **Critical** | Immediate |
-| CSRF attacks | Medium | High | **High** | Week 1 |
-| Sensitive data exposure | Medium | High | **High** | Week 1 |
-| File upload attacks | Medium | Medium | **Medium** | Week 3 |
-| Dependency vulnerabilities | High | Medium | **High** | Ongoing |
-| Session hijacking | Low | High | **Medium** | Week 4 |
-| DoS via validation bypass | Medium | Medium | **Medium** | Week 6 |
-| Supply chain attacks | Low | High | **Medium** | Ongoing |
+| Threat                     | Likelihood | Impact | Risk Level   | Mitigation Priority |
+| -------------------------- | ---------- | ------ | ------------ | ------------------- |
+| XSS via form inputs        | High       | High   | **Critical** | Immediate           |
+| CSRF attacks               | Medium     | High   | **High**     | Week 1              |
+| Sensitive data exposure    | Medium     | High   | **High**     | Week 1              |
+| File upload attacks        | Medium     | Medium | **Medium**   | Week 3              |
+| Dependency vulnerabilities | High       | Medium | **High**     | Ongoing             |
+| Session hijacking          | Low        | High   | **Medium**   | Week 4              |
+| DoS via validation bypass  | Medium     | Medium | **Medium**   | Week 6              |
+| Supply chain attacks       | Low        | High   | **Medium**   | Ongoing             |
 
 ## 3. Security Controls Implementation
 
 ### 3.1 Input Validation and Sanitization
 
 #### Client-Side Input Sanitization
+
 ```rust
 // src/security/input_sanitization.rs
 use regex::Regex;
@@ -141,7 +148,7 @@ impl InputSanitizer {
             }),
         }
     }
-    
+
     pub fn sanitize_field_value(&self, value: &FieldValue) -> Result<FieldValue, SecurityError> {
         match value {
             FieldValue::String(s) => {
@@ -168,17 +175,17 @@ impl InputSanitizer {
             other => Ok(other.clone()),
         }
     }
-    
+
     fn sanitize_string(&self, input: &str) -> Result<String, SecurityError> {
         // Check for malicious patterns
         if self.script_patterns.is_match(input) {
             return Err(SecurityError::MaliciousScript(input.to_string()));
         }
-        
+
         if self.sql_patterns.is_match(input) {
             return Err(SecurityError::SqlInjectionAttempt(input.to_string()));
         }
-        
+
         // HTML encode dangerous characters
         let mut sanitized = input.to_string();
         sanitized = sanitized.replace('&', "&amp;");
@@ -186,12 +193,12 @@ impl InputSanitizer {
         sanitized = sanitized.replace('>', "&gt;");
         sanitized = sanitized.replace('"', "&quot;");
         sanitized = sanitized.replace('\'', "&#x27;");
-        
+
         // Limit length to prevent DoS
         if sanitized.len() > 10000 {
             return Err(SecurityError::InputTooLong(sanitized.len()));
         }
-        
+
         Ok(sanitized)
     }
 }
@@ -200,22 +207,23 @@ impl InputSanitizer {
 pub enum SecurityError {
     #[error("Malicious script detected: {0}")]
     MaliciousScript(String),
-    
+
     #[error("SQL injection attempt detected: {0}")]
     SqlInjectionAttempt(String),
-    
+
     #[error("Input too long: {0} characters")]
     InputTooLong(usize),
-    
+
     #[error("Invalid file type: {0}")]
     InvalidFileType(String),
-    
+
     #[error("File too large: {0} bytes")]
     FileTooLarge(usize),
 }
 ```
 
 #### Validation Security Wrapper
+
 ```rust
 // src/security/secure_validation.rs
 use crate::validation::*;
@@ -233,7 +241,7 @@ impl SecureValidator {
             rate_limiter: RateLimiter::new(100, std::time::Duration::from_secs(60)), // 100 validations per minute
         }
     }
-    
+
     pub fn validate_with_security<T: Form>(&self, form: &T) -> Result<(), ValidationErrors> {
         // Rate limiting
         if !self.rate_limiter.check_rate_limit() {
@@ -241,11 +249,11 @@ impl SecureValidator {
                 "Rate limit exceeded. Please slow down.".to_string()
             ]));
         }
-        
+
         // Get all field values and sanitize them
         let field_metadata = T::field_metadata();
         let mut sanitized_form = form.clone();
-        
+
         for field_meta in &field_metadata {
             if let Some(field_value) = form.get_field(&field_meta.name) {
                 match self.sanitizer.sanitize_field_value(&field_value) {
@@ -264,7 +272,7 @@ impl SecureValidator {
                 }
             }
         }
-        
+
         // Run normal validation on sanitized form
         sanitized_form.validate()
     }
@@ -284,14 +292,14 @@ impl RateLimiter {
             requests: std::sync::Mutex::new(Vec::new()),
         }
     }
-    
+
     fn check_rate_limit(&self) -> bool {
         let now = std::time::Instant::now();
         let mut requests = self.requests.lock().unwrap();
-        
+
         // Remove old requests outside the window
         requests.retain(|&request_time| now.duration_since(request_time) < self.window_duration);
-        
+
         if requests.len() < self.max_requests {
             requests.push(now);
             true
@@ -305,6 +313,7 @@ impl RateLimiter {
 ### 3.2 Cross-Site Scripting (XSS) Prevention
 
 #### Content Security Policy Integration
+
 ```rust
 // src/security/csp.rs
 pub struct ContentSecurityPolicy {
@@ -314,38 +323,38 @@ pub struct ContentSecurityPolicy {
 impl ContentSecurityPolicy {
     pub fn new_strict() -> Self {
         let mut directives = std::collections::HashMap::new();
-        
+
         // Default source restrictions
         directives.insert("default-src".to_string(), vec!["'self'".to_string()]);
-        
+
         // Script source restrictions
         directives.insert("script-src".to_string(), vec![
             "'self'".to_string(),
             "'unsafe-inline'".to_string(), // Required for Leptos hydration
             "blob:".to_string(),           // Required for WASM
         ]);
-        
+
         // Style source restrictions
         directives.insert("style-src".to_string(), vec![
             "'self'".to_string(),
             "'unsafe-inline'".to_string(), // Common for CSS-in-JS
         ]);
-        
+
         // Object source restrictions
         directives.insert("object-src".to_string(), vec!["'none'".to_string()]);
-        
+
         // Base URI restrictions
         directives.insert("base-uri".to_string(), vec!["'self'".to_string()]);
-        
+
         // Form action restrictions
         directives.insert("form-action".to_string(), vec!["'self'".to_string()]);
-        
+
         // Frame ancestors
         directives.insert("frame-ancestors".to_string(), vec!["'none'".to_string()]);
-        
+
         Self { directives }
     }
-    
+
     pub fn to_header_value(&self) -> String {
         self.directives
             .iter()
@@ -357,6 +366,7 @@ impl ContentSecurityPolicy {
 ```
 
 #### XSS-Safe DOM Manipulation
+
 ```rust
 // src/security/dom_safety.rs
 use leptos::*;
@@ -375,12 +385,12 @@ pub fn sanitize_html(input: &str) -> Result<String, SecurityError> {
         .tags(hashset!["p", "br", "strong", "em", "u", "ol", "ul", "li"]) // Allow safe tags only
         .clean(input)
         .to_string();
-    
+
     // Additional checks
     if sanitized.contains("<script") || sanitized.contains("javascript:") {
         return Err(SecurityError::MaliciousScript(input.to_string()));
     }
-    
+
     Ok(sanitized)
 }
 
@@ -396,13 +406,13 @@ pub fn SafeUserContent(
         } else {
             content.clone()
         };
-        
+
         match sanitize_html(&truncated) {
             Ok(sanitized) => sanitized,
             Err(_) => "Content removed for security".to_string(),
         }
     };
-    
+
     view! {
         <div inner_html=safe_content></div>
     }
@@ -412,6 +422,7 @@ pub fn SafeUserContent(
 ### 3.3 CSRF Protection
 
 #### CSRF Token Integration
+
 ```rust
 // src/security/csrf.rs
 use rand::{Rng, thread_rng};
@@ -427,17 +438,17 @@ impl CsrfProtection {
         thread_rng().fill(&mut secret);
         Self { secret }
     }
-    
+
     pub fn generate_token(&self, session_id: &str) -> String {
         let mut hasher = Sha256::new();
         hasher.update(&self.secret);
         hasher.update(session_id.as_bytes());
         hasher.update(&chrono::Utc::now().timestamp().to_le_bytes());
-        
+
         let hash = hasher.finalize();
         base64::encode(hash)
     }
-    
+
     pub fn verify_token(&self, token: &str, session_id: &str) -> bool {
         // In production, this would check against server-side token
         // For client-side validation, we ensure token exists and has correct format
@@ -455,12 +466,12 @@ pub fn CsrfForm<T: Form>(
     let enhanced_handle_submit = {
         let original_submit = form_handle.handle_submit.clone();
         let csrf_token = csrf_token.clone();
-        
+
         Rc::new(move |event: web_sys::Event| {
             // Add CSRF token to form data
             if let Some(form_element) = event.target()
                 .and_then(|target| target.dyn_into::<web_sys::HtmlFormElement>().ok()) {
-                
+
                 let csrf_input = web_sys::window()
                     .unwrap()
                     .document()
@@ -469,18 +480,18 @@ pub fn CsrfForm<T: Form>(
                     .unwrap()
                     .dyn_into::<web_sys::HtmlInputElement>()
                     .unwrap();
-                    
+
                 csrf_input.set_type("hidden");
                 csrf_input.set_name("csrf_token");
                 csrf_input.set_value(&csrf_token);
-                
+
                 form_element.append_child(&csrf_input).unwrap();
             }
-            
+
             original_submit(event);
         })
     };
-    
+
     view! {
         <form on:submit=enhanced_handle_submit>
             {children()}
@@ -492,6 +503,7 @@ pub fn CsrfForm<T: Form>(
 ### 3.4 File Upload Security
 
 #### Secure File Upload Handler
+
 ```rust
 // src/security/file_security.rs
 use std::collections::HashSet;
@@ -510,77 +522,77 @@ impl SecureFileHandler {
         allowed_types.insert("image/gif".to_string());
         allowed_types.insert("text/plain".to_string());
         allowed_types.insert("application/pdf".to_string());
-        
+
         Self {
             allowed_types,
             max_file_size: 10 * 1024 * 1024, // 10MB
             virus_scanner: None, // Initialize virus scanner if available
         }
     }
-    
+
     pub async fn validate_file(&self, file: &web_sys::File) -> Result<(), SecurityError> {
         // Check file size
         if file.size() as usize > self.max_file_size {
             return Err(SecurityError::FileTooLarge(file.size() as usize));
         }
-        
+
         // Check file type
         let mime_type = file.type_();
         if !self.allowed_types.contains(&mime_type) {
             return Err(SecurityError::InvalidFileType(mime_type));
         }
-        
+
         // Check file name for path traversal
         let filename = file.name();
         if filename.contains("..") || filename.contains('/') || filename.contains('\\') {
             return Err(SecurityError::InvalidFileName(filename));
         }
-        
+
         // Validate file signature (magic bytes)
         let file_data = self.read_file_bytes(file).await?;
         self.validate_file_signature(&file_data, &mime_type)?;
-        
+
         // Virus scanning (if available)
         if let Some(scanner) = &self.virus_scanner {
             scanner.scan(&file_data).await?;
         }
-        
+
         Ok(())
     }
-    
+
     async fn read_file_bytes(&self, file: &web_sys::File) -> Result<Vec<u8>, SecurityError> {
         use js_sys::Uint8Array;
         use wasm_bindgen::JsCast;
         use wasm_bindgen_futures::JsFuture;
-        
+
         let array_buffer = JsFuture::from(file.array_buffer()).await
             .map_err(|_| SecurityError::FileReadError)?;
         let uint8_array = Uint8Array::new(&array_buffer);
         Ok(uint8_array.to_vec())
     }
-    
+
     fn validate_file_signature(&self, data: &[u8], expected_type: &str) -> Result<(), SecurityError> {
         if data.len() < 8 {
             return Err(SecurityError::InvalidFileSignature);
         }
-        
+
         let signature = &data[0..8];
         let valid = match expected_type {
             "image/jpeg" => signature.starts_with(&[0xFF, 0xD8, 0xFF]),
             "image/png" => signature.starts_with(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]),
-            "image/gif" => signature.starts_with(&[0x47, 0x49, 0x46, 0x38]) && 
+            "image/gif" => signature.starts_with(&[0x47, 0x49, 0x46, 0x38]) &&
                           (signature[4] == 0x37 || signature[4] == 0x39),
             "application/pdf" => signature.starts_with(b"%PDF-"),
             _ => true, // Skip signature check for text files
         };
-        
+
         if !valid {
             return Err(SecurityError::FileTypeMismatch {
                 expected: expected_type.to_string(),
                 actual: format!("{:02X?}", &signature[0..4]),
             });
         }
-        
+
         Ok(())
     }
 }
@@ -589,22 +601,22 @@ impl SecureFileHandler {
 pub enum SecurityError {
     #[error("File too large: {0} bytes")]
     FileTooLarge(usize),
-    
+
     #[error("Invalid file type: {0}")]
     InvalidFileType(String),
-    
+
     #[error("Invalid file name: {0}")]
     InvalidFileName(String),
-    
+
     #[error("Invalid file signature")]
     InvalidFileSignature,
-    
+
     #[error("File type mismatch - expected {expected}, got {actual}")]
     FileTypeMismatch { expected: String, actual: String },
-    
+
     #[error("File read error")]
     FileReadError,
-    
+
     #[error("Virus detected in file")]
     VirusDetected,
 }
@@ -613,6 +625,7 @@ pub enum SecurityError {
 ### 3.5 Secure Storage Implementation
 
 #### Encrypted Local Storage
+
 ```rust
 // src/security/secure_storage.rs
 use aes_gcm::{Aes256Gcm, Key, Nonce, NewAead, AeadInPlace};
@@ -634,77 +647,77 @@ impl SecureStorage {
             10000, // iterations
             &mut key_bytes,
         );
-        
+
         let key = Key::from_slice(&key_bytes);
         let cipher = Aes256Gcm::new(key);
-        
+
         let window = web_sys::window().ok_or(SecurityError::StorageUnavailable)?;
         let storage = window
             .local_storage()
             .map_err(|_| SecurityError::StorageUnavailable)?
             .ok_or(SecurityError::StorageUnavailable)?;
-        
+
         Ok(Self { cipher, storage })
     }
-    
+
     pub fn store_encrypted(&self, key: &str, data: &str) -> Result<(), SecurityError> {
         let mut nonce_bytes = [0u8; 12];
         thread_rng().fill(&mut nonce_bytes);
         let nonce = Nonce::from_slice(&nonce_bytes);
-        
+
         let mut buffer = data.as_bytes().to_vec();
         self.cipher
             .encrypt_in_place(nonce, b"", &mut buffer)
             .map_err(|_| SecurityError::EncryptionFailed)?;
-        
+
         // Prepend nonce to encrypted data
         let mut stored_data = nonce_bytes.to_vec();
         stored_data.extend_from_slice(&buffer);
-        
+
         let encoded = base64::encode(&stored_data);
         self.storage
             .set_item(key, &encoded)
             .map_err(|_| SecurityError::StorageError)?;
-        
+
         Ok(())
     }
-    
+
     pub fn retrieve_encrypted(&self, key: &str) -> Result<Option<String>, SecurityError> {
         let encoded = match self.storage.get_item(key).map_err(|_| SecurityError::StorageError)? {
             Some(data) => data,
             None => return Ok(None),
         };
-        
+
         let stored_data = base64::decode(&encoded)
             .map_err(|_| SecurityError::InvalidStoredData)?;
-        
+
         if stored_data.len() < 12 {
             return Err(SecurityError::InvalidStoredData);
         }
-        
+
         let (nonce_bytes, encrypted_data) = stored_data.split_at(12);
         let nonce = Nonce::from_slice(nonce_bytes);
-        
+
         let mut buffer = encrypted_data.to_vec();
         self.cipher
             .decrypt_in_place(nonce, b"", &mut buffer)
             .map_err(|_| SecurityError::DecryptionFailed)?;
-        
+
         let decrypted = String::from_utf8(buffer)
             .map_err(|_| SecurityError::InvalidStoredData)?;
-        
+
         Ok(Some(decrypted))
     }
-    
+
     fn get_or_create_salt() -> Result<[u8; 16], SecurityError> {
         let window = web_sys::window().ok_or(SecurityError::StorageUnavailable)?;
         let storage = window
             .local_storage()
             .map_err(|_| SecurityError::StorageUnavailable)?
             .ok_or(SecurityError::StorageUnavailable)?;
-        
+
         const SALT_KEY: &str = "_leptos_forms_salt";
-        
+
         if let Ok(Some(existing_salt)) = storage.get_item(SALT_KEY) {
             if let Ok(salt_bytes) = base64::decode(&existing_salt) {
                 if salt_bytes.len() == 16 {
@@ -714,16 +727,16 @@ impl SecureStorage {
                 }
             }
         }
-        
+
         // Generate new salt
         let mut salt = [0u8; 16];
         thread_rng().fill(&mut salt);
-        
+
         let encoded_salt = base64::encode(&salt);
         storage
             .set_item(SALT_KEY, &encoded_salt)
             .map_err(|_| SecurityError::StorageError)?;
-        
+
         Ok(salt)
     }
 }
@@ -734,6 +747,7 @@ impl SecureStorage {
 ### 4.1 Automated Vulnerability Scanning
 
 #### Cargo Audit Integration
+
 ```toml
 # .cargo/audit.toml
 [advisories]
@@ -755,17 +769,18 @@ enabled = true
 ```
 
 #### Security CI Pipeline
+
 ```yaml
 # .github/workflows/security.yml
 name: Security Scan
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '0 2 * * *'  # Daily at 2 AM
+    - cron: "0 2 * * *" # Daily at 2 AM
 
 jobs:
   security-audit:
@@ -774,10 +789,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -786,18 +801,18 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-security-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Install cargo-audit
         run: cargo install cargo-audit
-        
+
       - name: Run cargo audit
         run: cargo audit --json > audit-results.json
-        
+
       - name: Process audit results
         run: |
           VULNERABILITIES=$(jq '.vulnerabilities | length' audit-results.json)
           echo "Found $VULNERABILITIES vulnerabilities"
-          
+
           if [ $VULNERABILITIES -gt 0 ]; then
             echo "❌ Security vulnerabilities found!"
             jq '.vulnerabilities[] | "ID: \(.advisory.id) | Package: \(.package.name) | Severity: \(.advisory.severity) | Title: \(.advisory.title)"' audit-results.json
@@ -805,7 +820,7 @@ jobs:
           else
             echo "✅ No security vulnerabilities found"
           fi
-          
+
       - name: Upload audit results
         uses: actions/upload-artifact@v3
         with:
@@ -818,18 +833,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Install cargo-deny
         run: cargo install cargo-deny
-        
+
       - name: Check dependencies
         run: cargo deny check all
-        
+
       - name: Check for unmaintained crates
         run: |
           cargo install cargo-outdated
           OUTDATED=$(cargo outdated --format json | jq '.dependencies | length')
-          
+
           if [ $OUTDATED -gt 5 ]; then
             echo "⚠️ Many outdated dependencies: $OUTDATED"
             echo "Consider updating dependencies"
@@ -843,7 +858,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@main
         with:
@@ -856,6 +871,7 @@ jobs:
 ### 4.2 Supply Chain Security
 
 #### Dependency Pinning Strategy
+
 ```toml
 # Cargo.toml - Pin critical dependencies
 [dependencies]
@@ -864,7 +880,7 @@ serde = "=1.0.195"             # Pin serialization library
 wasm-bindgen = "=0.2.89"       # Pin WASM bindings
 web-sys = "=0.3.66"            # Pin web APIs
 
-# Allow patch updates for non-critical dependencies  
+# Allow patch updates for non-critical dependencies
 regex = "~1.10.0"              # Allow 1.10.x
 chrono = "~0.4.31"             # Allow 0.4.x
 uuid = "~1.6.0"                # Allow 1.x
@@ -876,6 +892,7 @@ features = ["std"]
 ```
 
 #### Dependency Verification
+
 ```bash
 #!/bin/bash
 # scripts/verify-dependencies.sh
@@ -914,6 +931,7 @@ echo "✅ Dependency verification complete"
 ### 5.1 Security Event Monitoring
 
 #### Client-Side Security Monitor
+
 ```rust
 // src/security/monitoring.rs
 pub struct SecurityMonitor {
@@ -928,25 +946,25 @@ impl SecurityMonitor {
             reporting_endpoint: endpoint,
         }
     }
-    
+
     pub fn report_security_event(&self, event: SecurityEvent) {
         let mut buffer = self.event_buffer.lock().unwrap();
         buffer.push(event);
-        
+
         // Flush buffer if it gets too large
         if buffer.len() >= 10 {
             let events = buffer.drain(..).collect();
             drop(buffer); // Release lock
-            
+
             self.flush_events(events);
         }
     }
-    
+
     fn flush_events(&self, events: Vec<SecurityEvent>) {
         // Send events to monitoring service
         wasm_bindgen_futures::spawn_local(async move {
             let events_json = serde_json::to_string(&events).unwrap();
-            
+
             if let Ok(response) = web_sys::window()
                 .unwrap()
                 .fetch_with_str(&self.reporting_endpoint)
@@ -992,6 +1010,7 @@ pub enum Severity {
 ### 5.2 Incident Response Plan
 
 #### Automated Security Response
+
 ```rust
 // src/security/incident_response.rs
 pub struct IncidentResponseSystem {
@@ -1006,35 +1025,35 @@ impl IncidentResponseSystem {
         thresholds.insert(SecurityEventType::XssAttempt, 3);           // 3 attempts trigger response
         thresholds.insert(SecurityEventType::RateLimitExceeded, 1);   // Immediate response
         thresholds.insert(SecurityEventType::CsrfViolation, 1);       // Immediate response
-        
+
         let mut actions = HashMap::new();
         actions.insert(SecurityEventType::XssAttempt, vec![
             ResponseAction::LogEvent,
             ResponseAction::BlockUser,
             ResponseAction::NotifyAdmin,
         ]);
-        
+
         Self {
             alert_thresholds: thresholds,
             response_actions: actions,
             monitoring: SecurityMonitor::new("/api/security-events".to_string()),
         }
     }
-    
+
     pub fn handle_security_event(&self, event: SecurityEvent) {
         // Always log the event
         self.monitoring.report_security_event(event.clone());
-        
+
         // Check if response is needed
         if let Some(&threshold) = self.alert_thresholds.get(&event.event_type) {
             let recent_events = self.count_recent_events(&event.event_type);
-            
+
             if recent_events >= threshold {
                 self.execute_response_actions(&event);
             }
         }
     }
-    
+
     fn execute_response_actions(&self, event: &SecurityEvent) {
         if let Some(actions) = self.response_actions.get(&event.event_type) {
             for action in actions {
@@ -1055,11 +1074,11 @@ impl IncidentResponseSystem {
             }
         }
     }
-    
+
     fn temporarily_block_user(&self) {
         // Implement temporary user blocking (e.g., 15-minute timeout)
         let block_until = chrono::Utc::now() + chrono::Duration::minutes(15);
-        
+
         if let Ok(storage) = web_sys::window()
             .and_then(|w| w.local_storage().ok())
             .flatten()
@@ -1067,7 +1086,7 @@ impl IncidentResponseSystem {
             let _ = storage.set_item("security_block_until", &block_until.to_rfc3339());
         }
     }
-    
+
     fn send_admin_notification(&self, event: &SecurityEvent) {
         // Send notification to security team
         wasm_bindgen_futures::spawn_local(async move {
@@ -1084,7 +1103,7 @@ impl IncidentResponseSystem {
                     "Consider updating security rules".to_string(),
                 ],
             };
-            
+
             // Send to monitoring/alerting system
             let _ = web_sys::window()
                 .unwrap()
@@ -1115,22 +1134,23 @@ struct SecurityNotification {
 ### 6.1 Penetration Testing Checklist
 
 #### Automated Security Tests
+
 ```rust
 // tests/security_tests.rs
 #[cfg(test)]
 mod security_tests {
     use super::*;
     use leptos_forms::*;
-    
+
     #[test]
     fn test_xss_prevention() {
         let mut form = TestForm::default();
         let xss_payload = "<script>alert('xss')</script>";
-        
+
         // Test that XSS payload is properly sanitized
         let result = form.set_field("name", FieldValue::String(xss_payload.to_string()));
         assert!(result.is_ok());
-        
+
         // Verify the value is sanitized
         let stored_value = form.get_field("name").unwrap();
         match stored_value {
@@ -1141,14 +1161,14 @@ mod security_tests {
             _ => panic!("Expected string field value"),
         }
     }
-    
+
     #[test]
     fn test_sql_injection_prevention() {
         let mut form = TestForm::default();
         let sql_payload = "'; DROP TABLE users; --";
-        
+
         let result = form.set_field("name", FieldValue::String(sql_payload.to_string()));
-        
+
         // Should either be sanitized or rejected
         match result {
             Ok(_) => {
@@ -1162,50 +1182,50 @@ mod security_tests {
             }
         }
     }
-    
+
     #[test]
     fn test_file_upload_validation() {
         let handler = SecureFileHandler::new();
-        
+
         // Test file size limit
         let large_file_data = vec![0u8; 20 * 1024 * 1024]; // 20MB
         let result = handler.validate_file_data(&large_file_data, "image/jpeg");
         assert!(matches!(result, Err(SecurityError::FileTooLarge(_))));
-        
+
         // Test invalid file type
         let result = handler.validate_file_data(&[0xFF, 0xD8, 0xFF], "application/exe");
         assert!(matches!(result, Err(SecurityError::InvalidFileType(_))));
-        
+
         // Test valid file
         let jpeg_header = [0xFF, 0xD8, 0xFF, 0xE0];
         let result = handler.validate_file_data(&jpeg_header, "image/jpeg");
         assert!(result.is_ok());
     }
-    
+
     #[test]
     fn test_rate_limiting() {
         let rate_limiter = RateLimiter::new(5, std::time::Duration::from_secs(60));
-        
+
         // Should allow first 5 requests
         for _ in 0..5 {
             assert!(rate_limiter.check_rate_limit());
         }
-        
+
         // Should block 6th request
         assert!(!rate_limiter.check_rate_limit());
     }
-    
+
     #[test]
     fn test_csrf_token_validation() {
         let csrf = CsrfProtection::new();
         let session_id = "test_session_123";
-        
+
         let token = csrf.generate_token(session_id);
         assert!(csrf.verify_token(&token, session_id));
-        
+
         // Test invalid token
         assert!(!csrf.verify_token("invalid_token", session_id));
-        
+
         // Test token for different session
         assert!(!csrf.verify_token(&token, "different_session"));
     }
@@ -1260,6 +1280,7 @@ This comprehensive security assessment provides defense-in-depth protection for 
 ---
 
 **Document Control**
+
 - **Created**: 2025-01-02
 - **Last Modified**: 2025-01-02
 - **Next Review**: Quarterly security review

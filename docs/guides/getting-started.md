@@ -26,10 +26,10 @@ use leptos_forms_rs::*;
 pub struct UserForm {
     #[form(required)]
     username: String,
-    
+
     #[form(required, email)]
     email: String,
-    
+
     #[form(min_length = 8)]
     password: String,
 }
@@ -37,11 +37,11 @@ pub struct UserForm {
 #[component]
 pub fn UserRegistrationForm() -> impl IntoView {
     let form = use_form::<UserForm>();
-    
+
     view! {
         <div class="user-form">
             <h2>"User Registration"</h2>
-            
+
             <form on:submit=form.handle_submit>
                 <div class="form-group">
                     <label for="username">"Username"</label>
@@ -52,11 +52,11 @@ pub fn UserRegistrationForm() -> impl IntoView {
                         on:input=form.handle_input
                         required
                     />
-                    {move || form.field_error("username").map(|error| 
+                    {move || form.field_error("username").map(|error|
                         view! { <span class="error">{error}</span> }
                     )}
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">"Email"</label>
                     <input
@@ -66,11 +66,11 @@ pub fn UserRegistrationForm() -> impl IntoView {
                         on:input=form.handle_input
                         required
                     />
-                    {move || form.field_error("email").map(|error| 
+                    {move || form.field_error("email").map(|error|
                         view! { <span class="error">{error}</span> }
                     )}
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">"Password"</label>
                     <input
@@ -80,18 +80,18 @@ pub fn UserRegistrationForm() -> impl IntoView {
                         on:input=form.handle_input
                         required
                     />
-                    {move || form.field_error("password").map(|error| 
+                    {move || form.field_error("password").map(|error|
                         view! { <span class="error">{error}</span> }
                     )}
                 </div>
-                
+
                 <button type="submit" disabled=move || !form.is_valid()>
                     "Register"
                 </button>
             </form>
-            
-            {move || form.form_data().map(|data| 
-                view! { 
+
+            {move || form.form_data().map(|data|
+                view! {
                     <div class="form-data">
                         <h3>"Form Data:"</h3>
                         <pre>{format!("{:#?}", data)}</pre>
@@ -114,16 +114,16 @@ Define your form structure using the `FormData` derive macro:
 pub struct ContactForm {
     #[form(required)]
     name: String,
-    
+
     #[form(required, email)]
     email: String,
-    
+
     #[form(required)]
     message: String,
-    
+
     #[form(optional)]
     phone: Option<String>,
-    
+
     #[form(default = false)]
     newsletter: bool,
 }
@@ -138,13 +138,13 @@ Use validation attributes to enforce rules:
 pub struct ValidatedForm {
     #[form(required, min_length = 3, max_length = 50)]
     username: String,
-    
+
     #[form(required, email, custom = "validate_domain")]
     email: String,
-    
+
     #[form(required, min = 18, max = 120)]
     age: u32,
-    
+
     #[form(required, pattern = r"^\d{3}-\d{3}-\d{4}$")]
     phone: String,
 }
@@ -192,7 +192,7 @@ use leptos_forms_rs::components::*;
 #[component]
 pub fn FormWithComponents() -> impl IntoView {
     let form = use_form::<UserForm>();
-    
+
     view! {
         <form on:submit=form.handle_submit>
             <TextInput
@@ -201,21 +201,21 @@ pub fn FormWithComponents() -> impl IntoView {
                 form=form.clone()
                 required
             />
-            
+
             <EmailInput
                 name="email"
                 label="Email"
                 form=form.clone()
                 required
             />
-            
+
             <PasswordInput
                 name="password"
                 label="Password"
                 form=form.clone()
                 required
             />
-            
+
             <SelectInput
                 name="country"
                 label="Country"
@@ -226,14 +226,14 @@ pub fn FormWithComponents() -> impl IntoView {
                 ]
                 form=form.clone()
             />
-            
+
             <CheckboxInput
                 name="terms"
                 label="I agree to the terms"
                 form=form.clone()
                 required
             />
-            
+
             <button type="submit">"Submit"</button>
         </form>
     }
@@ -253,7 +253,7 @@ pub fn CustomInput(
 ) -> impl IntoView {
     let value = form.field_value(name.clone());
     let error = form.field_error(name.clone());
-    
+
     view! {
         <div class="custom-input">
             <label for=name.clone()>{label}</label>
@@ -281,10 +281,10 @@ Handle dynamic lists of fields:
 pub struct ProductForm {
     #[form(required)]
     name: String,
-    
+
     #[form(required)]
     price: f64,
-    
+
     #[form(array)]
     tags: Vec<String>,
 }
@@ -292,7 +292,7 @@ pub struct ProductForm {
 #[component]
 pub fn ProductFormWithTags() -> impl IntoView {
     let form = use_form::<ProductForm>();
-    
+
     view! {
         <form on:submit=form.handle_submit>
             <input
@@ -301,7 +301,7 @@ pub fn ProductFormWithTags() -> impl IntoView {
                 on:input=form.handle_input
                 placeholder="Product name"
             />
-            
+
             <input
                 type="number"
                 name="price"
@@ -309,7 +309,7 @@ pub fn ProductFormWithTags() -> impl IntoView {
                 placeholder="Price"
                 step="0.01"
             />
-            
+
             <div class="tags-section">
                 <h3>"Tags"</h3>
                 {move || {
@@ -333,7 +333,7 @@ pub fn ProductFormWithTags() -> impl IntoView {
                         }
                     }).collect::<Vec<_>>()
                 }}
-                
+
                 <button
                     type="button"
                     on:click=move |_| form.add_field_array_item("tags")
@@ -341,7 +341,7 @@ pub fn ProductFormWithTags() -> impl IntoView {
                     "Add Tag"
                 </button>
             </div>
-            
+
             <button type="submit">"Create Product"</button>
         </form>
     }
@@ -357,13 +357,13 @@ Show/hide fields based on form state:
 pub struct ConditionalForm {
     #[form(required)]
     account_type: String,
-    
+
     #[form(required, when = "account_type == 'business'")]
     company_name: String,
-    
+
     #[form(required, when = "account_type == 'business'")]
     tax_id: String,
-    
+
     #[form(required, when = "account_type == 'personal'")]
     birth_date: String,
 }
@@ -372,7 +372,7 @@ pub struct ConditionalForm {
 pub fn ConditionalFormExample() -> impl IntoView {
     let form = use_form::<ConditionalForm>();
     let account_type = form.field_value("account_type");
-    
+
     view! {
         <form on:submit=form.handle_submit>
             <select name="account_type" on:change=form.handle_input>
@@ -380,7 +380,7 @@ pub fn ConditionalFormExample() -> impl IntoView {
                 <option value="personal">"Personal"</option>
                 <option value="business">"Business"</option>
             </select>
-            
+
             {move || {
                 if account_type.get() == Some("business".to_string()) {
                     view! {
@@ -411,7 +411,7 @@ pub fn ConditionalFormExample() -> impl IntoView {
                     view! { <div>"Please select an account type"</div> }
                 }
             }}
-            
+
             <button type="submit">"Submit"</button>
         </form>
     }
@@ -427,9 +427,9 @@ Save and restore form data:
 pub fn PersistentForm() -> impl IntoView {
     let form = use_form::<UserForm>()
         .with_persistence("user-form-data"); // Automatically saves to localStorage
-    
+
     // Form data is automatically restored when component mounts
-    
+
     view! {
         <form on:submit=form.handle_submit>
             <input
@@ -438,14 +438,14 @@ pub fn PersistentForm() -> impl IntoView {
                 on:input=form.handle_input
                 placeholder="Username"
             />
-            
+
             <input
                 type="email"
                 name="email"
                 on:input=form.handle_input
                 placeholder="Email"
             />
-            
+
             <button type="submit">"Save"</button>
             <button
                 type="button"
@@ -468,30 +468,30 @@ Test form logic in isolation:
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_form_validation() {
         let form = use_form::<UserForm>();
-        
+
         // Test required field validation
         assert!(!form.is_valid());
-        
+
         // Fill required fields
         form.set_field_value("username", "john_doe");
         form.set_field_value("email", "john@example.com");
         form.set_field_value("password", "secure123");
-        
+
         assert!(form.is_valid());
     }
-    
+
     #[test]
     fn test_email_validation() {
         let form = use_form::<UserForm>();
-        
+
         form.set_field_value("email", "invalid-email");
         assert!(!form.is_valid());
         assert!(form.field_error("email").is_some());
-        
+
         form.set_field_value("email", "valid@example.com");
         assert!(form.field_error("email").is_none());
     }
@@ -507,16 +507,16 @@ Test forms in the browser:
 mod integration_tests {
     use super::*;
     use leptos::*;
-    
+
     #[test]
     fn test_form_submission() {
         let app = view! {
             <UserRegistrationForm />
         };
-        
+
         // Mount the component
         mount_to_body(app);
-        
+
         // Test form interaction
         // (This would use a testing framework like Playwright)
     }

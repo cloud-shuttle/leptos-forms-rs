@@ -1,608 +1,835 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Form Components Showcase</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .component-section {
+        margin-bottom: 40px;
+        padding: 25px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+      }
+      .component-section h2 {
+        color: #495057;
+        margin-top: 0;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+      }
+      .form-field {
+        margin-bottom: 20px;
+      }
+      .form-row {
+        display: flex;
+        gap: 20px;
+      }
+      .form-row .form-field {
+        flex: 1;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="password"],
+      input[type="number"],
+      input[type="tel"],
+      input[type="url"],
+      input[type="date"],
+      input[type="time"],
+      input[type="datetime-local"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+      }
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="password"]:focus,
+      input[type="number"]:focus,
+      input[type="tel"]:focus,
+      input[type="url"]:focus,
+      input[type="date"]:focus,
+      input[type="time"]:focus,
+      input[type="datetime-local"]:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #007bff;
+        outline: none;
+      }
+
+      .dirty {
+        background-color: #fff3cd;
+      }
+
+      .touched {
+        border-color: #17a2b8;
+      }
+      .checkbox-group,
+      .radio-group {
+        margin-top: 10px;
+      }
+      .checkbox-item,
+      .radio-item {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+      .checkbox-item input,
+      .radio-item input {
+        margin-right: 10px;
+        width: auto;
+      }
+      .file-input {
+        border: 2px dashed #ddd;
+        padding: 20px;
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: border-color 0.3s;
+      }
+      .file-input:hover {
+        border-color: #007bff;
+      }
+      .file-input input[type="file"] {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .btn {
+        padding: 12px 24px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        position: relative;
+        z-index: 5;
+        pointer-events: auto;
+      }
+      .btn-primary {
+        background-color: #007bff;
+        color: white;
+      }
+      .btn-primary:hover {
+        background-color: #0056b3;
+      }
+      .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+      }
+      .btn-secondary:hover {
+        background-color: #545b62;
+      }
+      .btn-success {
+        background-color: #28a745;
+        color: white;
+      }
+      .btn-success:hover {
+        background-color: #1e7e34;
+      }
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+      }
+      .btn-danger:hover {
+        background-color: #c82333;
+      }
+      .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+      }
+      .success-message {
+        color: #28a745;
+        font-size: 16px;
+        text-align: center;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 4px;
+        display: none;
+      }
+      .form-debug {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        border-left: 4px solid #007bff;
+      }
+      .form-debug h3 {
+        margin-top: 0;
+        color: #495057;
+      }
+      .form-debug pre {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-size: 14px;
+      }
+      .field-array {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+      }
+      .field-array-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .remove-item {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      .add-item {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+      .conditional-field {
+        padding: 15px;
+        margin: 10px 0;
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 4px;
+      }
+      .form-actions {
+        text-align: center;
+        margin-top: 30px;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* Ensure buttons are clickable in mobile */
+      .btn {
+        position: relative;
+        z-index: 5;
+        pointer-events: auto;
+      }
+
+      /* Fix mobile pointer event issues */
+      @media (max-width: 768px) {
         .component-section {
-            margin-bottom: 40px;
-            padding: 25px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            background-color: #f8f9fa;
+          position: relative;
+          z-index: 1;
+          margin-bottom: 20px;
         }
-        .component-section h2 {
-            color: #495057;
-            margin-top: 0;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
-        .form-field {
-            margin-bottom: 20px;
-        }
-        .form-row {
-            display: flex;
-            gap: 20px;
-        }
-        .form-row .form-field {
-            flex: 1;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="tel"], input[type="url"], input[type="date"], input[type="time"], input[type="datetime-local"], select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-        }
-        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="number"]:focus, input[type="tel"]:focus, input[type="url"]:focus, input[type="date"]:focus, input[type="time"]:focus, input[type="datetime-local"]:focus, select:focus, textarea:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-        
-        .dirty {
-            background-color: #fff3cd;
-        }
-        
-        .touched {
-            border-color: #17a2b8;
-        }
-        .checkbox-group, .radio-group {
-            margin-top: 10px;
-        }
-        .checkbox-item, .radio-item {
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-        }
-        .checkbox-item input, .radio-item input {
-            margin-right: 10px;
-            width: auto;
-        }
-        .file-input {
-            border: 2px dashed #ddd;
-            padding: 20px;
-            text-align: center;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-        .file-input:hover {
-            border-color: #007bff;
-        }
-        .file-input input[type="file"] {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-        .btn {
-            padding: 12px 24px;
-            margin: 5px;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            position: relative;
-            z-index: 5;
-            pointer-events: auto;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-success:hover {
-            background-color: #1e7e34;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-        .success-message {
-            color: #28a745;
-            font-size: 16px;
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 4px;
-            display: none;
-        }
-        .form-debug {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            border-left: 4px solid #007bff;
-        }
-        .form-debug h3 {
-            margin-top: 0;
-            color: #495057;
-        }
-        .form-debug pre {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            overflow-x: auto;
-            font-size: 14px;
-        }
-        .field-array {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-            background-color: #f8f9fa;
-        }
-        .field-array-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .remove-item {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        .add-item {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        .conditional-field {
-            padding: 15px;
-            margin: 10px 0;
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 4px;
-        }
+
         .form-actions {
-            text-align: center;
-            margin-top: 30px;
-            position: relative;
-            z-index: 10;
+          z-index: 20;
+          margin-top: 40px;
+          padding: 20px 0;
         }
-        
-        /* Ensure buttons are clickable in mobile */
+
         .btn {
-            position: relative;
-            z-index: 5;
-            pointer-events: auto;
+          z-index: 25;
+          position: relative;
+          margin: 10px 5px;
+          min-height: 44px; /* Mobile-friendly touch target */
         }
-        
-        /* Fix mobile pointer event issues */
-        @media (max-width: 768px) {
-            .component-section {
-                position: relative;
-                z-index: 1;
-                margin-bottom: 20px;
-            }
-            
-            .form-actions {
-                z-index: 20;
-                margin-top: 40px;
-                padding: 20px 0;
-            }
-            
-            .btn {
-                z-index: 25;
-                position: relative;
-                margin: 10px 5px;
-                min-height: 44px; /* Mobile-friendly touch target */
-            }
-            
-            /* Ensure no overlapping elements block clicks */
-            .component-demo {
-                position: relative;
-                z-index: 1;
-                margin-bottom: 15px;
-            }
-            
-            .field-array {
-                position: relative;
-                z-index: 1;
-                margin-bottom: 15px;
-            }
-            
-            /* Add spacing between sections to prevent overlap */
-            .component-section + .component-section {
-                margin-top: 30px;
-            }
-        }
+
+        /* Ensure no overlapping elements block clicks */
         .component-demo {
-            background-color: white;
-            padding: 20px;
-            border-radius: 4px;
-            border: 1px solid #dee2e6;
+          position: relative;
+          z-index: 1;
+          margin-bottom: 15px;
         }
+
+        .field-array {
+          position: relative;
+          z-index: 1;
+          margin-bottom: 15px;
+        }
+
+        /* Add spacing between sections to prevent overlap */
+        .component-section + .component-section {
+          margin-top: 30px;
+        }
+      }
+      .component-demo {
+        background-color: white;
+        padding: 20px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container" data-testid="component-test-page">
-        <h1>Form Components Showcase</h1>
-        <p style="text-align: center; color: #666; margin-bottom: 30px;">
-            This page demonstrates various form components and their functionality for testing purposes.
-        </p>
-        
-        <form aria-label="Component Test Form">
-        
+      <h1>Form Components Showcase</h1>
+      <p style="text-align: center; color: #666; margin-bottom: 30px">
+        This page demonstrates various form components and their functionality
+        for testing purposes.
+      </p>
+
+      <form aria-label="Component Test Form">
         <!-- Text Input Components -->
         <div class="component-section">
-            <h2>Text Input Components</h2>
-            
-            <div class="component-demo">
-                <div class="form-field">
-                    <label for="test-text" data-testid="text-input-label">Test Text Input</label>
-                    <input 
-                        type="text" 
-                        id="test-text" 
-                        name="test-text"
-                        placeholder="Enter some text"
-                        data-testid="text-input"
-                        required
-                        aria-label="Test text input"
-                    />
-                    <div class="error-message" data-testid="validation-error" style="display: none;" role="alert">This field is required</div>
-                </div>
-                
-                <div class="form-field">
-                    <label for="test-email" data-testid="email-input-label">Test Email Input</label>
-                    <input 
-                        type="email" 
-                        id="test-email" 
-                        name="test-email"
-                        placeholder="Enter email address"
-                        data-testid="email-input"
-                        required
-                    />
-                    <div class="error-message" data-testid="validation-error" style="display: none;" role="alert">This field is required</div>
-                </div>
-                
-                <div class="form-field">
-                    <label for="test-password" data-testid="password-input-label">Test Password Input</label>
-                    <input 
-                        type="password" 
-                        id="test-password" 
-                        name="test-password"
-                        placeholder="Enter password"
-                        data-testid="password-input"
-                        required
-                    />
-                    <div class="error-message" data-testid="validation-error" style="display: none;" role="alert">This field is required</div>
-                </div>
-                
-                <div class="form-field">
-                    <label for="test-number" data-testid="number-input-label">Test Number Input</label>
-                    <input 
-                        type="number" 
-                        id="test-number" 
-                        name="test-number"
-                        placeholder="Enter a number"
-                        min="0"
-                        max="100"
-                        data-testid="number-input"
-                    />
-                    <div class="error-message" data-testid="number-error" style="display: none;">Number must be between 0 and 100</div>
-                </div>
-                
-                <div class="form-field">
-                    <label for="test-tel" data-testid="tel-input-label">Test Telephone Input</label>
-                    <input 
-                        type="tel" 
-                        id="test-tel" 
-                        name="test-tel"
-                        placeholder="Enter phone number"
-                        data-testid="tel-input"
-                    />
-                </div>
-                
-                <div class="form-field">
-                    <label for="test-url" data-testid="url-input-label">Test URL Input</label>
-                    <input 
-                        type="url" 
-                        id="test-url" 
-                        name="test-url"
-                        placeholder="Enter website URL"
-                        data-testid="url-input"
-                    />
-                </div>
+          <h2>Text Input Components</h2>
+
+          <div class="component-demo">
+            <div class="form-field">
+              <label for="test-text" data-testid="text-input-label"
+                >Test Text Input</label
+              >
+              <input
+                type="text"
+                id="test-text"
+                name="test-text"
+                placeholder="Enter some text"
+                data-testid="text-input"
+                required
+                aria-label="Test text input"
+              />
+              <div
+                class="error-message"
+                data-testid="validation-error"
+                style="display: none"
+                role="alert"
+              >
+                This field is required
+              </div>
             </div>
+
+            <div class="form-field">
+              <label for="test-email" data-testid="email-input-label"
+                >Test Email Input</label
+              >
+              <input
+                type="email"
+                id="test-email"
+                name="test-email"
+                placeholder="Enter email address"
+                data-testid="email-input"
+                required
+              />
+              <div
+                class="error-message"
+                data-testid="validation-error"
+                style="display: none"
+                role="alert"
+              >
+                This field is required
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="test-password" data-testid="password-input-label"
+                >Test Password Input</label
+              >
+              <input
+                type="password"
+                id="test-password"
+                name="test-password"
+                placeholder="Enter password"
+                data-testid="password-input"
+                required
+              />
+              <div
+                class="error-message"
+                data-testid="validation-error"
+                style="display: none"
+                role="alert"
+              >
+                This field is required
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="test-number" data-testid="number-input-label"
+                >Test Number Input</label
+              >
+              <input
+                type="number"
+                id="test-number"
+                name="test-number"
+                placeholder="Enter a number"
+                min="0"
+                max="100"
+                data-testid="number-input"
+              />
+              <div
+                class="error-message"
+                data-testid="number-error"
+                style="display: none"
+              >
+                Number must be between 0 and 100
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="test-tel" data-testid="tel-input-label"
+                >Test Telephone Input</label
+              >
+              <input
+                type="tel"
+                id="test-tel"
+                name="test-tel"
+                placeholder="Enter phone number"
+                data-testid="tel-input"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="test-url" data-testid="url-input-label"
+                >Test URL Input</label
+              >
+              <input
+                type="url"
+                id="test-url"
+                name="test-url"
+                placeholder="Enter website URL"
+                data-testid="url-input"
+              />
+            </div>
+          </div>
         </div>
-        
+
         <!-- Date and Time Components -->
         <div class="component-section">
-            <h2>Date and Time Components</h2>
-            
-            <div class="component-demo">
-                <div class="form-row">
-                    <div class="form-field">
-                        <label for="test-date" data-testid="date-input-label">Test Date Input</label>
-                        <input 
-                            type="date" 
-                            id="test-date" 
-                            name="test-date"
-                            data-testid="date-input"
-                        />
-                    </div>
-                    
-                    <div class="form-field">
-                        <label for="test-time" data-testid="time-input-label">Test Time Input</label>
-                        <input 
-                            type="time" 
-                            id="test-time" 
-                            name="test-time"
-                            data-testid="time-input"
-                        />
-                    </div>
-                    
-                    <div class="form-field">
-                        <label for="test-datetime" data-testid="datetime-input-label">Test DateTime Input</label>
-                        <input 
-                            type="datetime-local" 
-                            id="test-datetime" 
-                            name="test-datetime"
-                            data-testid="datetime-input"
-                        />
-                    </div>
-                </div>
+          <h2>Date and Time Components</h2>
+
+          <div class="component-demo">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="test-date" data-testid="date-input-label"
+                  >Test Date Input</label
+                >
+                <input
+                  type="date"
+                  id="test-date"
+                  name="test-date"
+                  data-testid="date-input"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="test-time" data-testid="time-input-label"
+                  >Test Time Input</label
+                >
+                <input
+                  type="time"
+                  id="test-time"
+                  name="test-time"
+                  data-testid="time-input"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="test-datetime" data-testid="datetime-input-label"
+                  >Test DateTime Input</label
+                >
+                <input
+                  type="datetime-local"
+                  id="test-datetime"
+                  name="test-datetime"
+                  data-testid="datetime-input"
+                />
+              </div>
             </div>
+          </div>
         </div>
-        
+
         <!-- Select and Textarea Components -->
         <div class="component-section">
-            <h2>Select and Textarea Components</h2>
-            
-            <div class="component-demo">
-                <div class="form-row">
-                                    <div class="form-field">
-                    <label for="test-select" data-testid="select-input-label">Test Select Input</label>
-                    <select id="test-select" name="test-select" data-testid="select-input" required>
-                        <option value="">Choose an option</option>
-                        <option value="option1">Option 1</option>
-                        <option value="option2">Option 2</option>
-                        <option value="option3">Option 3</option>
-                        <option value="option4">Option 4</option>
-                    </select>
-                    <div class="error-message" data-testid="validation-error" style="display: none;">This field is required</div>
+          <h2>Select and Textarea Components</h2>
+
+          <div class="component-demo">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="test-select" data-testid="select-input-label"
+                  >Test Select Input</label
+                >
+                <select
+                  id="test-select"
+                  name="test-select"
+                  data-testid="select-input"
+                  required
+                >
+                  <option value="">Choose an option</option>
+                  <option value="option1">Option 1</option>
+                  <option value="option2">Option 2</option>
+                  <option value="option3">Option 3</option>
+                  <option value="option4">Option 4</option>
+                </select>
+                <div
+                  class="error-message"
+                  data-testid="validation-error"
+                  style="display: none"
+                >
+                  This field is required
                 </div>
-                    
-                    <div class="form-field">
-                        <label for="test-textarea" data-testid="textarea-input-label">Test Textarea Input</label>
-                        <textarea 
-                            id="test-textarea" 
-                            name="test-textarea"
-                            rows="4"
-                            placeholder="Enter multiple lines of text"
-                            data-testid="textarea-input"
-                        ></textarea>
-                    </div>
-                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="test-textarea" data-testid="textarea-input-label"
+                  >Test Textarea Input</label
+                >
+                <textarea
+                  id="test-textarea"
+                  name="test-textarea"
+                  rows="4"
+                  placeholder="Enter multiple lines of text"
+                  data-testid="textarea-input"
+                ></textarea>
+              </div>
             </div>
+          </div>
         </div>
-        
+
         <!-- Checkbox and Radio Components -->
         <div class="component-section">
-            <h2>Checkbox and Radio Components</h2>
-            
-            <div class="component-demo">
-                <div class="form-row">
-                    <div class="form-field">
-                        <label data-testid="checkbox-group-label">Test Checkbox Group</label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="test-checkbox" name="test-checkbox" value="value1" data-testid="checkbox-input" />
-                                <label for="test-checkbox">Test Checkbox</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="checkbox2" name="checkboxes" value="value2" data-testid="checkbox2" />
-                                <label for="checkbox2">Checkbox 2</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="checkbox3" name="checkboxes" value="value3" data-testid="checkbox3" />
-                                <label for="checkbox3">Checkbox 3</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-field">
-                        <label data-testid="radio-group-label">Test Radio Group</label>
-                        <div class="radio-group">
-                            <div class="radio-item">
-                                <input type="radio" id="test-radio-1" name="test-radio" value="value1" data-testid="radio-input-1" />
-                                <label for="test-radio-1">Test Radio 1</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="test-radio-2" name="test-radio" value="value2" data-testid="radio-input-2" />
-                                <label for="test-radio-2">Test Radio 2</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="test-radio-3" name="test-radio" value="value3" data-testid="radio-input-3" />
-                                <label for="test-radio-3">Test Radio 3</label>
-                            </div>
-                        </div>
-                    </div>
+          <h2>Checkbox and Radio Components</h2>
+
+          <div class="component-demo">
+            <div class="form-row">
+              <div class="form-field">
+                <label data-testid="checkbox-group-label"
+                  >Test Checkbox Group</label
+                >
+                <div class="checkbox-group">
+                  <div class="checkbox-item">
+                    <input
+                      type="checkbox"
+                      id="test-checkbox"
+                      name="test-checkbox"
+                      value="value1"
+                      data-testid="checkbox-input"
+                    />
+                    <label for="test-checkbox">Test Checkbox</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input
+                      type="checkbox"
+                      id="checkbox2"
+                      name="checkboxes"
+                      value="value2"
+                      data-testid="checkbox2"
+                    />
+                    <label for="checkbox2">Checkbox 2</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input
+                      type="checkbox"
+                      id="checkbox3"
+                      name="checkboxes"
+                      value="value3"
+                      data-testid="checkbox3"
+                    />
+                    <label for="checkbox3">Checkbox 3</label>
+                  </div>
                 </div>
+              </div>
+
+              <div class="form-field">
+                <label data-testid="radio-group-label">Test Radio Group</label>
+                <div class="radio-group">
+                  <div class="radio-item">
+                    <input
+                      type="radio"
+                      id="test-radio-1"
+                      name="test-radio"
+                      value="value1"
+                      data-testid="radio-input-1"
+                    />
+                    <label for="test-radio-1">Test Radio 1</label>
+                  </div>
+                  <div class="radio-item">
+                    <input
+                      type="radio"
+                      id="test-radio-2"
+                      name="test-radio"
+                      value="value2"
+                      data-testid="radio-input-2"
+                    />
+                    <label for="test-radio-2">Test Radio 2</label>
+                  </div>
+                  <div class="radio-item">
+                    <input
+                      type="radio"
+                      id="test-radio-3"
+                      name="test-radio"
+                      value="value3"
+                      data-testid="radio-input-3"
+                    />
+                    <label for="test-radio-3">Test Radio 3</label>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-        
+
         <!-- File Upload Component -->
         <div class="component-section">
-            <h2>File Upload Component</h2>
-            
-            <div class="component-demo">
-                <div class="form-field">
-                    <label for="test-file" data-testid="file-input-label">Test File Upload</label>
-                    <div class="file-input" data-testid="file-input-container">
-                        <input type="file" id="test-file" name="test-file" accept=".txt,.pdf,.doc" multiple data-testid="file-input" />
-                        <p>Click to upload or drag and drop</p>
-                        <p>Accepted formats: TXT, PDF, DOC</p>
-                        <div id="file-name" data-testid="file-name" style="display: none;"></div>
-                    </div>
-                </div>
+          <h2>File Upload Component</h2>
+
+          <div class="component-demo">
+            <div class="form-field">
+              <label for="test-file" data-testid="file-input-label"
+                >Test File Upload</label
+              >
+              <div class="file-input" data-testid="file-input-container">
+                <input
+                  type="file"
+                  id="test-file"
+                  name="test-file"
+                  accept=".txt,.pdf,.doc"
+                  multiple
+                  data-testid="file-input"
+                />
+                <p>Click to upload or drag and drop</p>
+                <p>Accepted formats: TXT, PDF, DOC</p>
+                <div
+                  id="file-name"
+                  data-testid="file-name"
+                  style="display: none"
+                ></div>
+              </div>
             </div>
+          </div>
         </div>
-        
+
         <!-- Conditional Fields -->
         <div class="component-section">
-            <h2>Conditional Fields</h2>
-            
-            <div class="component-demo">
-                <div class="form-field">
-                    <label for="show-conditional" data-testid="show-conditional-label">
-                        <input type="checkbox" id="show-conditional" name="showConditional" data-testid="show-conditional" />
-                        Show additional fields
-                    </label>
-                </div>
-                
-                <div class="conditional-field" id="conditional-fields" data-testid="conditional-field" style="display: none;">
-                    <h4>Additional Information</h4>
-                    <div class="form-field">
-                        <label for="conditional-text" data-testid="conditional-text-label">Additional Text</label>
-                        <input 
-                            type="text" 
-                            id="conditional-text" 
-                            name="conditionalText"
-                            placeholder="This field appears when checkbox is checked"
-                            data-testid="conditional-text-input"
-                        />
-                    </div>
-                    
-                    <div class="form-field">
-                        <label for="conditional-select" data-testid="conditional-select-label">Additional Select</label>
-                        <select id="conditional-select" name="conditionalSelect" data-testid="conditional-select">
-                            <option value="">Choose an option</option>
-                            <option value="extra1">Extra Option 1</option>
-                            <option value="extra2">Extra Option 2</option>
-                        </select>
-                    </div>
-                </div>
+          <h2>Conditional Fields</h2>
+
+          <div class="component-demo">
+            <div class="form-field">
+              <label
+                for="show-conditional"
+                data-testid="show-conditional-label"
+              >
+                <input
+                  type="checkbox"
+                  id="show-conditional"
+                  name="showConditional"
+                  data-testid="show-conditional"
+                />
+                Show additional fields
+              </label>
             </div>
+
+            <div
+              class="conditional-field"
+              id="conditional-fields"
+              data-testid="conditional-field"
+              style="display: none"
+            >
+              <h4>Additional Information</h4>
+              <div class="form-field">
+                <label
+                  for="conditional-text"
+                  data-testid="conditional-text-label"
+                  >Additional Text</label
+                >
+                <input
+                  type="text"
+                  id="conditional-text"
+                  name="conditionalText"
+                  placeholder="This field appears when checkbox is checked"
+                  data-testid="conditional-text-input"
+                />
+              </div>
+
+              <div class="form-field">
+                <label
+                  for="conditional-select"
+                  data-testid="conditional-select-label"
+                  >Additional Select</label
+                >
+                <select
+                  id="conditional-select"
+                  name="conditionalSelect"
+                  data-testid="conditional-select"
+                >
+                  <option value="">Choose an option</option>
+                  <option value="extra1">Extra Option 1</option>
+                  <option value="extra2">Extra Option 2</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
-        
+
         <!-- Field Arrays -->
         <div class="component-section">
-            <h2>Field Arrays</h2>
-            
-            <div class="component-demo">
-                <div id="field-array-container" data-testid="field-array-container">
-                    <div class="field-array" data-testid="field-array-0">
-                        <div class="field-array-header">
-                            <h4>Item 1</h4>
-                            <button type="button" class="remove-item" data-testid="remove-item-0" onclick="removeFieldArrayItem(0)">Remove</button>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-field">
-                                <label for="array-name-0" data-testid="array-name-label-0">Name</label>
-                                <input type="text" id="array-name-0" name="arrayNames[]" data-testid="array-name-input-0" />
-                            </div>
-                            <div class="form-field">
-                                <label for="array-value-0" data-testid="array-value-label-0">Value</label>
-                                <input type="text" id="array-value-0" name="arrayValues[]" data-testid="array-value-input-0" />
-                            </div>
-                        </div>
-                    </div>
+          <h2>Field Arrays</h2>
+
+          <div class="component-demo">
+            <div id="field-array-container" data-testid="field-array-container">
+              <div class="field-array" data-testid="field-array-0">
+                <div class="field-array-header">
+                  <h4>Item 1</h4>
+                  <button
+                    type="button"
+                    class="remove-item"
+                    data-testid="remove-item-0"
+                    onclick="removeFieldArrayItem(0)"
+                  >
+                    Remove
+                  </button>
                 </div>
-                
-                <button type="button" class="add-item" onclick="addFieldArrayItem()" data-testid="add-field">Add Item</button>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label for="array-name-0" data-testid="array-name-label-0"
+                      >Name</label
+                    >
+                    <input
+                      type="text"
+                      id="array-name-0"
+                      name="arrayNames[]"
+                      data-testid="array-name-input-0"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="array-value-0" data-testid="array-value-label-0"
+                      >Value</label
+                    >
+                    <input
+                      type="text"
+                      id="array-value-0"
+                      name="arrayValues[]"
+                      data-testid="array-value-input-0"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <button
+              type="button"
+              class="add-item"
+              onclick="addFieldArrayItem()"
+              data-testid="add-field"
+            >
+              Add Item
+            </button>
+          </div>
         </div>
-        
+
         <!-- Form Actions -->
         <div class="form-actions">
-            <button type="button" class="btn btn-primary" onclick="submitForm()" data-testid="submit-button">Submit Form</button>
-            <button type="button" class="btn btn-secondary" onclick="resetForm()" data-testid="reset-button">Reset Form</button>
-            <button type="button" class="btn btn-success" onclick="validateForm()" data-testid="validate-button">Validate Form</button>
-            <button type="button" class="btn btn-danger" onclick="clearForm()" data-testid="clear-button">Clear Form</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="submitForm()"
+            data-testid="submit-button"
+          >
+            Submit Form
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="resetForm()"
+            data-testid="reset-button"
+          >
+            Reset Form
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="validateForm()"
+            data-testid="validate-button"
+          >
+            Validate Form
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            onclick="clearForm()"
+            data-testid="clear-button"
+          >
+            Clear Form
+          </button>
         </div>
-        
+
         <!-- Success Message -->
-        <div class="success-message" data-testid="success-message" id="success-message">
-            Form submitted successfully!
+        <div
+          class="success-message"
+          data-testid="success-message"
+          id="success-message"
+        >
+          Form submitted successfully!
         </div>
-        
+
         <!-- Form Debug -->
         <div class="form-debug">
-            <h3>Form Debug Info</h3>
-            <p>Form values: <span id="form-values" data-testid="form-values">No values yet</span></p>
-            <pre id="form-data" data-testid="form-data">No form data yet</pre>
+          <h3>Form Debug Info</h3>
+          <p>
+            Form values:
+            <span id="form-values" data-testid="form-values"
+              >No values yet</span
+            >
+          </p>
+          <pre id="form-data" data-testid="form-data">No form data yet</pre>
         </div>
-        </form>
+      </form>
     </div>
 
     <script>
-        let fieldArrayCounter = 1;
-        
-        // Conditional fields toggle
-        document.getElementById('show-conditional').addEventListener('change', function() {
-            const conditionalFields = document.getElementById('conditional-fields');
-            conditionalFields.style.display = this.checked ? 'block' : 'none';
+      let fieldArrayCounter = 1;
+
+      // Conditional fields toggle
+      document
+        .getElementById("show-conditional")
+        .addEventListener("change", function () {
+          const conditionalFields =
+            document.getElementById("conditional-fields");
+          conditionalFields.style.display = this.checked ? "block" : "none";
         });
-        
-        // Field array functions
-        function addFieldArrayItem() {
-            const container = document.getElementById('field-array-container');
-            const newItem = document.createElement('div');
-            newItem.className = 'field-array';
-            newItem.setAttribute('data-testid', `field-array-${fieldArrayCounter}`);
-            
-            newItem.innerHTML = `
+
+      // Field array functions
+      function addFieldArrayItem() {
+        const container = document.getElementById("field-array-container");
+        const newItem = document.createElement("div");
+        newItem.className = "field-array";
+        newItem.setAttribute("data-testid", `field-array-${fieldArrayCounter}`);
+
+        newItem.innerHTML = `
                 <div class="field-array-header">
                     <h4>Item ${fieldArrayCounter + 1}</h4>
                                             <button type="button" class="remove-item" data-testid="remove-field-${fieldArrayCounter}" onclick="removeFieldArrayItem(${fieldArrayCounter})">Remove</button>
@@ -618,74 +845,86 @@
                     </div>
                 </div>
             `;
-            
-            container.appendChild(newItem);
-            fieldArrayCounter++;
+
+        container.appendChild(newItem);
+        fieldArrayCounter++;
+      }
+
+      function removeFieldArrayItem(index) {
+        const item = document.querySelector(
+          `[data-testid="field-array-${index}"]`,
+        );
+        if (item) {
+          item.remove();
         }
-        
-        function removeFieldArrayItem(index) {
-            const item = document.querySelector(`[data-testid="field-array-${index}"]`);
-            if (item) {
-                item.remove();
+      }
+
+      // Form functions
+      function submitForm() {
+        // Validate required fields first
+        const requiredFields = document.querySelectorAll("[required]");
+        let isValid = true;
+
+        // Hide all validation errors first
+        document
+          .querySelectorAll('[data-testid="validation-error"]')
+          .forEach((error) => {
+            error.style.display = "none";
+          });
+
+        // Check each required field
+        requiredFields.forEach((field) => {
+          if (!field.value.trim()) {
+            // Show validation error
+            const errorElement = field.parentNode.querySelector(
+              '[data-testid="validation-error"]',
+            );
+            if (errorElement) {
+              errorElement.style.display = "block";
             }
+            isValid = false;
+          }
+        });
+
+        // Only submit if validation passes
+        if (isValid) {
+          const formData = collectFormData();
+          document.getElementById("form-data").textContent = JSON.stringify(
+            formData,
+            null,
+            2,
+          );
+          document.getElementById("success-message").style.display = "block";
+
+          // Keep success message visible longer for tests
+          setTimeout(() => {
+            document.getElementById("success-message").style.display = "none";
+            resetForm();
+          }, 3000);
         }
-        
-        // Form functions
-        function submitForm() {
-            // Validate required fields first
-            const requiredFields = document.querySelectorAll('[required]');
-            let isValid = true;
-            
-            // Hide all validation errors first
-            document.querySelectorAll('[data-testid="validation-error"]').forEach(error => {
-                error.style.display = 'none';
-            });
-            
-            // Check each required field
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    // Show validation error
-                    const errorElement = field.parentNode.querySelector('[data-testid="validation-error"]');
-                    if (errorElement) {
-                        errorElement.style.display = 'block';
-                    }
-                    isValid = false;
-                }
-            });
-            
-            // Only submit if validation passes
-            if (isValid) {
-                const formData = collectFormData();
-                document.getElementById('form-data').textContent = JSON.stringify(formData, null, 2);
-                document.getElementById('success-message').style.display = 'block';
-                
-                // Keep success message visible longer for tests
-                setTimeout(() => {
-                    document.getElementById('success-message').style.display = 'none';
-                    resetForm();
-                }, 3000);
+      }
+
+      function resetForm() {
+        document
+          .querySelectorAll("input, select, textarea")
+          .forEach((field) => {
+            if (field.type === "checkbox" || field.type === "radio") {
+              field.checked = false;
+            } else {
+              field.value = "";
             }
-        }
-        
-        function resetForm() {
-            document.querySelectorAll('input, select, textarea').forEach(field => {
-                if (field.type === 'checkbox' || field.type === 'radio') {
-                    field.checked = false;
-                } else {
-                    field.value = '';
-                }
-                
-                // Clear CSS classes
-                field.classList.remove('dirty', 'touched');
-            });
-            
-            // Reset conditional fields
-            document.getElementById('conditional-fields').style.display = 'none';
-            document.getElementById('show-conditional').checked = false;
-            
-            // Reset field arrays
-            const container = document.getElementById('field-array-container');
-            container.innerHTML = `
+
+            // Clear CSS classes
+            field.classList.remove("dirty", "touched");
+          });
+
+        // Reset conditional fields
+        document.getElementById("conditional-fields").style.display = "none";
+        document.getElementById("show-conditional").checked = false;
+
+        // Reset field arrays
+        const container = document.getElementById("field-array-container");
+        container.innerHTML = `
                 <div class="field-array" data-testid="field-array-0">
                     <div class="field-array-header">
                         <h4>Item 1</h4>
@@ -703,263 +942,310 @@
                     </div>
                 </div>
             `;
-            fieldArrayCounter = 1;
-            
-            updateFormValues();
-        }
-        
-        function validateForm() {
-            const requiredFields = document.querySelectorAll('[required]');
-            let isValid = true;
-            
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.style.borderColor = '#dc3545';
-                    isValid = false;
-                } else {
-                    field.style.borderColor = '#ddd';
-                }
-            });
-            
-            if (isValid) {
-                alert('Form validation passed!');
-            } else {
-                alert('Form validation failed. Please fill in all required fields.');
-            }
-        }
-        
-        function clearForm() {
-            document.querySelectorAll('input, select, textarea').forEach(field => {
-                if (field.type === 'checkbox' || field.type === 'radio') {
-                    field.checked = false;
-                } else {
-                    field.value = '';
-                }
-            });
-            updateFormValues();
-        }
-        
-        function collectFormData() {
-            const formData = new FormData();
-            const inputs = document.querySelectorAll('input, select, textarea');
-            
-            inputs.forEach(input => {
-                if (input.type === 'checkbox') {
-                    if (input.checked) {
-                        formData.append(input.name, input.value);
-                    }
-                } else if (input.type === 'radio') {
-                    if (input.checked) {
-                        formData.append(input.name, input.value);
-                    }
-                } else if (input.type === 'file') {
-                    if (input.files.length > 0) {
-                        formData.append(input.name, input.files[0].name);
-                    }
-                } else {
-                    if (input.value.trim()) {
-                        formData.append(input.name, input.value);
-                    }
-                }
-            });
-            
-            return Object.fromEntries(formData);
-        }
-        
-        function updateFormValues() {
-            const formData = collectFormData();
-            document.getElementById('form-values').textContent = JSON.stringify(formData, null, 2);
-        }
-        
-        // Real-time form value updates
-        document.addEventListener('input', updateFormValues);
-        document.addEventListener('change', updateFormValues);
-        
-        // Number input validation
-        document.getElementById('test-number').addEventListener('input', function() {
-            const value = parseInt(this.value);
-            const errorElement = document.querySelector('[data-testid="number-error"]');
-            
-            if (this.value && (value < 0 || value > 100)) {
-                errorElement.style.display = 'block';
-            } else {
-                errorElement.style.display = 'none';
-            }
-        });
-        
-        // Validation error handling
-        function hideValidationError(field) {
-            const errorElement = field.parentNode.querySelector('[data-testid="validation-error"]');
-            if (errorElement) {
-                errorElement.style.display = 'none';
-            }
-        }
-        
-        function hideAllValidationErrors() {
-            document.querySelectorAll('[data-testid="validation-error"]').forEach(error => {
-                error.style.display = 'none';
-            });
-        }
-        
-        // Hide validation errors when fields are filled
-        document.getElementById('test-text').addEventListener('input', function() {
-            if (this.value.trim()) {
-                hideValidationError(this);
-            }
-        });
-        
-        document.getElementById('test-email').addEventListener('input', function() {
-            if (this.value.trim()) {
-                hideValidationError(this);
-            }
-        });
-        
-        document.getElementById('test-password').addEventListener('input', function() {
-            if (this.value.trim()) {
-                hideValidationError(this);
-            }
-        });
-        
-        document.getElementById('test-select').addEventListener('change', function() {
-            if (this.value) {
-                hideValidationError(this);
-            }
-        });
-        
-        // Also hide validation errors when fields lose focus (blur)
-        document.getElementById('test-text').addEventListener('blur', function() {
-            if (this.value.trim()) {
-                hideValidationError(this);
-            }
-        });
-        
-        document.getElementById('test-email').addEventListener('blur', function() {
-            if (this.value.trim()) {
-                hideValidationError(this);
-            }
-        });
-        
-        document.getElementById('test-password').addEventListener('blur', function() {
-            if (this.value.trim()) {
-                hideValidationError(this);
-            }
-        });
-        
-        document.getElementById('test-select').addEventListener('blur', function() {
-            if (this.value) {
-                hideValidationError(this);
-            }
-        });
-        
-        // File input change handler
-        document.getElementById('test-file').addEventListener('change', function() {
-            const fileNameElement = document.getElementById('file-name');
-            if (this.files.length > 0) {
-                fileNameElement.textContent = this.files[0].name;
-                fileNameElement.style.display = 'block';
-            } else {
-                fileNameElement.style.display = 'none';
-            }
-        });
-        
-        // Field state change handlers
-        document.getElementById('test-text').addEventListener('focus', function() {
-            this.classList.add('touched');
-        });
-        
-        document.getElementById('test-text').addEventListener('input', function() {
-            this.classList.add('dirty');
-        });
-        
-        // Form persistence with localStorage
-        function saveFormData() {
-            const formData = collectFormData();
-            localStorage.setItem('form-persistence-data', JSON.stringify(formData));
-        }
-        
-        function loadFormData() {
-            const savedData = localStorage.getItem('form-persistence-data');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                
-                // Restore text inputs
-                if (data['test-text']) {
-                    document.getElementById('test-text').value = data['test-text'];
-                }
-                if (data['test-number']) {
-                    document.getElementById('test-number').value = data['test-number'];
-                }
-                if (data['test-email']) {
-                    document.getElementById('test-email').value = data['test-email'];
-                }
-                if (data['test-password']) {
-                    document.getElementById('test-password').value = data['test-password'];
-                }
-                
-                // Restore select
-                if (data['test-select']) {
-                    document.getElementById('test-select').value = data['test-select'];
-                }
-                
-                // Restore textarea
-                if (data['test-textarea']) {
-                    document.getElementById('test-textarea').value = data['test-textarea'];
-                }
-                
-                // Restore checkbox
-                if (data['test-checkbox']) {
-                    document.getElementById('test-checkbox').checked = true;
-                }
-                
-                // Restore radio
-                if (data['test-radio']) {
-                    const radio = document.querySelector(`input[name="test-radio"][value="${data['test-radio']}"]`);
-                    if (radio) {
-                        radio.checked = true;
-                    }
-                }
-                
-                // Restore conditional field state
-                if (data['showConditional']) {
-                    document.getElementById('show-conditional').checked = true;
-                    document.getElementById('conditional-fields').style.display = 'block';
-                    
-                    if (data['conditionalText']) {
-                        document.getElementById('conditional-text').value = data['conditionalText'];
-                    }
-                    if (data['conditionalSelect']) {
-                        document.getElementById('conditional-select').value = data['conditionalSelect'];
-                    }
-                }
-                
-                updateFormValues();
-            }
-        }
-        
-        // Auto-save form data on any change
-        document.addEventListener('input', saveFormData);
-        document.addEventListener('change', saveFormData);
-        
-        // Load saved data on page load
-        document.addEventListener('DOMContentLoaded', loadFormData);
-        
-        // Mobile-specific click handling
-        function isMobile() {
-            return window.innerWidth <= 768;
-        }
-        
-        // Ensure buttons are clickable on mobile
-        if (isMobile()) {
-            document.querySelectorAll('.btn').forEach(btn => {
-                btn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    this.click();
-                }, { passive: false });
-            });
-        }
-        
-        // Initialize
+        fieldArrayCounter = 1;
+
         updateFormValues();
+      }
+
+      function validateForm() {
+        const requiredFields = document.querySelectorAll("[required]");
+        let isValid = true;
+
+        requiredFields.forEach((field) => {
+          if (!field.value.trim()) {
+            field.style.borderColor = "#dc3545";
+            isValid = false;
+          } else {
+            field.style.borderColor = "#ddd";
+          }
+        });
+
+        if (isValid) {
+          alert("Form validation passed!");
+        } else {
+          alert("Form validation failed. Please fill in all required fields.");
+        }
+      }
+
+      function clearForm() {
+        document
+          .querySelectorAll("input, select, textarea")
+          .forEach((field) => {
+            if (field.type === "checkbox" || field.type === "radio") {
+              field.checked = false;
+            } else {
+              field.value = "";
+            }
+          });
+        updateFormValues();
+      }
+
+      function collectFormData() {
+        const formData = new FormData();
+        const inputs = document.querySelectorAll("input, select, textarea");
+
+        inputs.forEach((input) => {
+          if (input.type === "checkbox") {
+            if (input.checked) {
+              formData.append(input.name, input.value);
+            }
+          } else if (input.type === "radio") {
+            if (input.checked) {
+              formData.append(input.name, input.value);
+            }
+          } else if (input.type === "file") {
+            if (input.files.length > 0) {
+              formData.append(input.name, input.files[0].name);
+            }
+          } else {
+            if (input.value.trim()) {
+              formData.append(input.name, input.value);
+            }
+          }
+        });
+
+        return Object.fromEntries(formData);
+      }
+
+      function updateFormValues() {
+        const formData = collectFormData();
+        document.getElementById("form-values").textContent = JSON.stringify(
+          formData,
+          null,
+          2,
+        );
+      }
+
+      // Real-time form value updates
+      document.addEventListener("input", updateFormValues);
+      document.addEventListener("change", updateFormValues);
+
+      // Number input validation
+      document
+        .getElementById("test-number")
+        .addEventListener("input", function () {
+          const value = parseInt(this.value);
+          const errorElement = document.querySelector(
+            '[data-testid="number-error"]',
+          );
+
+          if (this.value && (value < 0 || value > 100)) {
+            errorElement.style.display = "block";
+          } else {
+            errorElement.style.display = "none";
+          }
+        });
+
+      // Validation error handling
+      function hideValidationError(field) {
+        const errorElement = field.parentNode.querySelector(
+          '[data-testid="validation-error"]',
+        );
+        if (errorElement) {
+          errorElement.style.display = "none";
+        }
+      }
+
+      function hideAllValidationErrors() {
+        document
+          .querySelectorAll('[data-testid="validation-error"]')
+          .forEach((error) => {
+            error.style.display = "none";
+          });
+      }
+
+      // Hide validation errors when fields are filled
+      document
+        .getElementById("test-text")
+        .addEventListener("input", function () {
+          if (this.value.trim()) {
+            hideValidationError(this);
+          }
+        });
+
+      document
+        .getElementById("test-email")
+        .addEventListener("input", function () {
+          if (this.value.trim()) {
+            hideValidationError(this);
+          }
+        });
+
+      document
+        .getElementById("test-password")
+        .addEventListener("input", function () {
+          if (this.value.trim()) {
+            hideValidationError(this);
+          }
+        });
+
+      document
+        .getElementById("test-select")
+        .addEventListener("change", function () {
+          if (this.value) {
+            hideValidationError(this);
+          }
+        });
+
+      // Also hide validation errors when fields lose focus (blur)
+      document
+        .getElementById("test-text")
+        .addEventListener("blur", function () {
+          if (this.value.trim()) {
+            hideValidationError(this);
+          }
+        });
+
+      document
+        .getElementById("test-email")
+        .addEventListener("blur", function () {
+          if (this.value.trim()) {
+            hideValidationError(this);
+          }
+        });
+
+      document
+        .getElementById("test-password")
+        .addEventListener("blur", function () {
+          if (this.value.trim()) {
+            hideValidationError(this);
+          }
+        });
+
+      document
+        .getElementById("test-select")
+        .addEventListener("blur", function () {
+          if (this.value) {
+            hideValidationError(this);
+          }
+        });
+
+      // File input change handler
+      document
+        .getElementById("test-file")
+        .addEventListener("change", function () {
+          const fileNameElement = document.getElementById("file-name");
+          if (this.files.length > 0) {
+            fileNameElement.textContent = this.files[0].name;
+            fileNameElement.style.display = "block";
+          } else {
+            fileNameElement.style.display = "none";
+          }
+        });
+
+      // Field state change handlers
+      document
+        .getElementById("test-text")
+        .addEventListener("focus", function () {
+          this.classList.add("touched");
+        });
+
+      document
+        .getElementById("test-text")
+        .addEventListener("input", function () {
+          this.classList.add("dirty");
+        });
+
+      // Form persistence with localStorage
+      function saveFormData() {
+        const formData = collectFormData();
+        localStorage.setItem("form-persistence-data", JSON.stringify(formData));
+      }
+
+      function loadFormData() {
+        const savedData = localStorage.getItem("form-persistence-data");
+        if (savedData) {
+          const data = JSON.parse(savedData);
+
+          // Restore text inputs
+          if (data["test-text"]) {
+            document.getElementById("test-text").value = data["test-text"];
+          }
+          if (data["test-number"]) {
+            document.getElementById("test-number").value = data["test-number"];
+          }
+          if (data["test-email"]) {
+            document.getElementById("test-email").value = data["test-email"];
+          }
+          if (data["test-password"]) {
+            document.getElementById("test-password").value =
+              data["test-password"];
+          }
+
+          // Restore select
+          if (data["test-select"]) {
+            document.getElementById("test-select").value = data["test-select"];
+          }
+
+          // Restore textarea
+          if (data["test-textarea"]) {
+            document.getElementById("test-textarea").value =
+              data["test-textarea"];
+          }
+
+          // Restore checkbox
+          if (data["test-checkbox"]) {
+            document.getElementById("test-checkbox").checked = true;
+          }
+
+          // Restore radio
+          if (data["test-radio"]) {
+            const radio = document.querySelector(
+              `input[name="test-radio"][value="${data["test-radio"]}"]`,
+            );
+            if (radio) {
+              radio.checked = true;
+            }
+          }
+
+          // Restore conditional field state
+          if (data["showConditional"]) {
+            document.getElementById("show-conditional").checked = true;
+            document.getElementById("conditional-fields").style.display =
+              "block";
+
+            if (data["conditionalText"]) {
+              document.getElementById("conditional-text").value =
+                data["conditionalText"];
+            }
+            if (data["conditionalSelect"]) {
+              document.getElementById("conditional-select").value =
+                data["conditionalSelect"];
+            }
+          }
+
+          updateFormValues();
+        }
+      }
+
+      // Auto-save form data on any change
+      document.addEventListener("input", saveFormData);
+      document.addEventListener("change", saveFormData);
+
+      // Load saved data on page load
+      document.addEventListener("DOMContentLoaded", loadFormData);
+
+      // Mobile-specific click handling
+      function isMobile() {
+        return window.innerWidth <= 768;
+      }
+
+      // Ensure buttons are clickable on mobile
+      if (isMobile()) {
+        document.querySelectorAll(".btn").forEach((btn) => {
+          btn.addEventListener(
+            "touchstart",
+            function (e) {
+              e.preventDefault();
+              this.click();
+            },
+            { passive: false },
+          );
+        });
+      }
+
+      // Initialize
+      updateFormValues();
     </script>
-</body>
+  </body>
 </html>

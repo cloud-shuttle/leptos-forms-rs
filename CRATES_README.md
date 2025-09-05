@@ -75,21 +75,21 @@ impl Form for UserForm {
 
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         if self.name.is_empty() {
             errors.add_field_error("name".to_string(), "Name is required".to_string());
         }
-        
+
         if self.email.is_empty() {
             errors.add_field_error("email".to_string(), "Email is required".to_string());
         } else if !self.email.contains('@') {
             errors.add_field_error("email".to_string(), "Invalid email format".to_string());
         }
-        
+
         if self.age < 18 {
             errors.add_field_error("age".to_string(), "Must be at least 18 years old".to_string());
         }
-        
+
         if errors.has_errors() {
             Err(errors)
         } else {
@@ -156,12 +156,12 @@ impl Form for UserForm {
 #[component]
 pub fn UserFormComponent() -> impl IntoView {
     let form = use_form::<UserForm>();
-    
+
     view! {
         <form on:submit=form.handle_submit>
             <div>
                 <label for="name">Name:</label>
-                <input 
+                <input
                     type="text"
                     id="name"
                     name="name"
@@ -172,10 +172,10 @@ pub fn UserFormComponent() -> impl IntoView {
                     <span class="error">{error}</span>
                 })}
             </div>
-            
+
             <div>
                 <label for="email">Email:</label>
-                <input 
+                <input
                     type="email"
                     id="email"
                     name="email"
@@ -186,10 +186,10 @@ pub fn UserFormComponent() -> impl IntoView {
                     <span class="error">{error}</span>
                 })}
             </div>
-            
+
             <div>
                 <label for="age">Age:</label>
-                <input 
+                <input
                     type="number"
                     id="age"
                     name="age"
@@ -202,7 +202,7 @@ pub fn UserFormComponent() -> impl IntoView {
                     <span class="error">{error}</span>
                 })}
             </div>
-            
+
             <button type="submit">Submit</button>
         </form>
     }
@@ -212,6 +212,7 @@ pub fn UserFormComponent() -> impl IntoView {
 ## ✨ **Features**
 
 ### **Core Capabilities**
+
 - **Type-safe forms** with compile-time validation
 - **Reactive state management** using Leptos signals
 - **WASM-powered** for high performance
@@ -221,6 +222,7 @@ pub fn UserFormComponent() -> impl IntoView {
 - **Accessibility-first** design with ARIA support
 
 ### **Field Types**
+
 - **Text**: Basic text input with validation
 - **Email**: Email-specific validation
 - **Password**: Secure password handling
@@ -231,6 +233,7 @@ pub fn UserFormComponent() -> impl IntoView {
 - **Custom**: Extensible field types
 
 ### **Validation System**
+
 - **Built-in validators**: Required, Email, MinLength, MaxLength, Pattern
 - **Custom validators**: Write your own validation logic
 - **Real-time validation**: Validate as users type
@@ -238,6 +241,7 @@ pub fn UserFormComponent() -> impl IntoView {
 - **Field dependencies**: Conditional validation rules
 
 ### **State Management**
+
 - **Reactive updates**: Automatic UI updates on form changes
 - **Form persistence**: Save and restore form state
 - **Field tracking**: Monitor individual field changes
@@ -282,7 +286,7 @@ impl Form for DynamicForm {
         // Generate metadata dynamically based on form state
         vec![]
     }
-    
+
     // ... implement other required methods
 }
 ```
@@ -332,7 +336,7 @@ impl Form for ArrayForm {
             }
         ]
     }
-    
+
     // ... implement other required methods
 }
 ```
@@ -364,12 +368,14 @@ impl Form for ArrayForm {
 ## 📦 **Installation Options**
 
 ### **Minimal Setup**
+
 ```toml
 [dependencies]
 leptos-forms-rs = "0.2.0"
 ```
 
 ### **Full Features**
+
 ```toml
 [dependencies]
 leptos-forms-rs = { version = "0.2.0", features = ["full"] }
@@ -377,6 +383,7 @@ leptos-forms-rs-macro = "0.2.0"
 ```
 
 ### **Development Dependencies**
+
 ```toml
 [dev-dependencies]
 leptos-forms-rs = { version = "0.2.0", features = ["dev"] }

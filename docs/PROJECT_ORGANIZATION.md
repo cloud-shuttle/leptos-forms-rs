@@ -77,6 +77,7 @@ leptos-forms/
 ## 🧪 **Test Organization**
 
 ### **Unit Tests** (`tests/unit/`)
+
 - **Purpose**: Test individual functions and components in isolation
 - **Coverage**: Core functionality, form handling, validation, hooks
 - **Framework**: `wasm-bindgen-test` for browser compatibility
@@ -88,18 +89,21 @@ leptos-forms/
   - `form_types.rs` - Type system tests
 
 ### **Integration Tests** (`tests/integration/`)
+
 - **Purpose**: Test the library as a whole
 - **Coverage**: End-to-end form workflows, cross-component interaction
 - **Framework**: `wasm-bindgen-test` with full form scenarios
 - **Focus**: Real-world usage patterns and edge cases
 
 ### **End-to-End Tests** (`tests/e2e/`)
+
 - **Purpose**: Test complete user workflows in real browsers
 - **Coverage**: User interactions, form submission, validation feedback
 - **Framework**: Playwright for cross-browser testing
 - **Scenarios**: Form filling, validation, submission, error handling
 
 ### **Performance Benchmarks** (`tests/benchmarks/`)
+
 - **Purpose**: Measure performance characteristics
 - **Coverage**: Form creation, validation, field operations
 - **Framework**: Criterion.rs for statistical benchmarking
@@ -108,35 +112,42 @@ leptos-forms/
 ## 📚 **Documentation Organization**
 
 ### **Guides** (`docs/guides/`)
+
 - **Getting Started**: Quick start for new users
 - **Contributing**: How to contribute to the project
 - **Development Workflow**: Development processes and practices
 
 ### **Architecture** (`docs/architecture/`)
+
 - **System Design**: High-level system architecture
 - **Component Architecture**: Component design and structure
 - **API Design**: API design principles and patterns
 - **Technical Requirements**: Technical specifications
 
 ### **Implementation** (`docs/implementation/`)
+
 - **Implementation Guide**: Detailed implementation documentation
 - **Implementation Plan**: Roadmap and milestones
 - **Project Charter**: Project goals and objectives
 
 ### **Testing** (`docs/testing/`)
+
 - **Testing Strategy**: Comprehensive testing approach
 - **Performance Testing**: Performance testing and benchmarking
 
 ### **Deployment** (`docs/deployment/`)
+
 - **CI/CD Pipeline**: Continuous integration and deployment
 - **Security Assessment**: Security analysis and recommendations
 
 ### **Migration** (`docs/migration/`)
+
 - **Leptos 0.8 Migration**: Migration guide from Leptos 0.6
 - **Compatibility Layer**: Status and implementation details
 - **Migration Analysis**: Detailed technical analysis
 
 ### **API** (`docs/api/`)
+
 - **API Reference**: Complete API documentation
 
 ## 🚀 **Test Runner Script**
@@ -174,29 +185,34 @@ test:benchmarks:   # Run performance benchmarks
 ## 📊 **Benefits of This Organization**
 
 ### **1. Clear Separation of Concerns**
+
 - Each test type has a specific purpose and scope
 - Documentation is organized by topic and audience
 - Easy to find relevant information and tests
 
 ### **2. Comprehensive Coverage**
+
 - Unit tests for individual components
 - Integration tests for system behavior
 - E2E tests for user workflows
 - Performance benchmarks for optimization
 
 ### **3. Developer Experience**
+
 - Single test runner script for all test types
 - Clear documentation structure
 - Easy navigation and discovery
 - Consistent patterns across test types
 
 ### **4. Maintainability**
+
 - Organized file structure
 - Clear naming conventions
 - Modular test organization
 - Easy to add new tests and documentation
 
 ### **5. CI/CD Integration**
+
 - Test runner script works in CI environments
 - Separate test types can be run independently
 - Performance benchmarks for regression detection
@@ -215,6 +231,7 @@ The old structure had scattered documentation and tests. The new organization:
 ## 📈 **Future Enhancements**
 
 ### **Planned Improvements**
+
 - Add more comprehensive E2E test scenarios
 - Expand performance benchmarks
 - Add visual regression testing
@@ -222,6 +239,7 @@ The old structure had scattered documentation and tests. The new organization:
 - Add stress testing for large forms
 
 ### **Documentation Enhancements**
+
 - Interactive examples and demos
 - Video tutorials and walkthroughs
 - API playground and testing tools

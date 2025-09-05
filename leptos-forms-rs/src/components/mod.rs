@@ -1,31 +1,31 @@
-use leptos::prelude::*;
-use leptos::task::spawn_local;
 use crate::core::*;
 use crate::hooks::*;
 use crate::validation::ValidationErrors;
+use leptos::prelude::*;
+use leptos::task::spawn_local;
 use web_sys;
 
-pub mod form;
-pub mod field;
-pub mod input;
-pub mod select;
 pub mod checkbox;
-pub mod radio;
-pub mod textarea;
-pub mod file_input;
-pub mod field_array;
-pub mod form_wizard;
-pub mod rich_text_input;
-pub mod markdown_input;
 pub mod code_input;
+pub mod field;
+pub mod field_array;
+pub mod file_input;
 pub mod file_upload_input;
+pub mod form;
+pub mod form_wizard;
+pub mod input;
+pub mod markdown_input;
+pub mod radio;
+pub mod rich_text_input;
+pub mod select;
+pub mod textarea;
 
-pub use input::*;
-pub use field_array::FieldArray;
-pub use rich_text_input::RichTextInput;
-pub use markdown_input::MarkdownInput;
 pub use code_input::CodeInput;
+pub use field_array::FieldArray;
 pub use file_upload_input::FileUploadInput;
+pub use input::*;
+pub use markdown_input::MarkdownInput;
+pub use rich_text_input::RichTextInput;
 
 /// Main Form component
 #[component]
@@ -39,8 +39,12 @@ pub fn Form<T: Form + PartialEq + Clone + Send + Sync>(
     let _ = &form;
     let form_id = id.unwrap_or_else(|| format!("form-{}", std::any::type_name::<T>()));
     let form_class = class.unwrap_or_else(|| "leptos-form".to_string());
-    let novalidate_attr = if novalidate.unwrap_or(true) { "novalidate" } else { "" };
-    
+    let novalidate_attr = if novalidate.unwrap_or(true) {
+        "novalidate"
+    } else {
+        ""
+    };
+
     view! {
         <form
             id=form_id
@@ -80,21 +84,19 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
     let placeholder_clone = placeholder.clone();
     let help_text_clone = help_text.clone();
     let field_type_clone = field_type.clone();
-    
+
     let _field_value = use_field_value(&mut form, &name);
     let field_error = use_field_error(&mut form, &name);
     let field_dirty = use_field_dirty(&mut form);
     let _ = &field_dirty;
     let field_touched = use_field_touched(&mut form);
-    
+
     let field_class = class.unwrap_or_else(|| "form-field".to_string());
     let is_required = required.unwrap_or(false);
     let is_disabled = disabled.unwrap_or(false);
-    
-    let show_error = move || {
-        !field_error.get().is_empty() && field_touched.get()
-    };
-    
+
+    let show_error = move || !field_error.get().is_empty() && field_touched.get();
+
     view! {
         <div class=field_class>
             {move || {
@@ -110,22 +112,22 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
                         </label>
                     }
                 } else {
-                    view! { 
+                    view! {
                         <label for=String::new() class="hidden">
                             {String::new()}
                             {view! { <span class="hidden">{String::new()}</span> }}
-                        </label> 
+                        </label>
                     }
                 }
             }}
-            
+
             <div class="form-input-wrapper">
                 {move || {
                     // Clone variables for use inside this closure
                     let name_clone = name_clone2.clone();
                     let field_type_clone = field_type_clone.clone();
                     let placeholder_clone = placeholder_clone.clone();
-                    
+
                     // Render the appropriate input component based on field type
                     let input_type = if let Some(FieldType::Email) = field_type_clone {
                         "email"
@@ -138,7 +140,7 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
                     } else {
                         "text"
                     };
-                    
+
                     view! {
                         <input
                             type=input_type
@@ -151,7 +153,7 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
                     }
                 }}
             </div>
-            
+
             {if show_error() {
                 view! {
                     <div class="form-error">
@@ -161,7 +163,7 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
             } else {
                 view! { <div class="hidden">{String::new()}</div> }
             }}
-            
+
                             {if let Some(help) = help_text_clone {
                     view! {
                         <div class="form-help">
@@ -182,7 +184,7 @@ pub fn FormErrors(
     #[prop(optional)] class: Option<String>,
 ) -> impl IntoView {
     let error_class = class.unwrap_or_else(|| "form-errors".to_string());
-    
+
     let error_class_clone = error_class.clone();
     view! {
         {move || {
@@ -201,7 +203,7 @@ pub fn FormErrors(
                     </div>
                 }
             } else {
-                view! { 
+                view! {
                     <div class="hidden".to_string()>
                         <ul class="error-list">{Vec::<_>::new()}</ul>
                     </div>
@@ -227,15 +229,15 @@ where
 {
     let is_submitting = form.is_submitting();
     let is_valid = form.is_valid();
-    
+
     let button_class = class.unwrap_or_else(|| "form-submit".to_string());
     let disabled_class = disabled_class.unwrap_or_else(|| "disabled".to_string());
     let loading_text = loading_text.unwrap_or_else(|| "Submitting...".to_string());
-    
+
     let _submit_handler = move |_: leptos::ev::MouseEvent| {
         let form_clone = form.clone();
         let on_submit_clone = on_submit.clone();
-        
+
         spawn_local(async move {
             let form_data = form_clone.values().get();
             if let Err(error) = on_submit_clone(&form_data) {
@@ -243,7 +245,7 @@ where
             }
         });
     };
-    
+
     view! {
         <button
             type="submit"
@@ -281,16 +283,20 @@ pub fn FormReset<T: Form + PartialEq + Clone + Send + Sync>(
     children: Option<Children>,
 ) -> impl IntoView {
     let button_class = class.unwrap_or_else(|| "form-reset".to_string());
-    let confirm_message = confirm_message.unwrap_or_else(|| "Are you sure you want to reset the form?".to_string());
-    
+    let confirm_message =
+        confirm_message.unwrap_or_else(|| "Are you sure you want to reset the form?".to_string());
+
     let _reset_handler = move |_: leptos::ev::MouseEvent| {
         if let Some(window) = web_sys::window() {
-            if window.confirm_with_message(&confirm_message).unwrap_or(false) {
+            if window
+                .confirm_with_message(&confirm_message)
+                .unwrap_or(false)
+            {
                 form.reset();
             }
         }
     };
-    
+
     view! {
         <button
             type="button"
@@ -311,7 +317,7 @@ pub fn FormProgress(
     #[prop(optional)] class: Option<String>,
 ) -> impl IntoView {
     let progress_class = class.unwrap_or_else(|| "form-progress".to_string());
-    
+
     let progress_percentage = move || {
         if total_steps == 0 {
             0.0
@@ -319,11 +325,11 @@ pub fn FormProgress(
             ((current_step.get() + 1) as f64 / total_steps as f64) * 100.0
         }
     };
-    
+
     view! {
         <div class=progress_class>
             <div class="progress-bar">
-                <div 
+                <div
                     class="progress-fill"
                     style=move || format!("width: {}%", progress_percentage())
                 ></div>
@@ -347,7 +353,7 @@ pub fn FormDebug<T: Form + PartialEq + Clone + Send + Sync + std::fmt::Debug>(
     let is_valid = form.is_valid();
     let is_dirty = form.is_dirty();
     let is_submitting = form.is_submitting();
-    
+
     view! {
         <details class=debug_class>
             <summary>"Form Debug Info"</summary>
@@ -360,12 +366,12 @@ pub fn FormDebug<T: Form + PartialEq + Clone + Send + Sync + std::fmt::Debug>(
                         <li>"Submitting: " {move || is_submitting.get()}</li>
                     </ul>
                 </div>
-                
+
                 <div class="debug-section">
                     <h4>"Form Values"</h4>
                     <pre>{move || format!("{:#?}", values.get())}</pre>
                 </div>
-                
+
                 <div class="debug-section">
                     <h4>"Form Errors"</h4>
                     <pre>{move || format!("{:#?}", errors.get())}</pre>
@@ -374,5 +380,3 @@ pub fn FormDebug<T: Form + PartialEq + Clone + Send + Sync + std::fmt::Debug>(
         </details>
     }
 }
-
-

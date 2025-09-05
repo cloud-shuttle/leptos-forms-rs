@@ -45,12 +45,14 @@ Leptos Forms is a type-safe, reactive form handling library for Leptos that prov
 **Purpose**: Central trait that all forms must implement for runtime introspection and type safety.
 
 **Key Features**:
+
 - Field metadata extraction
 - Dynamic field access
 - Validation orchestration
 - Serialization support
 
 **Implementation Strategy**:
+
 ```rust
 pub trait Form: Clone + Serialize + DeserializeOwned + 'static {
     fn field_metadata() -> Vec<FieldMetadata>;
@@ -66,12 +68,14 @@ pub trait Form: Clone + Serialize + DeserializeOwned + 'static {
 **Purpose**: Automatic trait implementation with declarative field configuration.
 
 **Code Generation**:
+
 - Field metadata extraction from struct definitions
 - Validation rule compilation
 - Getter/setter method generation
 - Type-safe field accessors
 
 **Attribute Processing**:
+
 - `#[form(validators(...))]` → validation rules
 - `#[form(depends_on = [...])]` → field dependencies
 - `#[form(skip)]` → field exclusion
@@ -82,6 +86,7 @@ pub trait Form: Clone + Serialize + DeserializeOwned + 'static {
 **Purpose**: Central state management with Leptos reactive primitives.
 
 **State Architecture**:
+
 ```rust
 pub struct FormHandle<T: Form> {
     // Core State
@@ -89,12 +94,12 @@ pub struct FormHandle<T: Form> {
     errors: ReadSignal<ValidationErrors>,
     touched: ReadSignal<HashSet<String>>,
     dirty_fields: ReadSignal<HashSet<String>>,
-    
+
     // Derived State
     is_valid: Signal<bool>,
     is_dirty: Signal<bool>,
     is_submitting: ReadSignal<bool>,
-    
+
     // Actions
     set_field_value: Rc<dyn Fn(&str, FieldValue)>,
     register: Rc<dyn Fn(&str) -> FieldRegistration>,
@@ -103,6 +108,7 @@ pub struct FormHandle<T: Form> {
 ```
 
 **Reactive Updates**:
+
 - Value changes trigger validation
 - Error state updates UI immediately
 - Touch/dirty tracking for UX optimization
@@ -113,17 +119,20 @@ pub struct FormHandle<T: Form> {
 **Purpose**: Comprehensive validation with built-in and custom rules.
 
 **Validation Types**:
+
 - **Synchronous**: Immediate field validation
 - **Asynchronous**: Server-side validation
 - **Cross-field**: Dependencies between fields
 - **Form-level**: Global form constraints
 
 **Built-in Validators**:
+
 - `Required`, `Email`, `Url`, `Pattern`
 - `MinLength`, `MaxLength`, `Min`, `Max`
 - `Custom`, `AsyncCustom`
 
 **Validation Modes**:
+
 - `OnChange`: Real-time validation
 - `OnBlur`: Validate on field exit
 - `OnSubmit`: Only validate on submission
@@ -135,12 +144,14 @@ pub struct FormHandle<T: Form> {
 **Purpose**: Connect form fields to reactive state with automatic prop generation.
 
 **Flow**:
+
 1. Component calls `form.register("field_name")`
 2. System creates field-specific signals
 3. Returns `FieldRegistration` with props and handlers
 4. Component spreads props to input elements
 
 **Benefits**:
+
 - Type-safe field binding
 - Automatic error handling
 - Consistent event handling
@@ -149,12 +160,14 @@ pub struct FormHandle<T: Form> {
 ### UI Component Integration
 
 **Design Philosophy**:
+
 - **Headless Core**: No UI assumptions in form logic
 - **Component Agnostic**: Works with any UI library
 - **Prop Spreading**: Easy integration with existing components
 - **Accessibility First**: ARIA attributes included by default
 
 **Integration Patterns**:
+
 ```rust
 // Native HTML
 <input {...form.register("email").props} />
@@ -177,6 +190,7 @@ pub struct FormHandle<T: Form> {
 **Purpose**: Dynamic lists with add/remove/reorder functionality.
 
 **Capabilities**:
+
 - Dynamic item management
 - Validation per item
 - Drag-and-drop reordering
@@ -187,6 +201,7 @@ pub struct FormHandle<T: Form> {
 **Purpose**: File handling with progress tracking and validation.
 
 **Features**:
+
 - Multiple file support
 - Size/type constraints
 - Upload progress tracking
@@ -197,6 +212,7 @@ pub struct FormHandle<T: Form> {
 **Purpose**: Complex forms broken into manageable steps.
 
 **Features**:
+
 - Step navigation
 - Progress indication
 - Step-specific validation
@@ -207,6 +223,7 @@ pub struct FormHandle<T: Form> {
 **Purpose**: Show/hide fields based on form state.
 
 **Implementation**:
+
 - Reactive field visibility
 - Cleanup on hide (optional)
 - Dependency tracking
@@ -247,18 +264,21 @@ User Input → Event Handler → Field Update → Validation → State Change �
 ## Testing Strategy
 
 ### Unit Testing
+
 - Form trait implementations
 - Validation rule testing
 - State management logic
 - Macro code generation
 
 ### Integration Testing
+
 - Component interaction
 - Form submission flows
 - Error handling
 - File upload processing
 
 ### E2E Testing
+
 - Multi-step forms
 - Complex validation scenarios
 - Cross-browser compatibility
@@ -269,18 +289,21 @@ User Input → Event Handler → Field Update → Validation → State Change �
 ### Optimization Strategies
 
 **Compile-time Optimizations**:
+
 - Zero-cost abstractions
 - Macro-generated code optimization
 - Dead code elimination
 - Type-level guarantees
 
 **Runtime Optimizations**:
+
 - Reactive granularity
 - Memoized computations
 - Lazy validation
 - Efficient DOM updates
 
 **Bundle Size**:
+
 - Tree-shakeable design
 - Optional features
 - Minimal dependencies
@@ -289,12 +312,14 @@ User Input → Event Handler → Field Update → Validation → State Change �
 ## Security Considerations
 
 ### Input Validation
+
 - Client-side validation for UX
 - Server-side validation required
 - XSS prevention
 - CSRF protection
 
 ### File Upload Security
+
 - MIME type validation
 - File size limits
 - Virus scanning integration
@@ -303,12 +328,14 @@ User Input → Event Handler → Field Update → Validation → State Change �
 ## Error Handling Strategy
 
 ### Error Types
+
 - **Validation Errors**: User input issues
 - **Network Errors**: API communication failures
 - **System Errors**: Unexpected failures
 - **User Errors**: Incorrect usage
 
 ### Error Recovery
+
 - Graceful degradation
 - Retry mechanisms
 - User-friendly messages
@@ -317,6 +344,7 @@ User Input → Event Handler → Field Update → Validation → State Change �
 ## Deployment & Distribution
 
 ### Package Structure
+
 ```
 leptos-forms/
 ├── leptos-forms/          # Core library
@@ -326,6 +354,7 @@ leptos-forms/
 ```
 
 ### Version Strategy
+
 - Semantic versioning
 - Feature flags for breaking changes
 - Migration guides
@@ -334,24 +363,28 @@ leptos-forms/
 ## Future Roadmap
 
 ### Phase 1: Core Implementation
+
 - Form trait system
 - Basic validation
 - Simple components
 - Documentation
 
 ### Phase 2: Advanced Features
+
 - Array fields
 - File uploads
 - Multi-step forms
 - Testing utilities
 
 ### Phase 3: Ecosystem Integration
+
 - UI library integrations
 - Additional validators
 - Developer tools
 - Performance optimizations
 
 ### Phase 4: Enterprise Features
+
 - Accessibility enhancements
 - Internationalization
 - Advanced testing
@@ -360,18 +393,21 @@ leptos-forms/
 ## Success Metrics
 
 ### Developer Experience
+
 - API simplicity score
 - Documentation completeness
 - Example coverage
 - Community adoption
 
 ### Performance Metrics
+
 - Bundle size impact
 - Runtime performance
 - Memory usage
 - Compilation time
 
 ### Quality Metrics
+
 - Test coverage (>95%)
 - Type safety guarantees
 - Error handling completeness

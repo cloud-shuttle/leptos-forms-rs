@@ -17,16 +17,19 @@ The test web server provides a collection of HTML forms that simulate the functi
 ## Running the Server
 
 ### Option 1: Using npm script
+
 ```bash
 pnpm run test:server
 ```
 
 ### Option 2: Direct execution
+
 ```bash
 node tests/e2e/web-server/server.js
 ```
 
 ### Option 3: With custom port
+
 ```bash
 PORT=8080 node tests/e2e/web-server/server.js
 ```
@@ -43,6 +46,7 @@ PORT=8080 node tests/e2e/web-server/server.js
 ## Test Forms
 
 ### Basic Form (`/basic-form.html`)
+
 - Simple login form with username/password
 - Real-time validation
 - Error message display
@@ -50,6 +54,7 @@ PORT=8080 node tests/e2e/web-server/server.js
 - Form reset functionality
 
 ### Complex Form (`/complex-form.html`)
+
 - Multi-step registration process
 - Conditional field rendering
 - Field arrays (add/remove items)
@@ -58,6 +63,7 @@ PORT=8080 node tests/e2e/web-server/server.js
 - Progress indicators
 
 ### Component Showcase (`/components.html`)
+
 - All HTML input types
 - Checkbox and radio groups
 - Select dropdowns and textareas
@@ -93,18 +99,21 @@ The forms cover the following scenarios:
 ## Development
 
 ### Adding New Test Forms
+
 1. Create a new HTML file in this directory
 2. Include comprehensive `data-testid` attributes
 3. Add navigation link to `index.html`
 4. Update this README with form description
 
 ### Modifying the Server
+
 - The server is a simple Node.js HTTP server
 - Supports custom MIME types for different file extensions
 - Includes security measures against path traversal
 - Can be extended with additional middleware if needed
 
 ### Testing Locally
+
 1. Start the server: `pnpm run test:server`
 2. Open `http://localhost:3000` in your browser
 3. Navigate through the test forms
@@ -113,19 +122,25 @@ The forms cover the following scenarios:
 ## Troubleshooting
 
 ### Port Already in Use
+
 If port 3000 is already in use, set a different port:
+
 ```bash
 PORT=8080 pnpm run test:server
 ```
 
 ### File Not Found
+
 Ensure all HTML files are in the correct directory and have proper permissions.
 
 ### CORS Issues
+
 The server includes CORS headers for testing. If you encounter issues, check that the server is running and accessible.
 
 ### Playwright Connection Issues
+
 If Playwright can't connect to the server:
+
 1. Verify the server is running on the expected port
 2. Check that the `webServer` configuration in `playwright.config.ts` is correct
 3. Ensure no firewall or network restrictions are blocking the connection

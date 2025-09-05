@@ -5,38 +5,45 @@ This directory contains comprehensive examples demonstrating how to use Leptos F
 ## 📚 **Example Categories**
 
 ### **🚀 Getting Started**
+
 - [**Basic Form**](./basic-form/) - Simple form with validation
 - [**User Registration**](./user-registration/) - Complete registration form
 - [**Contact Form**](./contact-form/) - Multi-field contact form
 
 ### **🎨 Form Components**
+
 - [**Input Types**](./input-types/) - All available input components
 - [**Custom Components**](./custom-components/) - Building custom form components
 - [**Component Library**](./component-library/) - Pre-built component showcase
 
 ### **✅ Validation Patterns**
+
 - [**Basic Validation**](./basic-validation/) - Required fields and simple rules
 - [**Advanced Validation**](./advanced-validation/) - Custom validation functions
 - [**Conditional Validation**](./conditional-validation/) - Field dependencies
 - [**Real-time Validation**](./real-time-validation/) - Live validation feedback
 
 ### **🔄 Advanced Patterns**
+
 - [**Field Arrays**](./field-arrays/) - Dynamic lists of fields
 - [**Conditional Fields**](./conditional-fields/) - Show/hide based on state
 - [**Multi-step Forms**](./multi-step-forms/) - Wizard-style forms
 - [**Form Persistence**](./form-persistence/) - Save/restore form data
 
 ### **📱 Mobile & Accessibility**
+
 - [**Mobile Forms**](./mobile-forms/) - Touch-friendly form design
 - [**Accessible Forms**](./accessible-forms/) - ARIA and screen reader support
 - [**Keyboard Navigation**](./keyboard-navigation/) - Keyboard-only form usage
 
 ### **🔧 Integration Examples**
+
 - [**API Integration**](./api-integration/) - Forms with backend APIs
 - [**State Management**](./state-management/) - Forms with global state
 - [**Routing Integration**](./routing-integration/) - Forms with navigation
 
 ### **🧪 Testing Examples**
+
 - [**Unit Testing**](./unit-testing/) - Testing form logic
 - [**Integration Testing**](./integration-testing/) - Testing form components
 - [**E2E Testing**](./e2e-testing/) - Browser testing examples
@@ -89,16 +96,19 @@ example-name/
 ## 🎯 **Learning Path**
 
 ### **Beginner**
+
 1. Start with [Basic Form](./basic-form/)
 2. Learn [Input Types](./input-types/)
 3. Understand [Basic Validation](./basic-validation/)
 
 ### **Intermediate**
+
 1. Explore [Field Arrays](./field-arrays/)
 2. Build [Custom Components](./custom-components/)
 3. Implement [Conditional Fields](./conditional-fields/)
 
 ### **Advanced**
+
 1. Master [Multi-step Forms](./multi-step-forms/)
 2. Optimize [Performance](./performance-optimization/)
 3. Integrate with [APIs](./api-integration/)

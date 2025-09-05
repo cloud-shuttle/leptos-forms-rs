@@ -1,5 +1,5 @@
-use std::fmt;
 use std::error::Error as StdError;
+use std::fmt;
 
 /// Main error type for the Leptos Forms library
 #[derive(Debug, Clone)]
@@ -27,20 +27,14 @@ pub enum FormError {
         response: Option<String>,
     },
     /// Form state management error
-    StateError {
-        message: String,
-        operation: String,
-    },
+    StateError { message: String, operation: String },
     /// Persistence/storage error
     PersistenceError {
         message: String,
         storage_type: String,
     },
     /// Configuration error
-    ConfigurationError {
-        message: String,
-        component: String,
-    },
+    ConfigurationError { message: String, component: String },
     /// Unknown or unexpected error
     Unknown {
         message: String,
@@ -57,7 +51,7 @@ impl FormError {
             code: None,
         }
     }
-    
+
     /// Convert from types::FieldError to error::FormError
     pub fn from_field_error(field_error: crate::core::types::FieldError) -> Self {
         Self::FieldError {
@@ -66,16 +60,20 @@ impl FormError {
             code: field_error.code,
         }
     }
-    
+
     /// Create a new field error with error code
-    pub fn field_error_with_code(field: impl Into<String>, message: impl Into<String>, code: impl Into<String>) -> Self {
+    pub fn field_error_with_code(
+        field: impl Into<String>,
+        message: impl Into<String>,
+        code: impl Into<String>,
+    ) -> Self {
         Self::FieldError {
             field: field.into(),
             message: message.into(),
             code: Some(code.into()),
         }
     }
-    
+
     /// Create a new validation error
     pub fn validation_error(message: impl Into<String>, field_errors: Vec<FieldError>) -> Self {
         Self::ValidationError {
@@ -83,7 +81,7 @@ impl FormError {
             field_errors,
         }
     }
-    
+
     /// Create a new serialization error
     pub fn serialization_error(message: impl Into<String>, field: Option<String>) -> Self {
         Self::SerializationError {
@@ -91,16 +89,20 @@ impl FormError {
             field,
         }
     }
-    
+
     /// Create a new submission error
-    pub fn submission_error(message: impl Into<String>, status_code: Option<u16>, response: Option<String>) -> Self {
+    pub fn submission_error(
+        message: impl Into<String>,
+        status_code: Option<u16>,
+        response: Option<String>,
+    ) -> Self {
         Self::SubmissionError {
             message: message.into(),
             status_code,
             response,
         }
     }
-    
+
     /// Create a new state error
     pub fn state_error(message: impl Into<String>, operation: impl Into<String>) -> Self {
         Self::StateError {
@@ -108,7 +110,7 @@ impl FormError {
             operation: operation.into(),
         }
     }
-    
+
     /// Create a new persistence error
     pub fn persistence_error(message: impl Into<String>, storage_type: impl Into<String>) -> Self {
         Self::PersistenceError {
@@ -116,7 +118,7 @@ impl FormError {
             storage_type: storage_type.into(),
         }
     }
-    
+
     /// Create a new configuration error
     pub fn configuration_error(message: impl Into<String>, component: impl Into<String>) -> Self {
         Self::ConfigurationError {
@@ -124,7 +126,7 @@ impl FormError {
             component: component.into(),
         }
     }
-    
+
     /// Create a new unknown error
     pub fn unknown(message: impl Into<String>, source: Option<String>) -> Self {
         Self::Unknown {
@@ -132,7 +134,7 @@ impl FormError {
             source,
         }
     }
-    
+
     /// Get the error message
     pub fn message(&self) -> &str {
         match self {
@@ -146,22 +148,22 @@ impl FormError {
             Self::Unknown { message, .. } => message,
         }
     }
-    
+
     /// Check if this is a field error
     pub fn is_field_error(&self) -> bool {
         matches!(self, Self::FieldError { .. })
     }
-    
+
     /// Check if this is a validation error
     pub fn is_validation_error(&self) -> bool {
         matches!(self, Self::ValidationError { .. })
     }
-    
+
     /// Check if this is a submission error
     pub fn is_submission_error(&self) -> bool {
         matches!(self, Self::SubmissionError { .. })
     }
-    
+
     /// Get the field name if this is a field error
     pub fn field_name(&self) -> Option<&str> {
         match self {
@@ -170,7 +172,7 @@ impl FormError {
             _ => None,
         }
     }
-    
+
     /// Get the error code if available
     pub fn error_code(&self) -> Option<&str> {
         match self {
@@ -178,11 +180,15 @@ impl FormError {
             _ => None,
         }
     }
-    
+
     /// Convert to a field error if possible
     pub fn as_field_error(&self) -> Option<FieldError> {
         match self {
-            Self::FieldError { field, message, code } => Some(FieldError {
+            Self::FieldError {
+                field,
+                message,
+                code,
+            } => Some(FieldError {
                 field: field.clone(),
                 message: message.clone(),
                 code: code.clone(),
@@ -198,7 +204,10 @@ impl fmt::Display for FormError {
             Self::FieldError { field, message, .. } => {
                 write!(f, "Field '{}': {}", field, message)
             }
-            Self::ValidationError { message, field_errors } => {
+            Self::ValidationError {
+                message,
+                field_errors,
+            } => {
                 write!(f, "Validation error: {}", message)?;
                 if !field_errors.is_empty() {
                     write!(f, " ({} field errors)", field_errors.len())?;
@@ -212,7 +221,11 @@ impl fmt::Display for FormError {
                 }
                 Ok(())
             }
-            Self::SubmissionError { message, status_code, .. } => {
+            Self::SubmissionError {
+                message,
+                status_code,
+                ..
+            } => {
                 write!(f, "Submission error: {}", message)?;
                 if let Some(code) = status_code {
                     write!(f, " (status: {})", code)?;
@@ -222,7 +235,10 @@ impl fmt::Display for FormError {
             Self::StateError { message, operation } => {
                 write!(f, "State error during {}: {}", operation, message)
             }
-            Self::PersistenceError { message, storage_type } => {
+            Self::PersistenceError {
+                message,
+                storage_type,
+            } => {
                 write!(f, "Persistence error ({}): {}", storage_type, message)
             }
             Self::ConfigurationError { message, component } => {
@@ -262,23 +278,23 @@ impl FieldError {
             code: None,
         }
     }
-    
+
     /// Create a new field error with code
     pub fn with_code(mut self, code: impl Into<String>) -> Self {
         self.code = Some(code.into());
         self
     }
-    
+
     /// Get the field name
     pub fn field_name(&self) -> &str {
         &self.field
     }
-    
+
     /// Get the error message
     pub fn message(&self) -> &str {
         &self.message
     }
-    
+
     /// Get the error code
     pub fn code(&self) -> Option<&str> {
         self.code.as_deref()
@@ -316,31 +332,31 @@ impl ErrorContext {
             additional_data: std::collections::HashMap::new(),
         }
     }
-    
+
     /// Set the form name
     pub fn with_form_name(mut self, form_name: impl Into<String>) -> Self {
         self.form_name = Some(form_name.into());
         self
     }
-    
+
     /// Set the field name
     pub fn with_field_name(mut self, field_name: impl Into<String>) -> Self {
         self.field_name = Some(field_name.into());
         self
     }
-    
+
     /// Set the operation
     pub fn with_operation(mut self, operation: impl Into<String>) -> Self {
         self.operation = Some(operation.into());
         self
     }
-    
+
     /// Set the user agent
     pub fn with_user_agent(mut self, user_agent: impl Into<String>) -> Self {
         self.user_agent = Some(user_agent.into());
         self
     }
-    
+
     /// Add additional data
     pub fn with_data(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
         self.additional_data.insert(key.into(), value.into());
@@ -361,10 +377,10 @@ pub type FormResult<T> = Result<T, FormError>;
 pub trait ErrorHandler {
     /// Handle a form error
     fn handle_error(&self, error: &FormError, context: &ErrorContext);
-    
+
     /// Check if an error should be logged
     fn should_log_error(&self, error: &FormError) -> bool;
-    
+
     /// Check if an error should be reported to external services
     fn should_report_error(&self, error: &FormError) -> bool;
 }
@@ -376,11 +392,11 @@ impl ErrorHandler for DefaultErrorHandler {
     fn handle_error(&self, error: &FormError, context: &ErrorContext) {
         log::error!("Form error: {} (context: {:?})", error, context);
     }
-    
+
     fn should_log_error(&self, _error: &FormError) -> bool {
         true
     }
-    
+
     fn should_report_error(&self, error: &FormError) -> bool {
         // Report all errors except field validation errors
         !error.is_field_error()
@@ -405,22 +421,26 @@ impl ErrorReporter for ConsoleErrorReporter {
 /// Error utilities
 pub mod utils {
     use super::*;
-    
+
     /// Create a field error from a validation error
     pub fn field_error_from_validation(field: &str, message: &str) -> FormError {
         FormError::field_error(field, message)
     }
-    
+
     /// Create a validation error from multiple field errors
     pub fn validation_error_from_fields(message: &str, field_errors: Vec<FieldError>) -> FormError {
         FormError::validation_error(message, field_errors)
     }
-    
+
     /// Extract field errors from a form error
     pub fn extract_field_errors(error: &FormError) -> Vec<FieldError> {
         match error {
             FormError::ValidationError { field_errors, .. } => field_errors.clone(),
-            FormError::FieldError { field, message, code } => {
+            FormError::FieldError {
+                field,
+                message,
+                code,
+            } => {
                 vec![FieldError {
                     field: field.clone(),
                     message: message.clone(),
@@ -430,21 +450,22 @@ pub mod utils {
             _ => Vec::new(),
         }
     }
-    
+
     /// Check if an error is recoverable
     pub fn is_recoverable_error(error: &FormError) -> bool {
-        matches!(error, 
-            FormError::FieldError { .. } | 
-            FormError::ValidationError { .. } |
-            FormError::SerializationError { .. }
+        matches!(
+            error,
+            FormError::FieldError { .. }
+                | FormError::ValidationError { .. }
+                | FormError::SerializationError { .. }
         )
     }
-    
+
     /// Check if an error is critical
     pub fn is_critical_error(error: &FormError) -> bool {
-        matches!(error,
-            FormError::StateError { .. } |
-            FormError::ConfigurationError { .. }
+        matches!(
+            error,
+            FormError::StateError { .. } | FormError::ConfigurationError { .. }
         )
     }
 }

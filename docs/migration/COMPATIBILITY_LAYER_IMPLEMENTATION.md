@@ -6,7 +6,7 @@ The initial compatibility layer implementation encountered significant issues:
 
 ### **Problems Identified**
 
-1. **API Mismatches**: 
+1. **API Mismatches**:
    - Leptos 0.6 doesn't have `signal()`, `memo()`, `action()` functions
    - `leptos::Error` type doesn't exist in 0.6
    - `NodeRefSignal` and `NodeRefSignalSetter` don't exist
@@ -34,16 +34,19 @@ The compatibility layer approach was **too ambitious** for the current state:
 Instead of a complex compatibility layer, I recommend a **phased migration approach**:
 
 ### **Phase 1: Stabilize Current Implementation** ✅
+
 - Fix all compilation errors in the current Leptos 0.6 codebase
 - Ensure all examples work correctly
 - Complete the core functionality
 
 ### **Phase 2: Create Migration Guide** 📋
+
 - Document the specific changes needed for 0.8.x
 - Create automated migration scripts
 - Provide step-by-step upgrade instructions
 
 ### **Phase 3: Implement 0.8.x Support** 🚀
+
 - Create a separate branch for 0.8.x development
 - Use feature flags to support both versions
 - Maintain backward compatibility through version-specific modules
@@ -76,6 +79,7 @@ The compatibility layer approach was well-intentioned but premature. We should:
 4. **Focus on stability** over premature optimization
 
 The user should decide whether to:
+
 - **Continue with Leptos 0.6** and create a migration guide
 - **Start fresh with Leptos 0.8.x** from the beginning
 - **Use a simpler feature-based approach** for version compatibility

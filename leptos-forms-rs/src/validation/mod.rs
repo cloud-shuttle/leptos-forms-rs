@@ -1,7 +1,7 @@
 use crate::core::types::FieldValue;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
 
 /// Validation errors for a form
 #[derive(Debug, Clone, PartialEq)]
@@ -32,23 +32,23 @@ impl ValidationErrors {
     pub fn is_empty(&self) -> bool {
         self.field_errors.is_empty() && self.form_errors.is_empty()
     }
-    
+
     pub fn has_errors(&self) -> bool {
         !self.is_empty()
     }
-    
+
     pub fn has_field_error(&self, field: &str) -> bool {
         self.field_errors.contains_key(field)
     }
-    
+
     pub fn get_field_error(&self, field: &str) -> Option<&Vec<String>> {
         self.field_errors.get(field)
     }
-    
+
     pub fn clear_field(&mut self, field: &str) {
         self.field_errors.remove(field);
     }
-    
+
     pub fn remove_field_error(&mut self, field: &str) {
         self.field_errors.remove(field);
     }
@@ -57,12 +57,15 @@ impl ValidationErrors {
         let mut errors = Vec::new();
         for (field_name, field_errors) in &self.field_errors {
             for error_msg in field_errors {
-                errors.push(crate::error::FieldError::new(field_name.clone(), error_msg.clone()));
+                errors.push(crate::error::FieldError::new(
+                    field_name.clone(),
+                    error_msg.clone(),
+                ));
             }
         }
         errors
     }
-    
+
     pub fn merge(&mut self, other: ValidationErrors) {
         for (field, errors) in other.field_errors {
             self.field_errors
@@ -124,7 +127,7 @@ impl ValidationRuleEngine {
         let mut engine = Self {
             validators: HashMap::new(),
         };
-        
+
         // Register built-in validators
         engine.register_builtin_validators();
         engine
@@ -134,19 +137,13 @@ impl ValidationRuleEngine {
         // Required field validator
         self.validators.insert(
             "required".to_string(),
-            Box::new(|value| {
-                match value {
-                    FieldValue::String(s) if s.trim().is_empty() => {
-                        Err("Field is required".to_string())
-                    }
-                    FieldValue::Array(arr) if arr.is_empty() => {
-                        Err("Field is required".to_string())
-                    }
-                    FieldValue::Number(n) if *n == 0.0 => {
-                        Err("Field is required".to_string())
-                    }
-                    _ => Ok(()),
+            Box::new(|value| match value {
+                FieldValue::String(s) if s.trim().is_empty() => {
+                    Err("Field is required".to_string())
                 }
+                FieldValue::Array(arr) if arr.is_empty() => Err("Field is required".to_string()),
+                FieldValue::Number(n) if *n == 0.0 => Err("Field is required".to_string()),
+                _ => Ok(()),
             }),
         );
 
@@ -155,7 +152,8 @@ impl ValidationRuleEngine {
             "email".to_string(),
             Box::new(|value| {
                 if let FieldValue::String(email) = value {
-                    let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+                    let email_regex =
+                        Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
                     if email_regex.is_match(email) {
                         Ok(())
                     } else {
@@ -244,7 +242,10 @@ impl ValidationRuleEngine {
                     if email.contains("@company.com") || email.contains("@business.com") {
                         Ok(())
                     } else {
-                        Err("Business email required (must contain @company.com or @business.com)".to_string())
+                        Err(
+                            "Business email required (must contain @company.com or @business.com)"
+                                .to_string(),
+                        )
                     }
                 } else {
                     Err("Expected string value for email".to_string())
@@ -260,7 +261,7 @@ impl ValidationRuleEngine {
                     let has_lowercase = password.chars().any(|c| c.is_lowercase());
                     let has_digit = password.chars().any(|c| c.is_numeric());
                     let has_special = password.chars().any(|c| "!@#$%^&*()_+-=[]{}|;:,.<>?".contains(c));
-                    
+
                     if has_uppercase && has_lowercase && has_digit && has_special {
                         Ok(())
                     } else {
@@ -334,18 +335,15 @@ impl ValidationRuleEngine {
     }
 
     fn luhn_check(card_number: &str) -> bool {
-        let digits: Vec<u32> = card_number
-            .chars()
-            .filter_map(|c| c.to_digit(10))
-            .collect();
-        
+        let digits: Vec<u32> = card_number.chars().filter_map(|c| c.to_digit(10)).collect();
+
         if digits.len() < 2 {
             return false;
         }
 
         let mut sum = 0;
         let mut double = false;
-        
+
         for &digit in digits.iter().rev() {
             if double {
                 let doubled = digit * 2;
@@ -355,11 +353,15 @@ impl ValidationRuleEngine {
             }
             double = !double;
         }
-        
+
         sum % 10 == 0
     }
 
-    pub fn register_validator(&mut self, name: &str, validator: Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>) {
+    pub fn register_validator(
+        &mut self,
+        name: &str,
+        validator: Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>,
+    ) {
         self.validators.insert(name.to_string(), validator);
     }
 
@@ -371,7 +373,7 @@ impl ValidationRuleEngine {
 
     pub fn validate_value(&self, value: FieldValue) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         // For now, just validate against basic rules
         // This can be expanded to use the stored validators
         if let FieldValue::String(s) = &value {
@@ -379,7 +381,7 @@ impl ValidationRuleEngine {
                 errors.add_field_error("", "Value is required".to_string());
             }
         }
-        
+
         if errors.is_empty() {
             Ok(())
         } else {
@@ -387,9 +389,14 @@ impl ValidationRuleEngine {
         }
     }
 
-    pub fn validate_field(&self, _field_name: &str, value: &FieldValue, validators: &[Validator]) -> Vec<String> {
+    pub fn validate_field(
+        &self,
+        _field_name: &str,
+        value: &FieldValue,
+        validators: &[Validator],
+    ) -> Vec<String> {
         let mut errors = Vec::new();
-        
+
         for validator in validators {
             match validator {
                 Validator::Required => {
@@ -468,7 +475,7 @@ impl ValidationRuleEngine {
                 }
             }
         }
-        
+
         errors
     }
 }
@@ -477,26 +484,26 @@ impl ValidationRuleEngine {
 pub fn validate_form<T: crate::core::Form>(form: &T) -> Result<(), ValidationErrors> {
     let engine = ValidationRuleEngine::new();
     let mut errors = ValidationErrors::new();
-    
+
     // Get form data and metadata
     let metadata = T::field_metadata();
     let form_data = form.get_form_data();
-    
+
     for field_meta in metadata {
         let field_name = &field_meta.name;
         let default_value = FieldValue::String(String::new());
         let field_value = form_data.get(field_name).unwrap_or(&default_value);
-        
+
         // Validate field
         let field_errors = engine.validate_field(field_name, field_value, &field_meta.validators);
-        
+
         if !field_errors.is_empty() {
             for error in field_errors {
                 errors.add_field_error(field_name, error);
             }
         }
     }
-    
+
     if errors.is_empty() {
         Ok(())
     } else {
@@ -511,13 +518,15 @@ impl Validators {
     /// Check if a field is required
     pub fn required(value: &FieldValue) -> Result<(), String> {
         match value {
-            FieldValue::String(s) if s.trim().is_empty() => Err("This field is required".to_string()),
+            FieldValue::String(s) if s.trim().is_empty() => {
+                Err("This field is required".to_string())
+            }
             FieldValue::Null => Err("This field is required".to_string()),
             FieldValue::Array(arr) if arr.is_empty() => Err("This field is required".to_string()),
             _ => Ok(()),
         }
     }
-    
+
     /// Validate email format
     pub fn email(value: &FieldValue) -> Result<(), String> {
         if let FieldValue::String(email) = value {
@@ -531,7 +540,7 @@ impl Validators {
             Err("Email must be a string".to_string())
         }
     }
-    
+
     /// Validate URL format
     pub fn url(value: &FieldValue) -> Result<(), String> {
         if let FieldValue::String(url) = value {
@@ -545,7 +554,7 @@ impl Validators {
             Err("URL must be a string".to_string())
         }
     }
-    
+
     /// Check minimum length for strings
     pub fn min_length(value: &FieldValue, min: usize) -> Result<(), String> {
         if let FieldValue::String(s) = value {
@@ -558,7 +567,7 @@ impl Validators {
             Err("Value must be a string".to_string())
         }
     }
-    
+
     /// Check maximum length for strings
     pub fn max_length(value: &FieldValue, max: usize) -> Result<(), String> {
         if let FieldValue::String(s) = value {
@@ -571,7 +580,7 @@ impl Validators {
             Err("Value must be a string".to_string())
         }
     }
-    
+
     /// Check minimum value for numbers
     pub fn min(value: &FieldValue, min: f64) -> Result<(), String> {
         if let Some(num) = value.as_number() {
@@ -584,7 +593,7 @@ impl Validators {
             Err("Value must be a number".to_string())
         }
     }
-    
+
     /// Check maximum value for numbers
     pub fn max(value: &FieldValue, max: f64) -> Result<(), String> {
         if let Some(num) = value.as_number() {
@@ -597,7 +606,7 @@ impl Validators {
             Err("Value must be a number".to_string())
         }
     }
-    
+
     /// Validate against a regex pattern
     pub fn pattern(value: &FieldValue, pattern: &str) -> Result<(), String> {
         if let FieldValue::String(s) = value {
@@ -611,7 +620,7 @@ impl Validators {
             Err("Value must be a string".to_string())
         }
     }
-    
+
     /// Validate phone number format
     pub fn phone(value: &FieldValue) -> Result<(), String> {
         if let FieldValue::String(phone) = value {
@@ -625,7 +634,7 @@ impl Validators {
             Err("Phone number must be a string".to_string())
         }
     }
-    
+
     /// Validate postal code format (basic)
     pub fn postal_code(value: &FieldValue) -> Result<(), String> {
         if let FieldValue::String(code) = value {
@@ -639,7 +648,7 @@ impl Validators {
             Err("Postal code must be a string".to_string())
         }
     }
-    
+
     /// Validate credit card number (Luhn algorithm)
     pub fn credit_card(value: &FieldValue) -> Result<(), String> {
         if let FieldValue::String(card) = value {
@@ -648,15 +657,15 @@ impl Validators {
                 .filter(|c| c.is_digit(10))
                 .map(|c| c.to_digit(10).unwrap())
                 .collect();
-            
+
             if digits.len() < 13 || digits.len() > 19 {
                 return Err("Invalid credit card number length".to_string());
             }
-            
+
             // Luhn algorithm
             let mut sum = 0;
             let mut double = false;
-            
+
             for &digit in digits.iter().rev() {
                 if double {
                     let doubled = digit * 2;
@@ -666,7 +675,7 @@ impl Validators {
                 }
                 double = !double;
             }
-            
+
             if sum % 10 == 0 {
                 Ok(())
             } else {
@@ -676,7 +685,7 @@ impl Validators {
             Err("Credit card number must be a string".to_string())
         }
     }
-    
+
     /// Validate date format (YYYY-MM-DD)
     pub fn date(value: &FieldValue) -> Result<(), String> {
         if let FieldValue::Date(_) = value {
@@ -692,7 +701,7 @@ impl Validators {
             Err("Value must be a date".to_string())
         }
     }
-    
+
     /// Validate that value is a positive number
     pub fn positive(value: &FieldValue) -> Result<(), String> {
         if let Some(num) = value.as_number() {
@@ -705,7 +714,7 @@ impl Validators {
             Err("Value must be a number".to_string())
         }
     }
-    
+
     /// Validate that value is a negative number
     pub fn negative(value: &FieldValue) -> Result<(), String> {
         if let Some(num) = value.as_number() {
@@ -718,7 +727,7 @@ impl Validators {
             Err("Value must be a number".to_string())
         }
     }
-    
+
     /// Validate that value is an integer
     pub fn integer(value: &FieldValue) -> Result<(), String> {
         if let Some(num) = value.as_number() {
@@ -731,7 +740,7 @@ impl Validators {
             Err("Value must be a number".to_string())
         }
     }
-    
+
     /// Validate array length
     pub fn array_length(value: &FieldValue, min: usize, max: usize) -> Result<(), String> {
         if let FieldValue::Array(arr) = value {
@@ -761,11 +770,11 @@ impl ConditionalValidator {
     pub fn new() -> Self {
         Self::default()
     }
-    
+
     pub fn add_rule(&mut self, rule: ConditionalRule) {
         self.rules.push(rule);
     }
-    
+
     pub fn validate_conditional_fields<T: crate::core::Form>(
         &self,
         form: &T,
@@ -778,7 +787,7 @@ impl ConditionalValidator {
                 if let Some(condition) = &rule.condition {
                     // Check if the condition is met
                     let condition_met = self.evaluate_condition(form, condition)?;
-                    
+
                     if condition_met {
                         // Apply the validation rule
                         for validator in &rule.validators {
@@ -792,7 +801,7 @@ impl ConditionalValidator {
         }
         Ok(())
     }
-    
+
     fn evaluate_condition<T: crate::core::Form>(
         &self,
         form: &T,
@@ -859,17 +868,20 @@ impl ConditionalRule {
             error_message: None,
         }
     }
-    
+
     pub fn when(mut self, condition: FieldCondition) -> Self {
         self.condition = Some(condition);
         self
     }
-    
-    pub fn validate_with(mut self, validator: Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>) -> Self {
+
+    pub fn validate_with(
+        mut self,
+        validator: Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>,
+    ) -> Self {
         self.validators.push(validator);
         self
     }
-    
+
     pub fn with_error_message(mut self, message: String) -> Self {
         self.error_message = Some(message);
         self
@@ -892,27 +904,27 @@ impl FieldCondition {
     pub fn equals(field: &str, value: FieldValue) -> Self {
         Self::Equals(field.to_string(), value)
     }
-    
+
     pub fn not_equals(field: &str, value: FieldValue) -> Self {
         Self::NotEquals(field.to_string(), value)
     }
-    
+
     pub fn contains(field: &str, value: &str) -> Self {
         Self::Contains(field.to_string(), value.to_string())
     }
-    
+
     pub fn is_empty(field: &str) -> Self {
         Self::IsEmpty(field.to_string())
     }
-    
+
     pub fn is_not_empty(field: &str) -> Self {
         Self::IsNotEmpty(field.to_string())
     }
-    
+
     pub fn and(conditions: Vec<FieldCondition>) -> Self {
         Self::And(conditions)
     }
-    
+
     pub fn or(conditions: Vec<FieldCondition>) -> Self {
         Self::Or(conditions)
     }

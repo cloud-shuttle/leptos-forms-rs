@@ -1,9 +1,11 @@
 //! Tests for form types functionality
 
-use serde::{Serialize, Deserialize};
-use leptos_forms_rs::core::{FieldType, FieldValue, NumberType, FieldMetadata, FormSchema, FieldError};
+use leptos_forms_rs::core::{
+    FieldError, FieldMetadata, FieldType, FieldValue, FormSchema, NumberType,
+};
 use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::{Form, ValidationErrors};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct TypesTestForm {
@@ -81,29 +83,32 @@ impl Form for TypesTestForm {
 
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         if self.text_field.is_empty() {
             errors.add_field_error("text_field", "Text field is required".to_string());
         }
-        
+
         if self.email_field.is_empty() {
             errors.add_field_error("email_field", "Email is required".to_string());
         } else if !self.email_field.contains('@') {
             errors.add_field_error("email_field", "Invalid email format".to_string());
         }
-        
+
         if self.password_field.len() < 8 {
-            errors.add_field_error("password_field", "Password must be at least 8 characters".to_string());
+            errors.add_field_error(
+                "password_field",
+                "Password must be at least 8 characters".to_string(),
+            );
         }
-        
+
         if self.number_field < 0.0 {
             errors.add_field_error("number_field", "Number must be non-negative".to_string());
         }
-        
+
         if self.url_field.is_empty() {
             errors.add_field_error("url_field", "URL field is required".to_string());
         }
-        
+
         if errors.has_errors() {
             Err(errors)
         } else {
@@ -147,11 +152,11 @@ fn test_field_value_conversions() {
     let text_value = FieldValue::String("test".to_string());
     let number_value = FieldValue::Number(123.0);
     let boolean_value = FieldValue::Boolean(true);
-    
+
     assert_eq!(text_value.as_string(), Some(&"test".to_string()));
     assert_eq!(number_value.as_number(), Some(123.0));
     assert_eq!(boolean_value.as_boolean(), Some(true));
-    
+
     assert!(matches!(text_value, FieldValue::String(_)));
     assert!(matches!(number_value, FieldValue::Number(_)));
     assert!(matches!(boolean_value, FieldValue::Boolean(_)));
@@ -160,10 +165,10 @@ fn test_field_value_conversions() {
 #[test]
 fn test_field_metadata() {
     let metadata = TypesTestForm::field_metadata();
-    
+
     let text_field = metadata.iter().find(|f| f.name == "text_field").unwrap();
     let boolean_field = metadata.iter().find(|f| f.name == "boolean_field").unwrap();
-    
+
     assert!(matches!(text_field.field_type, FieldType::Text));
     assert!(matches!(boolean_field.field_type, FieldType::Boolean));
     assert_eq!(text_field.is_required, true);
@@ -173,11 +178,11 @@ fn test_field_metadata() {
 #[test]
 fn test_form_validation() {
     let mut form = TypesTestForm::default_values();
-    
+
     // Test empty form validation
     let result = form.validate();
     assert!(result.is_err());
-    
+
     // Test valid form
     form.text_field = "Sample text".to_string();
     form.email_field = "test@example.com".to_string();
@@ -185,7 +190,7 @@ fn test_form_validation() {
     form.number_field = 42.0;
     form.boolean_field = true;
     form.url_field = "https://example.com".to_string();
-    
+
     let result = form.validate();
     assert!(result.is_ok());
 }
@@ -194,7 +199,7 @@ fn test_form_validation() {
 fn test_form_schema() {
     let schema = TypesTestForm::schema();
     assert_eq!(schema.field_metadata.len(), 6);
-    
+
     // Note: required_fields() method doesn't exist in current API
     // let required_fields = schema.required_fields();
     // assert_eq!(required_fields.len(), 5); // boolean_field is not required
@@ -203,12 +208,12 @@ fn test_form_schema() {
 #[test]
 fn test_field_access() {
     let mut form = TypesTestForm::default_values();
-    
+
     // Test setting and getting field values
     form.text_field = "test".to_string();
     let value = form.get_field_value("text_field");
     assert_eq!(value, FieldValue::String("test".to_string()));
-    
+
     // Test unknown field
     let value = form.get_field_value("unknown_field");
     assert_eq!(value, FieldValue::String(String::new()));

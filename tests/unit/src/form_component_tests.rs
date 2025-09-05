@@ -1,7 +1,7 @@
-use leptos_forms_rs::core::{FieldType, FieldValue, FieldMetadata, FormSchema, FieldError};
+use leptos_forms_rs::core::{FieldError, FieldMetadata, FieldType, FieldValue, FormSchema};
 use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::{Form, ValidationErrors};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct TestForm {
@@ -35,17 +35,17 @@ impl Form for TestForm {
 
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         if self.username.is_empty() {
             errors.add_field_error("username", "Username is required".to_string());
         }
-        
+
         if self.email.is_empty() {
             errors.add_field_error("email", "Email is required".to_string());
         } else if !self.email.contains('@') {
             errors.add_field_error("email", "Invalid email format".to_string());
         }
-        
+
         if errors.has_errors() {
             Err(errors)
         } else {
@@ -60,7 +60,6 @@ impl Form for TestForm {
             _ => FieldValue::String(String::new()),
         }
     }
-
 
     fn default_values() -> Self {
         Self {
@@ -81,7 +80,7 @@ impl Form for TestForm {
 fn test_form_component_renders_basic_form() {
     // Test that we can import the Form component
     use leptos_forms_rs::components::Form;
-    
+
     // If we get here, the component compiles and can be imported
     assert!(true);
 }
@@ -90,7 +89,7 @@ fn test_form_component_renders_basic_form() {
 fn test_form_component_handles_form_submission() {
     // Test that the Form component can be imported and used
     use leptos_forms_rs::components::Form;
-    
+
     // If we get here, the component compiles with submission handling
     assert!(true);
 }
@@ -99,7 +98,7 @@ fn test_form_component_handles_form_submission() {
 fn test_form_component_renders_form_fields() {
     // Test that the Form component can be imported and used
     use leptos_forms_rs::components::Form;
-    
+
     // If we get here, the component compiles with field rendering
     assert!(true);
 }
@@ -108,7 +107,7 @@ fn test_form_component_renders_form_fields() {
 fn test_form_component_handles_form_validation() {
     // Test that the Form component can be imported and used
     use leptos_forms_rs::components::Form;
-    
+
     // If we get here, the component compiles with validation handling
     assert!(true);
 }

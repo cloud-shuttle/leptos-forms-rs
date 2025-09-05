@@ -1,12 +1,14 @@
 # CI/CD Pipeline Documentation - Leptos Forms
-**Project**: Leptos Forms Library  
-**Version**: 1.0  
-**Date**: 2025-01-02  
-**Status**: Implementation Guide  
+
+**Project**: Leptos Forms Library
+**Version**: 1.0
+**Date**: 2025-01-02
+**Status**: Implementation Guide
 
 ## 1. Pipeline Overview
 
 ### 1.1 Pipeline Architecture
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Source Control (GitHub)                  │
@@ -31,20 +33,22 @@
 ```
 
 ### 1.2 Pipeline Triggers
-| Trigger | Pipeline | Purpose |
-|---------|----------|---------|
-| Push to main | Full CI/CD | Integration testing, automated release |
-| Pull Request | CI only | Code validation, quality gates |
-| Release tag | Release pipeline | Package publishing, documentation |
-| Scheduled | Nightly build | Dependency updates, performance regression |
-| Manual | Specific workflow | Ad-hoc testing, emergency fixes |
+
+| Trigger      | Pipeline          | Purpose                                    |
+| ------------ | ----------------- | ------------------------------------------ |
+| Push to main | Full CI/CD        | Integration testing, automated release     |
+| Pull Request | CI only           | Code validation, quality gates             |
+| Release tag  | Release pipeline  | Package publishing, documentation          |
+| Scheduled    | Nightly build     | Dependency updates, performance regression |
+| Manual       | Specific workflow | Ad-hoc testing, emergency fixes            |
 
 ### 1.3 Environment Strategy
-| Environment | Purpose | Deployment | Access |
-|-------------|---------|------------|--------|
-| Development | Feature development | Manual | Developers |
-| Staging | Pre-production testing | Automatic (main branch) | QA, Stakeholders |
-| Production | Live releases | Automatic (tags) | Public |
+
+| Environment | Purpose                | Deployment              | Access           |
+| ----------- | ---------------------- | ----------------------- | ---------------- |
+| Development | Feature development    | Manual                  | Developers       |
+| Staging     | Pre-production testing | Automatic (main branch) | QA, Stakeholders |
+| Production  | Live releases          | Automatic (tags)        | Public           |
 
 ## 2. GitHub Actions Workflows
 
@@ -56,11 +60,11 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+    - cron: "0 2 * * *" # Daily at 2 AM UTC
 
 env:
   CARGO_TERM_COLOR: always
@@ -74,12 +78,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-          
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -88,16 +92,16 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Check formatting
         run: cargo fmt --all -- --check
-        
+
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
-        
+
       - name: Check documentation
         run: cargo doc --all-features --no-deps --document-private-items
-        
+
       - name: Audit dependencies
         run: |
           cargo install cargo-audit
@@ -113,16 +117,16 @@ jobs:
         rust: [stable, beta, nightly]
         include:
           - os: ubuntu-latest
-            rust: 1.70.0  # MSRV
+            rust: 1.70.0 # MSRV
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust ${{ matrix.rust }}
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
-          
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -131,13 +135,13 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Build library
         run: cargo build --verbose --all-features
-        
+
       - name: Build without default features
         run: cargo build --verbose --no-default-features
-        
+
       - name: Build examples
         run: cargo build --verbose --examples
 
@@ -151,10 +155,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -163,13 +167,13 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Run unit tests
         run: cargo test --all-features --lib
-        
+
       - name: Run integration tests
         run: cargo test --all-features --test integration_tests
-        
+
       - name: Run documentation tests
         run: cargo test --all-features --doc
 
@@ -180,15 +184,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-          
+
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-        
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -197,16 +201,16 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-wasm-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Build WASM package
         run: wasm-pack build --target web --out-dir pkg
-        
+
       - name: Test WASM in Node.js
         run: wasm-pack test --node
-        
+
       - name: Test WASM in browser (headless)
         run: wasm-pack test --headless --chrome
-        
+
       - name: Check WASM bundle size
         run: |
           du -h pkg/*.wasm
@@ -222,13 +226,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Install cargo-tarpaulin
         run: cargo install cargo-tarpaulin
-        
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -237,7 +241,7 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-coverage-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Generate coverage report
         run: |
           cargo tarpaulin \
@@ -248,13 +252,13 @@ jobs:
             --timeout 300 \
             --out Html Lcov \
             --output-dir coverage
-            
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           files: coverage/lcov.info
           fail_ci_if_error: true
-          
+
       - name: Check coverage threshold
         run: |
           COVERAGE=$(grep -oP 'lines......: \K[0-9.]+' coverage/lcov.info | tail -1)
@@ -263,7 +267,7 @@ jobs:
             echo "Coverage ${COVERAGE}% is below minimum 90%"
             exit 1
           fi
-          
+
       - name: Archive coverage report
         uses: actions/upload-artifact@v3
         with:
@@ -277,10 +281,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -289,19 +293,19 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-bench-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Run benchmarks
         run: cargo bench --all-features
-        
+
       - name: Store benchmark results
         uses: benchmark-action/github-action-benchmark@v1
         with:
-          tool: 'cargo'
+          tool: "cargo"
           output-file-path: target/criterion/report/index.html
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           comment-on-alert: true
-          alert-threshold: '110%'  # Alert if performance degrades by 10%
+          alert-threshold: "110%" # Alert if performance degrades by 10%
 
   # Job 7: Security Scan
   security:
@@ -310,17 +314,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Run cargo-audit
         uses: actions-rs/audit-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Run cargo-deny
         run: |
           cargo install cargo-deny
           cargo deny check all
-          
+
       - name: Scan for secrets
         uses: trufflesecurity/trufflehog@v3.63.2
         with:
@@ -337,11 +341,11 @@ name: End-to-End Testing
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '0 4 * * *'  # Daily at 4 AM UTC
+    - cron: "0 4 * * *" # Daily at 4 AM UTC
 
 jobs:
   e2e-tests:
@@ -353,41 +357,41 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          
+          node-version: "18"
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-          
+
       - name: Install dependencies
         run: |
           npm install -g wasm-pack
           npm install playwright @playwright/test
-          
+
       - name: Install Playwright browsers
         run: npx playwright install ${{ matrix.browser }}
-        
+
       - name: Build examples for E2E testing
         run: |
           cd examples/contact-form
           wasm-pack build --target web
           npm install
           npm run build
-          
+
       - name: Start development server
         run: |
           cd examples/contact-form
           npm run serve &
           sleep 5  # Wait for server to start
-          
+
       - name: Run E2E tests
         run: npx playwright test --browser=${{ matrix.browser }}
-        
+
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: failure()
@@ -414,7 +418,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Run cross-browser tests
         uses: ./.github/actions/browser-test
         with:
@@ -431,7 +435,7 @@ name: Release Pipeline
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -444,10 +448,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Validate version consistency
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
@@ -456,7 +460,7 @@ jobs:
             echo "Version mismatch: tag=$TAG_VERSION, Cargo.toml=$CARGO_VERSION"
             exit 1
           fi
-          
+
       - name: Check changelog
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
@@ -464,7 +468,7 @@ jobs:
             echo "Version $TAG_VERSION not found in CHANGELOG.md"
             exit 1
           fi
-          
+
       - name: Run full test suite
         run: |
           cargo test --all-features
@@ -481,25 +485,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-          
+
       - name: Build optimized WASM
         run: |
           wasm-pack build --release --target web --out-dir pkg
-          
+
       - name: Optimize WASM binary
         run: |
           cargo install wasm-opt
           wasm-opt -Oz pkg/leptos_forms_bg.wasm -o pkg/leptos_forms_bg.wasm
-          
+
       - name: Create release archive
         run: |
           tar -czf leptos-forms-${{ matrix.os }}.tar.gz pkg/
-          
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -514,18 +518,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Publish leptos-forms-macro
         run: |
           cd leptos-forms-macro
           cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
-          
+
       - name: Wait for macro crate to propagate
         run: sleep 60
-        
+
       - name: Publish leptos-forms
         run: |
           cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
@@ -538,16 +542,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Download all artifacts
         uses: actions/download-artifact@v3
-        
+
       - name: Extract changelog entry
         id: changelog
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
           awk "/^## \[$TAG_VERSION\]/,/^## \[/{if(/^## \[/ && !/^## \[$TAG_VERSION\]/) exit; if(!/^## \[$TAG_VERSION\]/) print}" CHANGELOG.md > release-notes.md
-          
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
@@ -569,14 +573,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.DOCS_TOKEN }}
-          
+
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Build documentation
         run: |
           cargo doc --all-features --no-deps
-          
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -600,18 +604,18 @@ jobs:
             📦 Available on crates.io: https://crates.io/crates/leptos-forms
             📖 Documentation: https://leptos-forms.dev
             🔗 Release Notes: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
-            
+
       - name: Tweet announcement
         uses: ethomson/send-tweet-action@v1
         with:
           status: |
             🚀 Leptos Forms ${{ github.ref_name }} is now available!
-            
+
             ✨ Type-safe reactive forms for @leptos_rs
             🎯 <15KB bundle size
             ⚡ <1ms field updates
             🛡️ Compile-time validation
-            
+
             Get started: https://leptos-forms.dev
             #RustLang #WebDev #Leptos
         env:
@@ -626,6 +630,7 @@ jobs:
 ### 3.1 Automated Quality Checks
 
 #### Code Quality Gate
+
 ```bash
 #!/bin/bash
 # scripts/quality-gate.sh
@@ -684,6 +689,7 @@ echo "✅ All quality checks passed!"
 ```
 
 #### Performance Gate
+
 ```bash
 #!/bin/bash
 # scripts/performance-gate.sh
@@ -717,6 +723,7 @@ echo "  - Form validation: ${FORM_VALIDATION_TIME}ms (target: <2ms)"
 ### 3.2 Release Validation
 
 #### Pre-release Checklist
+
 ```yaml
 # .github/workflows/pre-release-checklist.yml
 name: Pre-release Checklist
@@ -725,7 +732,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g., 1.0.0)'
+        description: "Version to release (e.g., 1.0.0)"
         required: true
 
 jobs:
@@ -735,38 +742,38 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Validate release checklist
         run: |
           VERSION=${{ github.event.inputs.version }}
-          
+
           # Check version consistency
           if ! grep -q "version = \"$VERSION\"" Cargo.toml; then
             echo "❌ Version $VERSION not found in Cargo.toml"
             exit 1
           fi
-          
+
           # Check changelog
           if ! grep -q "## \[$VERSION\]" CHANGELOG.md; then
             echo "❌ Version $VERSION not documented in CHANGELOG.md"
             exit 1
           fi
-          
+
           # Check all tests pass
           cargo test --all-features
-          
+
           # Check documentation builds
           cargo doc --all-features --no-deps
-          
+
           # Check examples work
           cd examples/contact-form
           wasm-pack build --target web
-          
+
           # Security audit
           cargo audit
-          
+
           echo "✅ Release $VERSION is ready!"
-          
+
           # Create release checklist issue
           gh issue create \
             --title "Release $VERSION Checklist" \
@@ -779,13 +786,14 @@ jobs:
 ## 4. Deployment Strategies
 
 ### 4.1 Staging Deployment
+
 ```yaml
 # .github/workflows/deploy-staging.yml
 name: Deploy to Staging
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy-staging:
@@ -795,24 +803,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Build documentation site
         run: |
           cargo doc --all-features --no-deps
           mkdir -p staging-site
           cp -r target/doc/* staging-site/
-          
+
       - name: Build examples
         run: |
           cd examples/contact-form
           wasm-pack build --target web
           npm install && npm run build
           cp -r dist/* ../../staging-site/examples/
-          
+
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
-          publish-dir: './staging-site'
+          publish-dir: "./staging-site"
           production-deploy: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Staging deployment for commit ${{ github.sha }}"
@@ -822,6 +830,7 @@ jobs:
 ```
 
 ### 4.2 Production Deployment
+
 ```yaml
 # .github/workflows/deploy-production.yml
 name: Deploy to Production
@@ -838,17 +847,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Build production documentation
         run: |
           cargo doc --all-features --no-deps --release
-          
+
       - name: Optimize and deploy
         run: |
           # Optimize documentation for production
           find target/doc -name "*.html" -exec htmlmin {} {} \;
           find target/doc -name "*.css" -exec csso {} -o {} \;
-          
+
           # Deploy to production CDN
           aws s3 sync target/doc s3://leptos-forms-docs/ --delete
           aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
@@ -860,13 +869,14 @@ jobs:
 ## 5. Monitoring and Observability
 
 ### 5.1 Build Monitoring
+
 ```yaml
 # .github/workflows/monitoring.yml
 name: Pipeline Monitoring
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
+    - cron: "0 */6 * * *" # Every 6 hours
 
 jobs:
   health-check:
@@ -879,7 +889,7 @@ jobs:
           FAILED_RUNS=$(gh api repos/${{ github.repository }}/actions/runs \
             --jq '.workflow_runs[] | select(.created_at > (now - 86400 | strftime("%Y-%m-%dT%H:%M:%SZ")) and .conclusion == "failure") | .id' \
             | wc -l)
-          
+
           if [ $FAILED_RUNS -gt 5 ]; then
             echo "⚠️ High failure rate: $FAILED_RUNS failures in last 24 hours"
             # Send alert to Slack
@@ -889,13 +899,13 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Check dependency freshness
         run: |
           # Check for outdated dependencies
           cargo install cargo-outdated
           OUTDATED=$(cargo outdated --root-deps-only --format json | jq '.dependencies | length')
-          
+
           if [ $OUTDATED -gt 10 ]; then
             echo "⚠️ Many outdated dependencies: $OUTDATED"
             # Create issue for dependency updates
@@ -909,13 +919,14 @@ jobs:
 ```
 
 ### 5.2 Performance Monitoring
+
 ```yaml
 # .github/workflows/performance-monitoring.yml
 name: Performance Monitoring
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Daily at 3 AM
+    - cron: "0 3 * * *" # Daily at 3 AM
 
 jobs:
   performance-regression:
@@ -924,19 +935,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Run performance benchmarks
         run: |
           cargo bench --all-features -- --output-format json > current-benchmarks.json
-          
+
       - name: Compare with baseline
         run: |
           # Download previous benchmark results
           gh release download performance-baseline --pattern "benchmarks.json"
-          
+
           # Compare performance (simplified)
           python scripts/compare-benchmarks.py baseline-benchmarks.json current-benchmarks.json
-          
+
       - name: Upload current benchmarks
         if: success()
         run: |
@@ -948,17 +959,19 @@ jobs:
 ## 6. Secrets and Security
 
 ### 6.1 Required Secrets
-| Secret | Purpose | Scope |
-|--------|---------|-------|
-| `CRATES_IO_TOKEN` | Publishing to crates.io | Release workflow |
-| `GITHUB_TOKEN` | GitHub API access | All workflows |
-| `CODECOV_TOKEN` | Coverage reporting | CI workflow |
-| `DISCORD_WEBHOOK` | Community notifications | Release workflow |
-| `NETLIFY_AUTH_TOKEN` | Staging deployment | Deploy workflow |
-| `AWS_ACCESS_KEY_ID` | Production deployment | Deploy workflow |
-| `AWS_SECRET_ACCESS_KEY` | Production deployment | Deploy workflow |
+
+| Secret                  | Purpose                 | Scope            |
+| ----------------------- | ----------------------- | ---------------- |
+| `CRATES_IO_TOKEN`       | Publishing to crates.io | Release workflow |
+| `GITHUB_TOKEN`          | GitHub API access       | All workflows    |
+| `CODECOV_TOKEN`         | Coverage reporting      | CI workflow      |
+| `DISCORD_WEBHOOK`       | Community notifications | Release workflow |
+| `NETLIFY_AUTH_TOKEN`    | Staging deployment      | Deploy workflow  |
+| `AWS_ACCESS_KEY_ID`     | Production deployment   | Deploy workflow  |
+| `AWS_SECRET_ACCESS_KEY` | Production deployment   | Deploy workflow  |
 
 ### 6.2 Security Best Practices
+
 - **Principle of Least Privilege**: Each secret has minimum required permissions
 - **Environment Isolation**: Separate secrets for staging and production
 - **Regular Rotation**: Secrets rotated quarterly or on security events
@@ -969,6 +982,7 @@ jobs:
 ### 7.1 Common Issues
 
 #### Build Failures
+
 ```bash
 # Debug build issues
 cargo build --verbose 2>&1 | tee build.log
@@ -981,6 +995,7 @@ cargo clean && cargo build
 ```
 
 #### Test Failures
+
 ```bash
 # Run specific test with output
 cargo test test_name -- --nocapture
@@ -993,6 +1008,7 @@ RUST_BACKTRACE=full cargo test
 ```
 
 #### WASM Issues
+
 ```bash
 # Check WASM target
 rustup target list --installed | grep wasm32
@@ -1005,6 +1021,7 @@ wasm-pack build --dev --target web --verbose
 ```
 
 ### 7.2 Pipeline Failure Recovery
+
 1. **Identify failure point** from GitHub Actions logs
 2. **Reproduce locally** using same commands
 3. **Fix issue** and test locally
@@ -1016,6 +1033,7 @@ This comprehensive CI/CD pipeline ensures high-quality releases with automated t
 ---
 
 **Document Control**
+
 - **Created**: 2025-01-02
 - **Last Modified**: 2025-01-02
 - **Next Review**: Monthly during implementation

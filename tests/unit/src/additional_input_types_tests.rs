@@ -1,8 +1,8 @@
-use leptos_forms_rs::core::types::FieldValue;
-use leptos_forms_rs::core::FormHandle;
-use leptos_forms_rs::core::Form;
 use leptos::prelude::{Get, GetUntracked};
-use serde::{Serialize, Deserialize};
+use leptos_forms_rs::core::types::FieldValue;
+use leptos_forms_rs::core::Form;
+use leptos_forms_rs::core::FormHandle;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct AdditionalInputTypesForm {
@@ -89,38 +89,53 @@ impl Form for AdditionalInputTypesForm {
             },
         ]
     }
-    
+
     fn validate(&self) -> Result<(), leptos_forms_rs::validation::ValidationErrors> {
         let mut errors = leptos_forms_rs::validation::ValidationErrors::new();
-        
+
         // Validate file sizes and types
         if self.uploaded_files.len() > 10 {
             errors.add_field_error("uploaded_files", "Maximum 10 files allowed".to_string());
         }
-        
+
         if self.image_files.len() > 20 {
             errors.add_field_error("image_files", "Maximum 20 images allowed".to_string());
         }
-        
+
         if self.document_files.len() > 5 {
             errors.add_field_error("document_files", "Maximum 5 documents allowed".to_string());
         }
-        
+
         if errors.is_empty() {
             Ok(())
         } else {
             Err(errors)
         }
     }
-    
+
     fn get_field_value(&self, name: &str) -> FieldValue {
         match name {
             "rich_text_content" => FieldValue::String(self.rich_text_content.clone()),
             "markdown_content" => FieldValue::String(self.markdown_content.clone()),
             "code_content" => FieldValue::String(self.code_content.clone()),
-            "uploaded_files" => FieldValue::Array(self.uploaded_files.iter().map(|s| FieldValue::String(s.clone())).collect()),
-            "image_files" => FieldValue::Array(self.image_files.iter().map(|s| FieldValue::String(s.clone())).collect()),
-            "document_files" => FieldValue::Array(self.document_files.iter().map(|s| FieldValue::String(s.clone())).collect()),
+            "uploaded_files" => FieldValue::Array(
+                self.uploaded_files
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+            "image_files" => FieldValue::Array(
+                self.image_files
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+            "document_files" => FieldValue::Array(
+                self.document_files
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
             _ => FieldValue::String(String::new()),
         }
     }
@@ -135,7 +150,7 @@ impl Form for AdditionalInputTypesForm {
             document_files: vec![],
         }
     }
-    
+
     fn schema() -> leptos_forms_rs::core::FormSchema {
         leptos_forms_rs::core::FormSchema {
             name: "AdditionalInputTypesForm".to_string(),
@@ -147,8 +162,9 @@ impl Form for AdditionalInputTypesForm {
 #[test]
 fn test_rich_text_input_component_creation() {
     // Test that we can create the rich text input component
-    let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(AdditionalInputTypesForm::default_values());
-    
+    let form: FormHandle<AdditionalInputTypesForm> =
+        FormHandle::new(AdditionalInputTypesForm::default_values());
+
     // This would test the RichTextInput component if it existed
     // For now, we just verify the form can be created
     assert!(true);
@@ -157,8 +173,9 @@ fn test_rich_text_input_component_creation() {
 #[test]
 fn test_markdown_input_component_creation() {
     // Test that we can create the markdown input component
-    let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(AdditionalInputTypesForm::default_values());
-    
+    let form: FormHandle<AdditionalInputTypesForm> =
+        FormHandle::new(AdditionalInputTypesForm::default_values());
+
     // This would test the MarkdownInput component if it existed
     // For now, we just verify the form can be created
     assert!(true);
@@ -167,8 +184,9 @@ fn test_markdown_input_component_creation() {
 #[test]
 fn test_code_input_component_creation() {
     // Test that we can create the code input component
-    let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(AdditionalInputTypesForm::default_values());
-    
+    let form: FormHandle<AdditionalInputTypesForm> =
+        FormHandle::new(AdditionalInputTypesForm::default_values());
+
     // This would test the CodeInput component if it existed
     // For now, we just verify the form can be created
     assert!(true);
@@ -177,8 +195,9 @@ fn test_code_input_component_creation() {
 #[test]
 fn test_file_upload_input_component_creation() {
     // Test that we can create the file upload input component
-    let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(AdditionalInputTypesForm::default_values());
-    
+    let form: FormHandle<AdditionalInputTypesForm> =
+        FormHandle::new(AdditionalInputTypesForm::default_values());
+
     // This would test the FileUploadInput component if it existed
     // For now, we just verify the form can be created
     assert!(true);
@@ -190,13 +209,13 @@ fn test_rich_text_content_handling() {
     let mut form_data = AdditionalInputTypesForm::default_values();
     let rich_content = "<p><strong>Bold text</strong> and <em>italic text</em></p>";
     form_data.rich_text_content = rich_content.to_string();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the content was set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert_eq!(form_data.rich_text_content, rich_content);
 }
 
@@ -204,15 +223,16 @@ fn test_rich_text_content_handling() {
 fn test_markdown_content_handling() {
     // Test that markdown content can be handled
     let mut form_data = AdditionalInputTypesForm::default_values();
-    let markdown_content = "# Heading\n\n**Bold** and *italic* text\n\n- List item 1\n- List item 2";
+    let markdown_content =
+        "# Heading\n\n**Bold** and *italic* text\n\n- List item 1\n- List item 2";
     form_data.markdown_content = markdown_content.to_string();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the content was set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert_eq!(form_data.markdown_content, markdown_content);
 }
 
@@ -222,13 +242,13 @@ fn test_code_content_handling() {
     let mut form_data = AdditionalInputTypesForm::default_values();
     let code_content = "fn main() {\n    println!(\"Hello, world!\");\n}";
     form_data.code_content = code_content.to_string();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the content was set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert_eq!(form_data.code_content, code_content);
 }
 
@@ -241,13 +261,13 @@ fn test_file_upload_handling() {
         "uploads/file2.docx".to_string(),
     ];
     form_data.document_files = file_urls.clone();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the files were set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert_eq!(form_data.document_files.len(), 2);
     assert_eq!(form_data.document_files[0], "uploads/file1.pdf");
     assert_eq!(form_data.document_files[1], "uploads/file2.docx");
@@ -263,13 +283,13 @@ fn test_image_file_handling() {
         "uploads/image3.gif".to_string(),
     ];
     form_data.image_files = image_urls.clone();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the images were set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert_eq!(form_data.image_files.len(), 3);
     assert_eq!(form_data.image_files[0], "uploads/image1.jpg");
     assert_eq!(form_data.image_files[1], "uploads/image2.png");
@@ -280,19 +300,19 @@ fn test_image_file_handling() {
 fn test_file_validation() {
     // Test that file validation works correctly
     let mut form_data = AdditionalInputTypesForm::default_values();
-    
+
     // Add too many files to trigger validation error
     let many_files: Vec<String> = (1..=11).map(|i| format!("file{}.pdf", i)).collect();
     form_data.uploaded_files = many_files;
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Validate the form
     let validation_result = form.validate();
-    
+
     // Should fail due to too many files
     assert!(validation_result.is_err());
-    
+
     if let Err(_errors) = validation_result {
         // Validation failed as expected
         assert!(true);
@@ -303,7 +323,7 @@ fn test_file_validation() {
 fn test_rich_text_editor_features() {
     // Test that rich text editor features work
     let mut form_data = AdditionalInputTypesForm::default_values();
-    
+
     // Test various rich text features
     let rich_content = r#"
         <h1>Main Title</h1>
@@ -317,15 +337,17 @@ fn test_rich_text_editor_features() {
         <code>Inline code</code>
     "#;
     form_data.rich_text_content = rich_content.to_string();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the content was set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert!(form_data.rich_text_content.contains("<h1>Main Title</h1>"));
-    assert!(form_data.rich_text_content.contains("<strong>paragraph</strong>"));
+    assert!(form_data
+        .rich_text_content
+        .contains("<strong>paragraph</strong>"));
     assert!(form_data.rich_text_content.contains("<ul>"));
 }
 
@@ -333,7 +355,7 @@ fn test_rich_text_editor_features() {
 fn test_markdown_editor_features() {
     // Test that markdown editor features work
     let mut form_data = AdditionalInputTypesForm::default_values();
-    
+
     // Test various markdown features
     let markdown_content = r#"
 # Main Title
@@ -362,13 +384,13 @@ fn main() {
 ![Alt text](image.jpg)
     "#;
     form_data.markdown_content = markdown_content.to_string();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the content was set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert!(form_data.markdown_content.contains("# Main Title"));
     assert!(form_data.markdown_content.contains("**bold**"));
     assert!(form_data.markdown_content.contains("- List item 1"));
@@ -378,8 +400,9 @@ fn main() {
 #[test]
 fn test_code_editor_features() {
     // Test that code editor features work
-    let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(AdditionalInputTypesForm::default_values());
-    
+    let form: FormHandle<AdditionalInputTypesForm> =
+        FormHandle::new(AdditionalInputTypesForm::default_values());
+
     // Test various code features
     let code_content = r#"
 use std::collections::HashMap;
@@ -395,7 +418,7 @@ impl User {
     fn new(id: u64, name: String, email: String) -> Self {
         Self { id, name, email }
     }
-    
+
     fn display_info(&self) {
         println!("User: {} ({})", self.name, self.email);
     }
@@ -403,10 +426,10 @@ impl User {
 
 fn main() {
     let mut users = HashMap::new();
-    
+
     let user = User::new(1, "John Doe".to_string(), "john@example.com".to_string());
     users.insert(user.id, user);
-    
+
     for (id, user) in &users {
         println!("ID: {}", id);
         user.display_info();
@@ -415,13 +438,13 @@ fn main() {
     "#;
     let mut form_data = AdditionalInputTypesForm::default_values();
     form_data.code_content = code_content.to_string();
-    
+
     let form: FormHandle<AdditionalInputTypesForm> = FormHandle::new(form_data);
-    
+
     // Verify the content was set
     let current_values = form.values();
     let form_data = current_values.get_untracked();
-    
+
     assert!(form_data.code_content.contains("struct User"));
     assert!(form_data.code_content.contains("impl User"));
     assert!(form_data.code_content.contains("fn main()"));

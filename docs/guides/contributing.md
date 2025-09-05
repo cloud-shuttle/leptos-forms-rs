@@ -14,28 +14,31 @@ Thank you for your interest in contributing to Leptos Forms RS! This guide will 
 ### **Development Setup**
 
 1. **Fork and clone the repository**
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/leptos-forms-rs.git
    cd leptos-forms-rs
    ```
 
 2. **Set up the development environment**
+
    ```bash
    # Install Rust WASM target
    rustup target add wasm32-unknown-unknown
-   
+
    # Install wasm-pack
    cargo install wasm-pack
-   
+
    # Install Node.js dependencies
    pnpm install
    ```
 
 3. **Verify the setup**
+
    ```bash
    # Run tests to ensure everything works
    pnpm run test:e2e
-   
+
    # Build the project
    cargo build
    ```
@@ -106,25 +109,25 @@ wasm-pack test --node
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_form_validation() {
         let form = use_form::<UserForm>();
-        
+
         // Test initial state
         assert!(!form.is_valid());
-        
+
         // Test validation logic
         form.set_field_value("username", "john_doe");
         form.set_field_value("email", "john@example.com");
-        
+
         assert!(form.is_valid());
     }
-    
+
     #[test]
     fn test_custom_validation() {
         let form = use_form::<ValidatedForm>();
-        
+
         // Test custom validation function
         form.set_field_value("email", "invalid@wrongdomain.com");
         assert!(!form.is_valid());
@@ -139,17 +142,17 @@ mod tests {
 #[test]
 fn test_form_submission() {
     let page = create_page();
-    
+
     // Navigate to form
     page.goto("/form").await?;
-    
+
     // Fill form fields
     page.fill("[name=username]", "testuser").await?;
     page.fill("[name=email]", "test@example.com").await?;
-    
+
     // Submit form
     page.click("[type=submit]").await?;
-    
+
     // Verify success
     expect(page.locator(".success-message")).toBeVisible();
 }
@@ -172,7 +175,7 @@ fn test_form_submission() {
 - Use proper markdown formatting
 - Document error conditions and edge cases
 
-```rust
+````rust
 /// Creates a new form instance with the specified configuration.
 ///
 /// # Examples
@@ -199,7 +202,7 @@ pub fn use_form_with_config<T: FormData>(
 ) -> Result<FormHandle<T>, FormError> {
     // Implementation
 }
-```
+````
 
 ### **Component Standards**
 
@@ -232,6 +235,7 @@ git checkout -b feature/your-feature-name
 ```
 
 **Branch Naming Convention:**
+
 - `feature/feature-name` - New features
 - `fix/bug-description` - Bug fixes
 - `docs/documentation-update` - Documentation changes
@@ -257,6 +261,7 @@ git commit -m "feat: add custom validation support
 ```
 
 **Commit Message Format:**
+
 ```
 type(scope): description
 
@@ -267,6 +272,7 @@ Closes #123
 ```
 
 **Types:**
+
 - `feat` - New feature
 - `fix` - Bug fix
 - `docs` - Documentation
@@ -282,6 +288,7 @@ git push origin feature/your-feature-name
 ```
 
 Then create a pull request on GitHub with:
+
 - Clear description of changes
 - Link to related issues
 - Screenshots for UI changes
@@ -332,35 +339,44 @@ When reporting bugs, include:
 
 ### **Bug Report Template**
 
-```markdown
+````markdown
 ## Bug Description
+
 Brief description of the issue
 
 ## Steps to Reproduce
+
 1. Step 1
 2. Step 2
 3. Step 3
 
 ## Expected Behavior
+
 What should happen
 
 ## Actual Behavior
+
 What actually happens
 
 ## Environment
+
 - OS: [e.g., macOS 14.0]
 - Browser: [e.g., Chrome 120]
 - Rust: [e.g., 1.89.0]
 - Leptos: [e.g., 0.6]
 
 ## Reproduction Code
+
 ```rust
 // Minimal code to reproduce
 ```
+````
 
 ## Additional Context
+
 Any other relevant information
-```
+
+````
 
 ## 💡 **Feature Requests**
 
@@ -386,16 +402,20 @@ Explain when and why this feature would be useful
 ## Proposed API
 ```rust
 // Example of how the API would work
-```
+````
 
 ## Benefits
+
 What problems does this solve?
 
 ## Alternatives Considered
+
 What other approaches were considered?
 
 ## Implementation Notes
+
 Any technical considerations or challenges
+
 ```
 
 ## 📚 **Documentation**
@@ -493,3 +513,4 @@ Thank you for contributing to Leptos Forms RS! Your contributions help make the 
 Whether you're fixing a bug, adding a feature, improving documentation, or helping other users, every contribution is valuable and appreciated.
 
 Happy coding! 🎉
+```

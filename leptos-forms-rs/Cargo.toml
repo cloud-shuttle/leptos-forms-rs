@@ -20,8 +20,9 @@ leptos = { version = "0.8", features = ["csr"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 leptos-forms-rs-macro = "1.0.0"
-web-sys = { version = "0.3", features = ["Window", "Storage"] }
+web-sys = { version = "0.3", features = ["Window", "Storage", "Performance", "HtmlElement", "Event", "EventTarget", "Document"] }
 wasm-bindgen = { workspace = true }
+js-sys = "0.3"
 chrono = { workspace = true }
 regex = { workspace = true }
 gloo-net = { workspace = true }
@@ -37,6 +38,10 @@ csr = ["leptos/csr"]
 ssr = ["leptos/ssr"]
 hydrate = ["leptos/hydrate"]
 
+# WASM optimization features
+wasm-opt = []
+minimal = ["wasm-opt"]
+
 [lib]
 name = "leptos_forms_rs"
 path = "src/lib.rs"
@@ -44,3 +49,19 @@ crate-type = ["cdylib", "rlib"]
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
+
+# WASM optimization profiles
+[profile.release]
+# Optimize for size
+opt-level = "s"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.wasm-release]
+inherits = "release"
+# Additional WASM-specific optimizations
+opt-level = "s"
+codegen-units = 1
+panic = "abort"
+strip = "debuginfo"

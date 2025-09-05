@@ -18,6 +18,7 @@
 ## 🚀 **Features**
 
 ### **Core Capabilities**
+
 - **Type-safe forms** with compile-time validation
 - **Reactive state management** using Leptos signals
 - **WASM-powered** for high performance
@@ -27,6 +28,7 @@
 - **Accessibility-first** design with ARIA support
 
 ### **Testing & Quality**
+
 - **Automated browser testing** in real browsers
 - **Cross-browser compatibility** verification
 - **Mobile responsiveness** testing
@@ -34,6 +36,7 @@
 - **Security assessment** and audit tools
 
 ### **Developer Experience**
+
 - **Nix development environment** for consistent builds
 - **Modern tooling** with pnpm and Rust
 - **Comprehensive examples** and documentation
@@ -51,22 +54,26 @@
 ### **Installation**
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-org/leptos-forms-rs.git
    cd leptos-forms-rs
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Run tests to verify setup**
+
    ```bash
    pnpm run test:e2e
    ```
 
 4. **Start development server**
+
    ```bash
    pnpm run dev
    ```
@@ -74,21 +81,25 @@
 ## 📚 **Documentation**
 
 ### **Getting Started**
+
 - [**Quick Start Guide**](docs/getting-started.md) - Get up and running in minutes
 - [**Examples**](docs/examples/) - Complete working examples
 - [**API Reference**](docs/api-reference.md) - Complete API documentation
 
 ### **Core Concepts**
+
 - [**Form Architecture**](docs/architecture/form-architecture.md) - Understanding the design
 - [**Validation System**](docs/validation/validation-guide.md) - How validation works
 - [**State Management**](docs/state-management.md) - Form state and reactivity
 
 ### **Advanced Topics**
+
 - [**Testing Strategy**](docs/testing-strategy.md) - Comprehensive testing approach
 - [**Performance Guide**](docs/performance-guide.md) - Optimization and benchmarking
 - [**Security Assessment**](docs/security-assessment.md) - Security considerations
 
 ### **Development**
+
 - [**Contributing Guide**](docs/contributing.md) - How to contribute
 - [**Development Workflow**](docs/development-workflow.md) - Development practices
 - [**CI/CD Pipeline**](docs/cicd-pipeline.md) - Automated testing and deployment
@@ -97,20 +108,21 @@
 
 ### **Test Coverage**
 
-| Test Suite | Status | Tests | Browsers |
-|------------|--------|-------|----------|
-| **E2E Tests** | ✅ **PASSING** | 245 | Chrome, Firefox, WebKit, Mobile |
-| **Unit Tests** | ✅ **PASSING** | 20 | Native Rust |
-|------------|--------|-------|----------|
-| **Form Components** | ✅ 100% | 85/85 | All 5 |
-| **Basic Forms** | ✅ 100% | 55/55 | All 5 |
-| **Complex Forms** | ✅ 100% | 55/55 | All 5 |
-| **Setup Tests** | ✅ 100% | 20/20 | All 5 |
-| **Smoke Tests** | ✅ 100% | 15/15 | All 5 |
+| Test Suite          | Status         | Tests   | Browsers                        |
+| ------------------- | -------------- | ------- | ------------------------------- |
+| **E2E Tests**       | ✅ **PASSING** | 245     | Chrome, Firefox, WebKit, Mobile |
+| **Unit Tests**      | ✅ **PASSING** | 20      | Native Rust                     |
+| ------------        | --------       | ------- | ----------                      |
+| **Form Components** | ✅ 100%        | 85/85   | All 5                           |
+| **Basic Forms**     | ✅ 100%        | 55/55   | All 5                           |
+| **Complex Forms**   | ✅ 100%        | 55/55   | All 5                           |
+| **Setup Tests**     | ✅ 100%        | 20/20   | All 5                           |
+| **Smoke Tests**     | ✅ 100%        | 15/15   | All 5                           |
 
 **Total: 210/210 tests passing (100%)**
 
 ### **Supported Browsers**
+
 - **Desktop**: Chrome, Firefox, WebKit
 - **Mobile**: Mobile Chrome, Mobile Safari
 
@@ -133,6 +145,7 @@ pnpm run test:e2e --reporter=line
 ## 📖 **Examples**
 
 ### **Basic Form Example**
+
 ```rust
 use leptos::*;
 use leptos_forms_rs::*;
@@ -140,10 +153,10 @@ use leptos_forms_rs::*;
 #[component]
 pub fn BasicForm() -> impl IntoView {
     let form = use_form::<BasicFormData>();
-    
+
     view! {
         <form on:submit=form.handle_submit>
-            <input 
+            <input
                 type="text"
                 name="username"
                 on:input=form.handle_input
@@ -156,6 +169,7 @@ pub fn BasicForm() -> impl IntoView {
 ```
 
 ### **Complex Multi-Step Form**
+
 ```rust
 use leptos_forms_rs::*;
 
@@ -163,7 +177,7 @@ use leptos_forms_rs::*;
 pub fn MultiStepForm() -> impl IntoView {
     let form = use_form::<MultiStepFormData>();
     let current_step = create_rw_signal(0);
-    
+
     view! {
         <div class="multi-step-form">
             {move || match current_step.get() {
@@ -180,6 +194,7 @@ pub fn MultiStepForm() -> impl IntoView {
 ## 🏗️ **Architecture**
 
 ### **Core Components**
+
 - **Form Engine** - Handles form state and validation
 - **Validation System** - Type-safe validation with custom rules
 - **State Management** - Reactive form state using Leptos signals
@@ -187,6 +202,7 @@ pub fn MultiStepForm() -> impl IntoView {
 - **Testing Framework** - Comprehensive browser testing
 
 ### **Design Principles**
+
 - **Type Safety First** - Compile-time guarantees
 - **Performance Optimized** - WASM-powered for speed
 - **Accessibility Focused** - ARIA support and keyboard navigation
@@ -197,6 +213,7 @@ pub fn MultiStepForm() -> impl IntoView {
 We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for details.
 
 ### **Development Setup**
+
 ```bash
 # Enter development environment
 nix develop

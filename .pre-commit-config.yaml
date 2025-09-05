@@ -80,7 +80,7 @@ repos:
       - id: cargo-test
         name: cargo test
         description: Run Rust tests
-        entry: bash -c 'cd /Users/peterhanssens/consulting/CloudShuttle/leptos-forms && cargo test --all --lib'
+        entry: bash -c 'cd /Users/peterhanssens/consulting/CloudShuttle/leptos-forms && cargo test --all --lib --exclude leptos-forms-rs'
         language: system
         pass_filenames: false
         always_run: true

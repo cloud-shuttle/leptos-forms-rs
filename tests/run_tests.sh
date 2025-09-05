@@ -90,7 +90,7 @@ done
 run_cargo() {
     local cmd="$1"
     local args="$2"
-    
+
     if [ "$VERBOSE" = true ]; then
         cargo $cmd $args
     else
@@ -155,12 +155,12 @@ main() {
     print_status "Test type: $TEST_TYPE"
     print_status "Verbose: $VERBOSE"
     print_status "Clean: $CLEAN"
-    
+
     # Clean if requested
     if [ "$CLEAN" = true ]; then
         clean_build
     fi
-    
+
     # Run tests based on type
     case $TEST_TYPE in
         unit)
@@ -188,7 +188,7 @@ main() {
             exit 1
             ;;
     esac
-    
+
     print_success "Test execution completed successfully!"
 }
 

@@ -1,15 +1,15 @@
+use crate::core::traits::Form;
+use crate::core::types::FieldValue;
+use crate::core::FormHandle;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
-use crate::core::FormHandle;
-use crate::core::types::FieldValue;
-use crate::core::traits::Form;
 
 /// Hook for managing form state
 pub fn use_form<T: Form + PartialEq + Clone + Send + Sync>(
     initial_values: T,
 ) -> (FormHandle<T>, Callback<()>, Callback<()>) {
     let form_handle = FormHandle::new(initial_values);
-    
+
     let form_clone1 = form_handle.clone();
     let submit = Callback::new(move |_| {
         let form_clone = form_clone1.clone();
@@ -19,13 +19,13 @@ pub fn use_form<T: Form + PartialEq + Clone + Send + Sync>(
             }
         });
     });
-    
+
     let form_clone2 = form_handle.clone();
     let reset = Callback::new(move |_| {
         let form_clone = form_clone2.clone();
         form_clone.reset();
     });
-    
+
     (form_handle, submit, reset)
 }
 
@@ -37,7 +37,8 @@ pub fn use_field_value<T: Form + PartialEq + Clone + Send + Sync>(
     let form_handle = form_handle.clone();
     let field_name = field_name.to_string();
     Memo::new(move |_| {
-        form_handle.get_field_value(&field_name)
+        form_handle
+            .get_field_value(&field_name)
             .unwrap_or(FieldValue::String(String::new()))
     })
 }
@@ -50,7 +51,9 @@ pub fn use_field_error<T: Form + PartialEq + Clone + Send + Sync>(
     let form_handle = form_handle.clone();
     let field_name = field_name.to_string();
     Memo::new(move |_| {
-        form_handle.errors().get()
+        form_handle
+            .errors()
+            .get()
             .get_field_error(&field_name)
             .cloned()
             .unwrap_or_default()
@@ -77,7 +80,7 @@ pub fn use_form_validation<T: Form + PartialEq + Clone + Send + Sync>(
     form_handle: &FormHandle<T>,
 ) -> (Memo<bool>, Callback<()>) {
     let is_valid = form_handle.is_valid();
-    
+
     let form_clone = form_handle.clone();
     let validate = Callback::new(move |_| {
         let form_clone = form_clone.clone();
@@ -87,7 +90,7 @@ pub fn use_form_validation<T: Form + PartialEq + Clone + Send + Sync>(
             }
         });
     });
-    
+
     (is_valid, validate)
 }
 
@@ -96,7 +99,7 @@ pub fn use_form_submission<T: Form + PartialEq + Clone + Send + Sync>(
     form_handle: &FormHandle<T>,
 ) -> (Memo<bool>, Callback<()>) {
     let is_submitting = form_handle.is_submitting();
-    
+
     let form_clone = form_handle.clone();
     let submit = Callback::new(move |_| {
         let form_clone = form_clone.clone();
@@ -106,7 +109,7 @@ pub fn use_form_submission<T: Form + PartialEq + Clone + Send + Sync>(
             }
         });
     });
-    
+
     (is_submitting, submit)
 }
 
@@ -119,7 +122,7 @@ pub fn use_form_persistence<T: Form + PartialEq + Clone + Send + Sync>(
     let storage_key1 = storage_key.clone();
     let storage_key2 = storage_key.clone();
     let storage_key3 = storage_key.clone();
-    
+
     let save = Callback::new(move |_| {
         let storage_key = storage_key1.clone();
         spawn_local(async move {
@@ -130,7 +133,7 @@ pub fn use_form_persistence<T: Form + PartialEq + Clone + Send + Sync>(
             }
         });
     });
-    
+
     let load = Callback::new(move |_| {
         let storage_key = storage_key2.clone();
         spawn_local(async move {
@@ -141,7 +144,7 @@ pub fn use_form_persistence<T: Form + PartialEq + Clone + Send + Sync>(
             }
         });
     });
-    
+
     let clear = Callback::new(move |_| {
         let storage_key = storage_key3.clone();
         spawn_local(async move {
@@ -152,7 +155,7 @@ pub fn use_form_persistence<T: Form + PartialEq + Clone + Send + Sync>(
             }
         });
     });
-    
+
     (save, load, clear)
 }
 
@@ -166,7 +169,10 @@ pub fn use_form_analytics<T: Form + PartialEq + Clone + Send + Sync>(
 }
 
 /// Hook for managing field arrays
-pub fn use_field_array<T: Form + PartialEq + Clone + Send + Sync, U: std::fmt::Debug + Clone + Send + Sync + 'static>(
+pub fn use_field_array<
+    T: Form + PartialEq + Clone + Send + Sync,
+    U: std::fmt::Debug + Clone + Send + Sync + 'static,
+>(
     form_handle: &FormHandle<T>,
     field_name: &str,
 ) -> FieldArrayHandle<U> {
@@ -181,7 +187,7 @@ pub fn use_field_array<T: Form + PartialEq + Clone + Send + Sync, U: std::fmt::D
             form_clone.add_array_item(&field_name, field_value);
         });
     });
-    
+
     let form_clone2 = form_handle.clone();
     let field_name_clone2 = field_name.clone();
     let remove_item = Callback::new(move |index: usize| {
@@ -191,7 +197,7 @@ pub fn use_field_array<T: Form + PartialEq + Clone + Send + Sync, U: std::fmt::D
             form_clone.remove_array_item(&field_name, index);
         });
     });
-    
+
     let form_clone3 = form_handle.clone();
     let field_name3 = field_name.clone();
     let move_item = Callback::new(move |(from_index, to_index): (usize, usize)| {
@@ -201,7 +207,7 @@ pub fn use_field_array<T: Form + PartialEq + Clone + Send + Sync, U: std::fmt::D
             form_clone.move_array_item(&field_name, from_index, to_index);
         });
     });
-    
+
     let form_clone4 = form_handle.clone();
     let field_name4 = field_name.clone();
     let clear_array = Callback::new(move |_| {
@@ -211,7 +217,7 @@ pub fn use_field_array<T: Form + PartialEq + Clone + Send + Sync, U: std::fmt::D
             form_clone.clear_array(&field_name);
         });
     });
-    
+
     FieldArrayHandle {
         add_item,
         remove_item,
@@ -232,36 +238,48 @@ pub struct FieldArrayHandle<U: 'static> {
 /// Hook for form wizard functionality
 pub fn use_form_wizard<T: Form + PartialEq + Clone + Send + Sync>(
     steps: Vec<String>,
-) -> (ReadSignal<usize>, Callback<()>, Callback<()>, Callback<usize>, Callback<()>) {
+) -> (
+    ReadSignal<usize>,
+    Callback<()>,
+    Callback<()>,
+    Callback<usize>,
+    Callback<()>,
+) {
     let current_step = RwSignal::new(0);
     let steps1 = steps.clone();
-    
+
     let next_step = Callback::new(move |_| {
         let step = current_step.get();
         if step < steps1.len() - 1 {
             current_step.set(step + 1);
         }
     });
-    
+
     let prev_step = Callback::new(move |_| {
         let step = current_step.get();
         if step > 0 {
             current_step.set(step - 1);
         }
     });
-    
+
     let steps3 = steps.clone();
     let go_to_step = Callback::new(move |step: usize| {
         if step < steps3.len() {
             current_step.set(step);
         }
     });
-    
+
     let reset_wizard = Callback::new(move |_| {
         current_step.set(0);
     });
-    
-    (current_step.read_only(), next_step, prev_step, go_to_step, reset_wizard)
+
+    (
+        current_step.read_only(),
+        next_step,
+        prev_step,
+        go_to_step,
+        reset_wizard,
+    )
 }
 
 /// Hook for real-time validation
@@ -271,7 +289,7 @@ pub fn use_real_time_validation<T: Form + PartialEq + Clone + Send + Sync>(
     delay_ms: u32,
 ) -> (ReadSignal<Option<String>>, Callback<FieldValue>) {
     let validation_error = RwSignal::new(None::<String>);
-    
+
     let form_clone = form_handle.clone();
     let field_name = field_name.to_string();
     let set_error = validation_error.clone();
@@ -279,21 +297,23 @@ pub fn use_real_time_validation<T: Form + PartialEq + Clone + Send + Sync>(
         let form_clone = form_clone.clone();
         let field_name = field_name.clone();
         let set_error = set_error.clone();
-        
+
         spawn_local(async move {
             // Simulate validation delay
             gloo_timers::callback::Timeout::new(delay_ms, move || {
                 if let Err(errors) = form_clone.validate_field(&field_name) {
-                    if let Some(error) = errors.get_field_error(&field_name).and_then(|v| v.first()) {
+                    if let Some(error) = errors.get_field_error(&field_name).and_then(|v| v.first())
+                    {
                         set_error.set(Some(error.clone()));
                     }
                 } else {
                     set_error.set(None);
                 }
-            }).forget();
+            })
+            .forget();
         });
     });
-    
+
     (validation_error.read_only(), validate_field)
 }
 
@@ -314,30 +334,33 @@ pub fn use_conditional_validation<T: Form + PartialEq + Clone + Send + Sync>(
 /// Hook for form performance monitoring
 pub fn use_form_performance<T: Form + PartialEq + Clone + Send + Sync>(
     form_handle: &FormHandle<T>,
-) -> (ReadSignal<crate::core::performance::FormPerformanceMetrics>, Callback<()>) {
+) -> (
+    ReadSignal<crate::core::performance::FormPerformanceMetrics>,
+    Callback<()>,
+) {
     let metrics = RwSignal::new(crate::core::performance::FormPerformanceMetrics::new());
-    
+
     let form_clone = form_handle.clone();
     let metrics_clone = metrics.clone();
-    
+
     // Benchmark callback for measuring performance
     let benchmark = Callback::new(move |_| {
         let form_clone = form_clone.clone();
         let metrics_clone = metrics_clone.clone();
-        
+
         spawn_local(async move {
             let start = std::time::Instant::now();
-            
+
             // Measure form creation time
             let _form = FormHandle::new(form_clone.values().get());
             let creation_time = start.elapsed();
-            
+
             // Update metrics
             metrics_clone.update(|m| {
                 m.record_form_creation(creation_time);
             });
         });
     });
-    
+
     (metrics.read_only(), benchmark)
 }

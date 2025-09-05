@@ -29,18 +29,21 @@ The component architecture follows a layered approach with clear separation of c
 ## Core Principles
 
 ### 1. Headless Architecture
+
 - **Separation**: Logic separated from presentation
 - **Flexibility**: Works with any UI library
 - **Customization**: Full control over styling
 - **Accessibility**: Built-in ARIA support
 
 ### 2. Reactive Design
+
 - **Signals**: Leptos-native reactivity
 - **Granular Updates**: Minimal re-renders
 - **Derived State**: Computed properties
 - **Effect Management**: Automatic cleanup
 
 ### 3. Type Safety
+
 - **Compile-time Validation**: Catch errors early
 - **Generic Design**: Type-safe field handling
 - **Trait Bounds**: Interface contracts
@@ -69,6 +72,7 @@ pub fn FormProvider<T: Form>(
 ```
 
 **Responsibilities**:
+
 - Form context distribution
 - State management coordination
 - Error boundary handling
@@ -89,6 +93,7 @@ pub fn Form<T: Form>(
 ```
 
 **Features**:
+
 - Form submission coordination
 - Validation trigger
 - Error handling
@@ -113,6 +118,7 @@ pub fn FormField(
 ```
 
 **Architecture**:
+
 ```
 FormField
 ├── Label (with required indicator)
@@ -122,6 +128,7 @@ FormField
 ```
 
 **Responsibilities**:
+
 - Field registration coordination
 - Label association
 - Error state management
@@ -130,6 +137,7 @@ FormField
 #### 2. Field Input Components
 
 ##### TextInput (`components/inputs/text.rs`)
+
 ```rust
 #[component]
 pub fn TextInput(
@@ -143,6 +151,7 @@ pub fn TextInput(
 ```
 
 ##### SelectInput (`components/inputs/select.rs`)
+
 ```rust
 #[component]
 pub fn Select<T: SelectOption>(
@@ -155,6 +164,7 @@ pub fn Select<T: SelectOption>(
 ```
 
 ##### FileInput (`components/inputs/file.rs`)
+
 ```rust
 #[component]
 pub fn FileInput(
@@ -183,6 +193,7 @@ pub fn FieldArray<T: Clone + Default + 'static>(
 ```
 
 **Component Structure**:
+
 ```
 FieldArray
 ├── Array Items (dynamic)
@@ -192,6 +203,7 @@ FieldArray
 ```
 
 **Array Helpers API**:
+
 ```rust
 pub struct ArrayHelpers<T> {
     pub append: Callback<T>,
@@ -218,6 +230,7 @@ pub fn ConditionalField<T: Form>(
 ```
 
 **Behavior Options**:
+
 - **Visible/Hidden**: CSS display control
 - **Mount/Unmount**: DOM presence control
 - **Animated**: Transition support
@@ -237,6 +250,7 @@ pub fn FormWizard<T: Form>(
 ```
 
 **Wizard Architecture**:
+
 ```
 FormWizard
 ├── StepIndicator (progress display)
@@ -274,23 +288,23 @@ pub struct FieldRegistration {
     // Identity
     pub name: String,
     pub field_type: FieldType,
-    
+
     // State Signals
     pub value: Signal<FieldValue>,
     pub error: Signal<Option<String>>,
     pub is_touched: Signal<bool>,
     pub is_dirty: Signal<bool>,
     pub is_focused: Signal<bool>,
-    
+
     // Event Handlers
     pub on_input: Callback<Event>,
     pub on_change: Callback<Event>,
     pub on_blur: Callback<FocusEvent>,
     pub on_focus: Callback<FocusEvent>,
-    
+
     // DOM Properties
     pub props: FieldProps,
-    
+
     // Methods
     pub set_value: Callback<FieldValue>,
     pub clear_error: Callback<()>,
@@ -307,12 +321,12 @@ pub struct FieldProps {
     pub value: Signal<String>,
     pub disabled: Signal<bool>,
     pub required: Signal<bool>,
-    
+
     // Accessibility
     pub aria_invalid: Signal<bool>,
     pub aria_describedby: Signal<Option<String>>,
     pub aria_required: Signal<bool>,
-    
+
     // Event Handlers (spread-ready)
     pub on_input: Callback<Event>,
     pub on_change: Callback<Event>,
@@ -338,7 +352,7 @@ pub fn ShadcnInput(
 ) -> impl IntoView {
     let form = use_form_context::<T>();
     let field = form.register(&name);
-    
+
     view! {
         <cn::Input
             class={cn::input_variants(variant, field.error.get().is_some())}
@@ -362,7 +376,7 @@ pub fn RadixTextField(
     #[prop(spread)] props: Vec<(&'static str, Attribute)>,
 ) -> impl IntoView {
     let field = use_field_registration(&name);
-    
+
     view! {
         <TextField
             value={field.value}
@@ -388,15 +402,16 @@ DOM Event → Field Handler → Validation → State Update → UI Re-render
 ### Event Handlers
 
 #### Input Event Handler
+
 ```rust
 let on_input = {
     let field_name = field_name.clone();
     let set_field_value = set_field_value.clone();
-    
+
     Callback::new(move |ev: Event| {
         let value = extract_input_value(&ev);
         set_field_value(&field_name, value);
-        
+
         // Trigger validation if configured
         if validation_mode == ValidationMode::OnChange {
             trigger_field_validation(&field_name);
@@ -406,16 +421,17 @@ let on_input = {
 ```
 
 #### Blur Event Handler
+
 ```rust
 let on_blur = {
     let field_name = field_name.clone();
     let set_touched = set_touched.clone();
-    
+
     Callback::new(move |_: FocusEvent| {
         set_touched.update(|touched| {
             touched.insert(field_name.clone());
         });
-        
+
         // Trigger validation on blur
         if validation_mode == ValidationMode::OnBlur {
             trigger_field_validation(&field_name);
@@ -435,12 +451,12 @@ pub struct FormState<T: Form> {
     pub errors: ValidationErrors,
     pub touched: HashSet<String>,
     pub dirty_fields: HashSet<String>,
-    
+
     // UI State
     pub is_submitting: bool,
     pub submit_count: u32,
     pub focused_field: Option<String>,
-    
+
     // Configuration
     pub validation_mode: ValidationMode,
     pub submit_on_enter: bool,
@@ -463,19 +479,20 @@ pub struct DerivedState {
 ### State Updates
 
 #### Value Changes
+
 ```rust
 fn update_field_value(field: &str, value: FieldValue) {
     // 1. Update form values
     form_state.values.set_field(field, value);
-    
+
     // 2. Mark field as dirty
     form_state.dirty_fields.insert(field);
-    
+
     // 3. Trigger validation if needed
     if validation_mode.should_validate_on_change() {
         validate_field(field);
     }
-    
+
     // 4. Update derived state
     update_derived_state();
 }
@@ -566,11 +583,11 @@ let debounced_validate = use_debounced_callback(
 mod tests {
     use super::*;
     use leptos_testing::*;
-    
+
     #[test]
     fn test_text_input_registration() {
         let form = create_test_form(TestForm::default());
-        
+
         mount_component(|| {
             view! {
                 <FormProvider form_handle={form}>
@@ -578,10 +595,10 @@ mod tests {
                 </FormProvider>
             }
         });
-        
+
         // Test field registration
         assert!(form.is_field_registered("test_field"));
-        
+
         // Test input handling
         simulate_input("test_field", "test value");
         assert_eq!(form.values.get().test_field, "test value");
@@ -595,15 +612,15 @@ mod tests {
 #[test]
 fn test_form_wizard_navigation() {
     let form = create_test_form(WizardForm::default());
-    
+
     mount_wizard_component(form.clone());
-    
+
     // Test step navigation
     assert_eq!(get_current_step(), 0);
-    
+
     fill_step_fields();
     click_next_button();
-    
+
     assert_eq!(get_current_step(), 1);
 }
 ```

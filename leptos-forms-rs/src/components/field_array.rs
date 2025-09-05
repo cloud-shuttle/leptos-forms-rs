@@ -1,5 +1,5 @@
-use leptos::prelude::*;
 use crate::hooks::FieldArrayHandle;
+use leptos::prelude::*;
 
 /// Field array component for managing dynamic lists of fields
 #[component]
@@ -17,29 +17,29 @@ pub fn FieldArray<U: Clone + Send + Sync + Default + 'static>(
         move_item: Callback::new(|_: (usize, usize)| {}),
         clear_array: Callback::new(|_: ()| {}),
     };
-    
+
     let add_item = move |_| {
         // For now, just log - this will be implemented when we have a real form handle
         log::info!("Add item clicked");
     };
-    
+
     let remove_item = move |index: usize| {
         // For now, just log - this will be implemented when we have a real form handle
         log::info!("Remove item clicked at index: {}", index);
     };
-    
+
     let move_item = move |(from, to): (usize, usize)| {
         // For now, just log - this will be implemented when we have a real form handle
         log::info!("Move item from {} to {}", from, to);
     };
-    
+
     let clear_all = move |_| {
         // For now, just log - this will be implemented when we have a real form handle
         log::info!("Clear all clicked");
     };
-    
+
     let array_class = class.unwrap_or_else(|| "field-array".to_string());
-    
+
     view! {
         <div class={array_class}>
             <div class="field-array-header">
@@ -53,12 +53,12 @@ pub fn FieldArray<U: Clone + Send + Sync + Default + 'static>(
                     </button>
                 </div>
             </div>
-            
+
             <div class="field-array-items">
                 {items.iter().enumerate().map(|(index, item)| {
                     let item_index = index;
                     let _item_value = item.clone();
-                    
+
                     view! {
                         <div class="field-array-item">
                             <div class="item-content">
@@ -66,20 +66,20 @@ pub fn FieldArray<U: Clone + Send + Sync + Default + 'static>(
                                     {format!("Item {}", item_index + 1)}
                                 </div>
                             </div>
-                            
+
                             <div class="item-controls">
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     class="remove-item-btn"
                                     on:click=move |_| remove_item(item_index)
                                 >
                                     "Remove"
                                 </button>
-                                
+
                                 {if item_index > 0 {
                                     view! {
-                                        <button 
-                                            type="button" 
+                                        <button
+                                            type="button"
                                             class="move-up-btn"
                                             on:click=move |_| move_item((item_index, item_index - 1))
                                         >
@@ -89,11 +89,11 @@ pub fn FieldArray<U: Clone + Send + Sync + Default + 'static>(
                                 } else {
                                     view! { <div></div> }.into_any()
                                 }}
-                                
+
                                 {if item_index < items.len() - 1 {
                                     view! {
-                                        <button 
-                                            type="button" 
+                                        <button
+                                            type="button"
                                             class="move-down-btn"
                                             on:click=move |_| move_item((item_index, item_index + 1))
                                         >
@@ -111,4 +111,3 @@ pub fn FieldArray<U: Clone + Send + Sync + Default + 'static>(
         </div>
     }
 }
-

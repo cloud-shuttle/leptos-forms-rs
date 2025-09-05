@@ -1,8 +1,8 @@
-use crate::core::{Form, FormHandle, FieldValue};
+use crate::core::{FieldValue, Form, FormHandle};
 use crate::validation::ValidationErrors;
 use leptos::prelude::GetUntracked;
 use std::collections::HashMap;
-use std::time::{SystemTime, Duration};
+use std::time::{Duration, SystemTime};
 
 /// Form State Inspector for DevTools
 pub struct FormStateInspector<T: Form + Send + Sync + PartialEq> {
@@ -110,23 +110,28 @@ impl<T: Form + Send + Sync + PartialEq> FormStateInspector<T> {
         let mut field_states = HashMap::new();
         let form_data = self.form_handle.values().get_untracked();
         let state = self.form_handle.state().get_untracked();
-        
+
         for field_metadata in &T::schema().field_metadata {
             let value = form_data.get_field_value(&field_metadata.name);
             let has_error = state.errors.get_field_error(&field_metadata.name).is_some();
-            let error_message = state.errors.get_field_error(&field_metadata.name)
+            let error_message = state
+                .errors
+                .get_field_error(&field_metadata.name)
                 .map(|errors| errors.join(", "));
-            
-            field_states.insert(field_metadata.name.clone(), FieldState {
-                name: field_metadata.name.clone(),
-                field_type: format!("{:?}", field_metadata.field_type),
-                is_required: field_metadata.is_required,
-                value: Some(value),
-                has_error: Some(has_error),
-                error_message,
-            });
+
+            field_states.insert(
+                field_metadata.name.clone(),
+                FieldState {
+                    name: field_metadata.name.clone(),
+                    field_type: format!("{:?}", field_metadata.field_type),
+                    is_required: field_metadata.is_required,
+                    value: Some(value),
+                    has_error: Some(has_error),
+                    error_message,
+                },
+            );
         }
-        
+
         field_states
     }
 
@@ -141,7 +146,7 @@ impl<T: Form + Send + Sync + PartialEq> FormStateInspector<T> {
     {
         let callback = Box::new(callback);
         self.change_listeners.push(callback);
-        
+
         // Return unsubscribe function
         move || {
             // In a real implementation, this would remove the listener
@@ -170,12 +175,15 @@ impl<T: Form + Send + Sync + PartialEq> PerformanceMonitor<T> {
 
     pub fn track_field_operation(&mut self, operation_time: Duration) {
         self.metrics.total_field_operations += 1;
-        
+
         // Update average time calculation
         if let Some(ref mut avg) = self.metrics.average_field_operation_time {
             // Simple running average calculation
-            let total_time = avg.as_nanos() * (self.metrics.total_field_operations - 1) as u128 + operation_time.as_nanos();
-            *avg = Duration::from_nanos((total_time / self.metrics.total_field_operations as u128) as u64);
+            let total_time = avg.as_nanos() * (self.metrics.total_field_operations - 1) as u128
+                + operation_time.as_nanos();
+            *avg = Duration::from_nanos(
+                (total_time / self.metrics.total_field_operations as u128) as u64,
+            );
         } else {
             self.metrics.average_field_operation_time = Some(operation_time);
         }
@@ -183,12 +191,15 @@ impl<T: Form + Send + Sync + PartialEq> PerformanceMonitor<T> {
 
     pub fn track_validation_operation(&mut self, operation_time: Duration) {
         self.metrics.validation_operations += 1;
-        
+
         // Update average time calculation
         if let Some(ref mut avg) = self.metrics.average_validation_time {
             // Simple running average calculation
-            let total_time = avg.as_nanos() * (self.metrics.validation_operations - 1) as u128 + operation_time.as_nanos();
-            *avg = Duration::from_nanos((total_time / self.metrics.validation_operations as u128) as u64);
+            let total_time = avg.as_nanos() * (self.metrics.validation_operations - 1) as u128
+                + operation_time.as_nanos();
+            *avg = Duration::from_nanos(
+                (total_time / self.metrics.validation_operations as u128) as u64,
+            );
         } else {
             self.metrics.average_validation_time = Some(operation_time);
         }
@@ -196,16 +207,18 @@ impl<T: Form + Send + Sync + PartialEq> PerformanceMonitor<T> {
 }
 
 impl DebugUtilities {
-    pub fn create_form_snapshot<T: Form + Send + Sync + PartialEq>(form_handle: &FormHandle<T>) -> FormSnapshot {
+    pub fn create_form_snapshot<T: Form + Send + Sync + PartialEq>(
+        form_handle: &FormHandle<T>,
+    ) -> FormSnapshot {
         let form_data = form_handle.values().get_untracked();
         let state = form_handle.state().get_untracked();
         let mut field_values = HashMap::new();
-        
+
         for field_metadata in &T::schema().field_metadata {
             let value = form_data.get_field_value(&field_metadata.name);
             field_values.insert(field_metadata.name.clone(), value);
         }
-        
+
         FormSnapshot {
             form_name: T::schema().name,
             timestamp: SystemTime::now(),
@@ -219,7 +232,7 @@ impl DebugUtilities {
 
     pub fn compare_snapshots(snapshot1: &FormSnapshot, snapshot2: &FormSnapshot) -> SnapshotDiff {
         let mut changed_fields = Vec::new();
-        
+
         for (field_name, value1) in &snapshot1.field_values {
             if let Some(value2) = snapshot2.field_values.get(field_name) {
                 if value1 != value2 {
@@ -231,17 +244,19 @@ impl DebugUtilities {
                 }
             }
         }
-        
+
         SnapshotDiff {
             has_changes: !changed_fields.is_empty(),
             changed_fields,
         }
     }
 
-    pub fn export_form_data<T: Form + Send + Sync + PartialEq + std::fmt::Debug>(form_handle: &FormHandle<T>) -> String {
+    pub fn export_form_data<T: Form + Send + Sync + PartialEq + std::fmt::Debug>(
+        form_handle: &FormHandle<T>,
+    ) -> String {
         let form_data = form_handle.values().get_untracked();
         let state = form_handle.state().get_untracked();
-        
+
         format!(
             "Form: {}\nFields: {}\nIs Dirty: {}\nIs Submitting: {}\nHas Errors: {}\nData: {:?}",
             T::schema().name,
@@ -253,20 +268,24 @@ impl DebugUtilities {
         )
     }
 
-    pub fn validate_form_integrity<T: Form + Send + Sync + PartialEq>(form_handle: &FormHandle<T>) -> IntegrityCheck {
+    pub fn validate_form_integrity<T: Form + Send + Sync + PartialEq>(
+        form_handle: &FormHandle<T>,
+    ) -> IntegrityCheck {
         let mut issues = Vec::new();
-        
+
         // Check if all required fields have values
         let form_data = form_handle.values().get_untracked();
         for field_metadata in &T::schema().field_metadata {
             if field_metadata.is_required {
                 let value = form_data.get_field_value(&field_metadata.name);
-                if matches!(value, FieldValue::Null) || matches!(value, FieldValue::String(ref s) if s.is_empty()) {
+                if matches!(value, FieldValue::Null)
+                    || matches!(value, FieldValue::String(ref s) if s.is_empty())
+                {
                     issues.push(format!("Required field '{}' is empty", field_metadata.name));
                 }
             }
         }
-        
+
         IntegrityCheck {
             is_valid: issues.is_empty(),
             issues,

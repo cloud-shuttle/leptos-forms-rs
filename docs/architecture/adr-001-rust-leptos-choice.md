@@ -1,8 +1,8 @@
 # ADR-001: Why Rust/Leptos over Alternatives
 
-**Status**: Accepted  
-**Date**: 2025-01-02  
-**Deciders**: Architecture Team  
+**Status**: Accepted
+**Date**: 2025-01-02
+**Deciders**: Architecture Team
 **Technical Story**: Choose the foundational technology stack for the form library
 
 ## Context
@@ -27,6 +27,7 @@ We need to build a modern, performant form handling library. The primary alterna
 ### Option 1: Rust + Leptos ✅ **CHOSEN**
 
 **Pros:**
+
 - **Superior Performance**: WASM compilation provides near-native speed
 - **Zero-cost Abstractions**: Rust's ownership system eliminates runtime overhead
 - **Compile-time Safety**: Type system prevents common form handling errors
@@ -35,12 +36,14 @@ We need to build a modern, performant form handling library. The primary alterna
 - **Growing Ecosystem**: Active community, rapid development
 
 **Cons:**
+
 - **Learning Curve**: Rust ownership model requires developer investment
 - **Smaller Ecosystem**: Fewer ready-made components compared to JS ecosystem
 - **WASM Bundle**: Initial WASM download adds some overhead
 - **Tooling Maturity**: Less mature than JS toolchains
 
 **Performance Analysis:**
+
 ```
 Bundle Size: 15-20KB (vs 50-100KB for JS equivalents)
 Runtime Speed: 2-5x faster than JS for complex validations
@@ -51,12 +54,14 @@ Type Safety: 100% compile-time guarantees
 ### Option 2: TypeScript + React/Vue/Solid ❌
 
 **Pros:**
+
 - **Large Ecosystem**: Extensive component libraries and tooling
 - **Developer Familiarity**: Large pool of experienced developers
 - **Mature Tooling**: Well-established build tools and development workflow
 - **Quick Prototyping**: Rapid development and iteration
 
 **Cons:**
+
 - **Bundle Size**: Significantly larger bundles (50-100KB+)
 - **Runtime Errors**: Type safety limited to development time
 - **Performance Overhead**: Virtual DOM and framework overhead
@@ -66,11 +71,13 @@ Type Safety: 100% compile-time guarantees
 ### Option 3: Rust + Yew ❌
 
 **Pros:**
+
 - **Rust Benefits**: Type safety and performance advantages
 - **React-like API**: Familiar component model
 - **Mature**: More established than Leptos
 
 **Cons:**
+
 - **Virtual DOM Overhead**: Similar performance characteristics to React
 - **Less Modern**: Not built with fine-grained reactivity
 - **API Verbosity**: More boilerplate than Leptos
@@ -79,11 +86,13 @@ Type Safety: 100% compile-time guarantees
 ### Option 4: JavaScript + Web Components ❌
 
 **Pros:**
+
 - **Framework Agnostic**: Works with any framework
 - **Standards Based**: Built on web standards
 - **No Build Step**: Can work without compilation
 
 **Cons:**
+
 - **Browser Support**: Limited in older browsers
 - **Performance**: Slower than compiled alternatives
 - **Type Safety**: JavaScript limitations remain
@@ -126,33 +135,37 @@ Type Safety: 100% compile-time guarantees
 
 ### Risks and Mitigations
 
-| Risk | Impact | Mitigation |
-|------|---------|------------|
-| Developer Adoption | High | Comprehensive docs, examples, gradual migration path |
-| Ecosystem Gaps | Medium | Build missing pieces, partner with UI library authors |
-| WASM Support | Low | All target browsers support WASM |
-| Compilation Complexity | Medium | Provide pre-built binaries, clear setup docs |
+| Risk                   | Impact | Mitigation                                            |
+| ---------------------- | ------ | ----------------------------------------------------- |
+| Developer Adoption     | High   | Comprehensive docs, examples, gradual migration path  |
+| Ecosystem Gaps         | Medium | Build missing pieces, partner with UI library authors |
+| WASM Support           | Low    | All target browsers support WASM                      |
+| Compilation Complexity | Medium | Provide pre-built binaries, clear setup docs          |
 
 ## Consequences
 
 ### Positive
+
 - **Performance Leadership**: Best-in-class bundle size and runtime performance
 - **Type Safety**: Eliminate entire classes of form-related bugs
 - **Modern Foundation**: Built on cutting-edge web technologies
 - **Differentiation**: Unique value proposition in the form library space
 
 ### Negative
+
 - **Learning Investment**: Teams need to learn Rust/Leptos patterns
 - **Initial Ecosystem**: Need to build or integrate missing pieces
 - **Build Complexity**: More complex build pipeline than pure JS
 
 ### Neutral
+
 - **Developer Pool**: Smaller but rapidly growing Rust web developer community
 - **Tooling**: Rapidly improving but not as mature as JS ecosystem
 
 ## Compliance
 
 This decision supports:
+
 - **Performance Requirements**: Meets all bundle size and speed targets
 - **Type Safety Requirements**: Provides compile-time guarantees
 - **Scalability Requirements**: Zero-cost abstractions enable large-scale usage
@@ -167,5 +180,5 @@ This decision supports:
 
 ---
 
-**Next Review**: 2025-04-01  
+**Next Review**: 2025-04-01
 **Related ADRs**: ADR-002 (Serialization), ADR-003 (Cache Strategy)

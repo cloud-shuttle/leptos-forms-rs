@@ -1,15 +1,16 @@
 # ADR-002: Serialization Strategy (serde vs bincode vs msgpack vs protobuf)
 
-**Status**: Accepted  
-**Date**: 2025-01-02  
-**Deciders**: Architecture Team  
+**Status**: Accepted
+**Date**: 2025-01-02
+**Deciders**: Architecture Team
 **Technical Story**: Choose serialization format for form data persistence and transmission
 
 ## Context
 
 Forms need to serialize data for multiple purposes:
+
 - **Client Storage**: Local/session storage, IndexedDB
-- **Network Transmission**: API communication, WebSocket messages  
+- **Network Transmission**: API communication, WebSocket messages
 - **State Persistence**: Form state recovery, draft saving
 - **Development Tools**: Debugging, state inspection
 
@@ -26,6 +27,7 @@ Forms need to serialize data for multiple purposes:
 ### Option 1: Serde + JSON ✅ **PRIMARY CHOICE**
 
 **Pros:**
+
 - **Universal Compatibility**: Every backend/API supports JSON
 - **Human Readable**: Easy debugging and inspection
 - **Ecosystem**: Excellent Rust support via serde
@@ -33,6 +35,7 @@ Forms need to serialize data for multiple purposes:
 - **Web Native**: Browsers handle JSON natively
 
 **Cons:**
+
 - **Size Overhead**: Verbose compared to binary formats (~30% larger)
 - **Performance**: Slower than binary serialization
 - **Precision**: Potential floating-point precision issues
@@ -42,12 +45,14 @@ Forms need to serialize data for multiple purposes:
 ### Option 2: bincode ✅ **PERFORMANCE CHOICE**
 
 **Pros:**
+
 - **Speed**: Fastest serialization in Rust ecosystem
 - **Size**: Compact binary format (~40% smaller than JSON)
 - **Type Safety**: Perfect Rust type preservation
 - **Zero Configuration**: Works with any serde-compatible type
 
 **Cons:**
+
 - **Rust-Only**: Not interoperable with other languages
 - **Binary**: Not human-readable
 - **Version Sensitivity**: Schema changes break compatibility
@@ -57,12 +62,14 @@ Forms need to serialize data for multiple purposes:
 ### Option 3: MessagePack (msgpack) ❌
 
 **Pros:**
+
 - **Compact**: Smaller than JSON (~20% reduction)
 - **Fast**: Faster than JSON parsing
 - **Cross-Platform**: Good language support
 - **Type Preservation**: Better than JSON for numeric types
 
 **Cons:**
+
 - **Complexity**: Additional dependency and encoding complexity
 - **Limited Benefits**: Not enough advantage over JSON for our use case
 - **Debugging**: Less readable than JSON
@@ -71,12 +78,14 @@ Forms need to serialize data for multiple purposes:
 ### Option 4: Protocol Buffers (protobuf) ❌
 
 **Pros:**
+
 - **Efficiency**: Very compact and fast
 - **Schema Evolution**: Built-in versioning support
 - **Cross-Platform**: Excellent language support
 - **Validation**: Built-in schema validation
 
 **Cons:**
+
 - **Complexity**: Requires schema definitions and compilation
 - **Overkill**: Too heavyweight for form data
 - **Learning Curve**: Additional concepts to learn
@@ -105,9 +114,9 @@ pub trait FormSerialization<T> {
 }
 
 // Default implementation
-impl<T> FormSerialization<T> for T 
-where 
-    T: Serialize + DeserializeOwned 
+impl<T> FormSerialization<T> for T
+where
+    T: Serialize + DeserializeOwned
 {
     fn serialize(&self, format: SerializationFormat) -> Result<Vec<u8>, SerializationError> {
         match format {
@@ -119,7 +128,7 @@ where
             }
         }
     }
-    
+
     fn deserialize(data: &[u8], format: SerializationFormat) -> Result<T, SerializationError> {
         match format {
             SerializationFormat::Json => {
@@ -136,6 +145,7 @@ where
 ### Usage Patterns
 
 **JSON for External Communication:**
+
 ```rust
 // API submission
 let json_data = form.serialize(SerializationFormat::Json)?;
@@ -147,6 +157,7 @@ window.localStorage().set_item("draft_form", &json_string)?;
 ```
 
 **bincode for Internal Performance:**
+
 ```rust
 // High-frequency state updates
 let binary_data = form.serialize(SerializationFormat::Bincode)?;
@@ -162,13 +173,13 @@ let optimized_array = bincode::serialize(&form_array)?;
 #[derive(Debug, Clone)]
 pub struct FormOptions<T> {
     // ... other options
-    
+
     /// Serialization format for persistence
     pub persistence_format: SerializationFormat,
-    
-    /// Serialization format for API communication  
+
+    /// Serialization format for API communication
     pub api_format: SerializationFormat,
-    
+
     /// Enable compression for large forms
     pub enable_compression: bool,
 }
@@ -187,12 +198,12 @@ impl<T> Default for FormOptions<T> {
 
 ## Performance Analysis
 
-| Format | Serialization Speed | Deserialization Speed | Size (1KB form) | Size (10KB form) |
-|--------|-------------------|---------------------|-----------------|------------------|
-| JSON | 1.2ms | 1.5ms | 1.3KB | 13KB |
-| bincode | 0.3ms | 0.4ms | 0.9KB | 9KB |
-| MessagePack | 0.8ms | 1.0ms | 1.1KB | 11KB |
-| Protobuf | 0.5ms | 0.7ms | 0.8KB | 8KB |
+| Format      | Serialization Speed | Deserialization Speed | Size (1KB form) | Size (10KB form) |
+| ----------- | ------------------- | --------------------- | --------------- | ---------------- |
+| JSON        | 1.2ms               | 1.5ms                 | 1.3KB           | 13KB             |
+| bincode     | 0.3ms               | 0.4ms                 | 0.9KB           | 9KB              |
+| MessagePack | 0.8ms               | 1.0ms                 | 1.1KB           | 11KB             |
+| Protobuf    | 0.5ms               | 0.7ms                 | 0.8KB           | 8KB              |
 
 **Winner**: bincode for performance, JSON for compatibility
 
@@ -227,13 +238,13 @@ pub struct TestForm {
 pub enum SerializationError {
     #[error("JSON serialization error: {0}")]
     Json(#[from] serde_json::Error),
-    
-    #[error("bincode serialization error: {0}")]  
+
+    #[error("bincode serialization error: {0}")]
     Bincode(#[from] bincode::Error),
-    
+
     #[error("Unsupported format: {0:?}")]
     UnsupportedFormat(SerializationFormat),
-    
+
     #[error("Data corruption detected")]
     CorruptedData,
 }
@@ -242,17 +253,20 @@ pub enum SerializationError {
 ## Consequences
 
 ### Positive
+
 - **Best of Both Worlds**: JSON compatibility + bincode performance
 - **Type Safety**: Full serde integration ensures type correctness
 - **Flexibility**: Can choose optimal format per use case
 - **Future-Proof**: Easy to add new formats later
 
 ### Negative
+
 - **Complexity**: Two serialization paths to maintain and test
 - **Bundle Size**: Both JSON and bincode dependencies
 - **Decision Overhead**: Developers need to choose appropriate format
 
 ### Mitigation Strategies
+
 - **Default Configuration**: Sensible defaults for most use cases
 - **Documentation**: Clear guidance on when to use each format
 - **Testing**: Comprehensive tests for both serialization paths
@@ -264,7 +278,7 @@ pub enum SerializationError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_json_roundtrip() {
         let form = TestForm { /* ... */ };
@@ -272,7 +286,7 @@ mod tests {
         let deserialized = TestForm::deserialize(&json_data, SerializationFormat::Json).unwrap();
         assert_eq!(form, deserialized);
     }
-    
+
     #[test]
     fn test_bincode_roundtrip() {
         let form = TestForm { /* ... */ };
@@ -280,19 +294,19 @@ mod tests {
         let deserialized = TestForm::deserialize(&binary_data, SerializationFormat::Bincode).unwrap();
         assert_eq!(form, deserialized);
     }
-    
+
     #[test]
     fn test_cross_format_compatibility() {
         let form = TestForm { /* ... */ };
-        
+
         // Serialize as JSON
         let json_data = form.serialize(SerializationFormat::Json).unwrap();
         let from_json = TestForm::deserialize(&json_data, SerializationFormat::Json).unwrap();
-        
+
         // Serialize the result as bincode
         let binary_data = from_json.serialize(SerializationFormat::Bincode).unwrap();
         let from_binary = TestForm::deserialize(&binary_data, SerializationFormat::Bincode).unwrap();
-        
+
         // Should be equivalent
         assert_eq!(form, from_binary);
     }
@@ -308,5 +322,5 @@ mod tests {
 
 ---
 
-**Next Review**: 2025-03-01  
+**Next Review**: 2025-03-01
 **Related ADRs**: ADR-001 (Rust Choice), ADR-003 (Cache Strategy)

@@ -1,11 +1,11 @@
 //! Stress tests for leptos-forms-rs
-//! 
+//!
 //! These tests verify that the library can handle large forms and high-frequency updates
 
 use leptos::prelude::*;
-use leptos_forms_rs::core::{Form, FormHandle, FieldMetadata, FieldType, FieldValue};
-use leptos_forms_rs::validation::{ValidationErrors, Validator};
+use leptos_forms_rs::core::{FieldMetadata, FieldType, FieldValue, Form, FormHandle};
 use leptos_forms_rs::hooks::use_form;
+use leptos_forms_rs::validation::{ValidationErrors, Validator};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::Instant;
@@ -17,7 +17,7 @@ struct LargeStressForm {
     name: String,
     email: String,
     age: i32,
-    
+
     // Many text fields
     field_1: String,
     field_2: String,
@@ -39,21 +39,21 @@ struct LargeStressForm {
     field_18: String,
     field_19: String,
     field_20: String,
-    
+
     // Number fields
     number_1: f64,
     number_2: f64,
     number_3: f64,
     number_4: f64,
     number_5: f64,
-    
+
     // Boolean fields
     bool_1: bool,
     bool_2: bool,
     bool_3: bool,
     bool_4: bool,
     bool_5: bool,
-    
+
     // Array fields
     tags: Vec<String>,
     categories: Vec<String>,
@@ -106,7 +106,7 @@ impl Default for LargeStressForm {
 impl Form for LargeStressForm {
     fn field_metadata() -> Vec<FieldMetadata> {
         let mut metadata = Vec::new();
-        
+
         // Basic fields
         metadata.push(FieldMetadata {
             name: "name".to_string(),
@@ -117,7 +117,7 @@ impl Form for LargeStressForm {
             attributes: HashMap::new(),
             validators: vec![Validator::Required, Validator::MinLength(2)],
         });
-        
+
         metadata.push(FieldMetadata {
             name: "email".to_string(),
             field_type: FieldType::Email,
@@ -127,13 +127,13 @@ impl Form for LargeStressForm {
             attributes: HashMap::new(),
             validators: vec![Validator::Required, Validator::Email],
         });
-        
+
         metadata.push(FieldMetadata {
             name: "age".to_string(),
-            field_type: FieldType::Number(leptos_forms_rs::core::NumberType { 
-                min: Some(0.0), 
-                max: Some(120.0), 
-                step: Some(1.0) 
+            field_type: FieldType::Number(leptos_forms_rs::core::NumberType {
+                min: Some(0.0),
+                max: Some(120.0),
+                step: Some(1.0),
             }),
             is_required: false,
             default_value: Some(FieldValue::Number(0.0)),
@@ -141,7 +141,7 @@ impl Form for LargeStressForm {
             attributes: HashMap::new(),
             validators: vec![Validator::Min(0.0), Validator::Max(120.0)],
         });
-        
+
         // Add many text fields
         for i in 1..=20 {
             metadata.push(FieldMetadata {
@@ -154,15 +154,15 @@ impl Form for LargeStressForm {
                 validators: vec![Validator::MaxLength(100)],
             });
         }
-        
+
         // Add number fields
         for i in 1..=5 {
             metadata.push(FieldMetadata {
                 name: format!("number_{}", i),
-                field_type: FieldType::Number(leptos_forms_rs::core::NumberType { 
-                    min: Some(-1000.0), 
-                    max: Some(1000.0), 
-                    step: Some(0.1) 
+                field_type: FieldType::Number(leptos_forms_rs::core::NumberType {
+                    min: Some(-1000.0),
+                    max: Some(1000.0),
+                    step: Some(0.1),
                 }),
                 is_required: false,
                 default_value: Some(FieldValue::Number(0.0)),
@@ -171,7 +171,7 @@ impl Form for LargeStressForm {
                 validators: vec![Validator::Min(-1000.0), Validator::Max(1000.0)],
             });
         }
-        
+
         // Add boolean fields
         for i in 1..=5 {
             metadata.push(FieldMetadata {
@@ -184,7 +184,7 @@ impl Form for LargeStressForm {
                 validators: Vec::new(),
             });
         }
-        
+
         // Add array fields
         metadata.push(FieldMetadata {
             name: "tags".to_string(),
@@ -195,7 +195,7 @@ impl Form for LargeStressForm {
             attributes: HashMap::new(),
             validators: Vec::new(),
         });
-        
+
         metadata.push(FieldMetadata {
             name: "categories".to_string(),
             field_type: FieldType::Array(Box::new(FieldType::Text)),
@@ -205,7 +205,7 @@ impl Form for LargeStressForm {
             attributes: HashMap::new(),
             validators: Vec::new(),
         });
-        
+
         metadata.push(FieldMetadata {
             name: "items".to_string(),
             field_type: FieldType::Array(Box::new(FieldType::Text)),
@@ -215,52 +215,77 @@ impl Form for LargeStressForm {
             attributes: HashMap::new(),
             validators: Vec::new(),
         });
-        
+
         metadata
     }
 
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         // Basic validation
         if self.name.is_empty() {
             errors.add_field_error("name", "Name is required".to_string());
         } else if self.name.len() < 2 {
             errors.add_field_error("name", "Name must be at least 2 characters".to_string());
         }
-        
+
         if self.email.is_empty() {
             errors.add_field_error("email", "Email is required".to_string());
         } else if !self.email.contains('@') {
             errors.add_field_error("email", "Invalid email format".to_string());
         }
-        
+
         if self.age < 0 || self.age > 120 {
             errors.add_field_error("age", "Age must be between 0 and 120".to_string());
         }
-        
+
         // Validate text fields
         let text_fields = [
-            &self.field_1, &self.field_2, &self.field_3, &self.field_4, &self.field_5,
-            &self.field_6, &self.field_7, &self.field_8, &self.field_9, &self.field_10,
-            &self.field_11, &self.field_12, &self.field_13, &self.field_14, &self.field_15,
-            &self.field_16, &self.field_17, &self.field_18, &self.field_19, &self.field_20,
+            &self.field_1,
+            &self.field_2,
+            &self.field_3,
+            &self.field_4,
+            &self.field_5,
+            &self.field_6,
+            &self.field_7,
+            &self.field_8,
+            &self.field_9,
+            &self.field_10,
+            &self.field_11,
+            &self.field_12,
+            &self.field_13,
+            &self.field_14,
+            &self.field_15,
+            &self.field_16,
+            &self.field_17,
+            &self.field_18,
+            &self.field_19,
+            &self.field_20,
         ];
-        
+
         for (i, field) in text_fields.iter().enumerate() {
             if field.len() > 100 {
                 errors.add_field_error(&format!("field_{}", i + 1), "Field too long".to_string());
             }
         }
-        
+
         // Validate number fields
-        let numbers = [self.number_1, self.number_2, self.number_3, self.number_4, self.number_5];
+        let numbers = [
+            self.number_1,
+            self.number_2,
+            self.number_3,
+            self.number_4,
+            self.number_5,
+        ];
         for (i, num) in numbers.iter().enumerate() {
             if *num < -1000.0 || *num > 1000.0 {
-                errors.add_field_error(&format!("number_{}", i + 1), "Number out of range".to_string());
+                errors.add_field_error(
+                    &format!("number_{}", i + 1),
+                    "Number out of range".to_string(),
+                );
             }
         }
-        
+
         if errors.is_empty() {
             Ok(())
         } else {
@@ -307,9 +332,24 @@ impl Form for LargeStressForm {
             "bool_3" => FieldValue::Boolean(self.bool_3),
             "bool_4" => FieldValue::Boolean(self.bool_4),
             "bool_5" => FieldValue::Boolean(self.bool_5),
-            "tags" => FieldValue::Array(self.tags.iter().map(|t| FieldValue::String(t.clone())).collect()),
-            "categories" => FieldValue::Array(self.categories.iter().map(|c| FieldValue::String(c.clone())).collect()),
-            "items" => FieldValue::Array(self.items.iter().map(|i| FieldValue::String(i.clone())).collect()),
+            "tags" => FieldValue::Array(
+                self.tags
+                    .iter()
+                    .map(|t| FieldValue::String(t.clone()))
+                    .collect(),
+            ),
+            "categories" => FieldValue::Array(
+                self.categories
+                    .iter()
+                    .map(|c| FieldValue::String(c.clone()))
+                    .collect(),
+            ),
+            "items" => FieldValue::Array(
+                self.items
+                    .iter()
+                    .map(|i| FieldValue::String(i.clone()))
+                    .collect(),
+            ),
             _ => FieldValue::String(String::new()),
         }
     }
@@ -483,7 +523,8 @@ impl Form for LargeStressForm {
             }
             "tags" => {
                 if let FieldValue::Array(arr) = value {
-                    self.tags = arr.into_iter()
+                    self.tags = arr
+                        .into_iter()
                         .filter_map(|v| {
                             if let FieldValue::String(s) = v {
                                 Some(s)
@@ -496,7 +537,8 @@ impl Form for LargeStressForm {
             }
             "categories" => {
                 if let FieldValue::Array(arr) = value {
-                    self.categories = arr.into_iter()
+                    self.categories = arr
+                        .into_iter()
                         .filter_map(|v| {
                             if let FieldValue::String(s) = v {
                                 Some(s)
@@ -509,7 +551,8 @@ impl Form for LargeStressForm {
             }
             "items" => {
                 if let FieldValue::Array(arr) = value {
-                    self.items = arr.into_iter()
+                    self.items = arr
+                        .into_iter()
                         .filter_map(|v| {
                             if let FieldValue::String(s) = v {
                                 Some(s)
@@ -530,10 +573,14 @@ fn test_large_form_creation_performance() {
     let start = Instant::now();
     let form = LargeStressForm::default();
     let creation_time = start.elapsed();
-    
+
     // Form creation should be fast (less than 1ms)
-    assert!(creation_time.as_micros() < 1000, "Form creation took too long: {:?}", creation_time);
-    
+    assert!(
+        creation_time.as_micros() < 1000,
+        "Form creation took too long: {:?}",
+        creation_time
+    );
+
     // Verify form has all expected fields
     let metadata = LargeStressForm::field_metadata();
     assert_eq!(metadata.len(), 36); // 3 basic + 20 text + 5 number + 5 bool + 3 arrays
@@ -545,10 +592,14 @@ fn test_large_form_handle_creation_performance() {
     let form = LargeStressForm::default();
     let form_handle = FormHandle::new(form);
     let creation_time = start.elapsed();
-    
+
     // FormHandle creation should be fast (less than 5ms)
-    assert!(creation_time.as_micros() < 5000, "FormHandle creation took too long: {:?}", creation_time);
-    
+    assert!(
+        creation_time.as_micros() < 5000,
+        "FormHandle creation took too long: {:?}",
+        creation_time
+    );
+
     // Verify we can access all fields
     let metadata = LargeStressForm::field_metadata();
     for field in metadata {
@@ -561,21 +612,25 @@ fn test_large_form_handle_creation_performance() {
 fn test_high_frequency_field_updates() {
     let form = LargeStressForm::default();
     let form_handle = FormHandle::new(form);
-    
+
     let start = Instant::now();
-    
+
     // Perform 1000 rapid field updates
     for i in 0..1000 {
         let field_name = format!("field_{}", (i % 20) + 1);
         let value = FieldValue::String(format!("value_{}", i));
         form_handle.set_field_value(&field_name, value);
     }
-    
+
     let update_time = start.elapsed();
-    
+
     // 1000 updates should complete in reasonable time (less than 100ms)
-    assert!(update_time.as_millis() < 100, "High frequency updates took too long: {:?}", update_time);
-    
+    assert!(
+        update_time.as_millis() < 100,
+        "High frequency updates took too long: {:?}",
+        update_time
+    );
+
     // Verify some values were set correctly
     let value_1 = form_handle.get_field_value("field_1");
     if let Some(FieldValue::String(s)) = value_1 {
@@ -588,86 +643,104 @@ fn test_high_frequency_field_updates() {
 #[test]
 fn test_large_form_validation_performance() {
     let mut form = LargeStressForm::default();
-    
+
     // Fill form with valid data
     form.name = "John Doe".to_string();
     form.email = "john@example.com".to_string();
     form.age = 30;
-    
+
     for i in 1..=20 {
         let field_name = format!("field_{}", i);
-        form.set_field_value(&field_name, FieldValue::String(format!("Valid field {}", i)));
+        form.set_field_value(
+            &field_name,
+            FieldValue::String(format!("Valid field {}", i)),
+        );
     }
-    
+
     for i in 1..=5 {
         let field_name = format!("number_{}", i);
         form.set_field_value(&field_name, FieldValue::Number(i as f64 * 10.0));
     }
-    
+
     for i in 1..=5 {
         let field_name = format!("bool_{}", i);
         form.set_field_value(&field_name, FieldValue::Boolean(i % 2 == 0));
     }
-    
+
     form.tags = vec!["tag1".to_string(), "tag2".to_string()];
     form.categories = vec!["cat1".to_string(), "cat2".to_string()];
     form.items = vec!["item1".to_string(), "item2".to_string()];
-    
+
     let form_handle = FormHandle::new(form);
-    
+
     let start = Instant::now();
     let result = form_handle.validate();
     let validation_time = start.elapsed();
-    
+
     // Validation should be fast (less than 10ms)
-    assert!(validation_time.as_micros() < 10000, "Validation took too long: {:?}", validation_time);
+    assert!(
+        validation_time.as_micros() < 10000,
+        "Validation took too long: {:?}",
+        validation_time
+    );
     assert!(result.is_ok(), "Valid form should pass validation");
 }
 
 #[test]
 fn test_large_form_serialization_performance() {
     let mut form = LargeStressForm::default();
-    
+
     // Fill form with data
     form.name = "Serialization Test".to_string();
     form.email = "test@example.com".to_string();
     form.age = 25;
-    
+
     for i in 1..=20 {
         let field_name = format!("field_{}", i);
-        form.set_field_value(&field_name, FieldValue::String(format!("Serialized field {}", i)));
+        form.set_field_value(
+            &field_name,
+            FieldValue::String(format!("Serialized field {}", i)),
+        );
     }
-    
+
     for i in 1..=5 {
         let field_name = format!("number_{}", i);
         form.set_field_value(&field_name, FieldValue::Number(i as f64 * 5.0));
     }
-    
+
     for i in 1..=5 {
         let field_name = format!("bool_{}", i);
         form.set_field_value(&field_name, FieldValue::Boolean(true));
     }
-    
+
     form.tags = (1..=10).map(|i| format!("tag_{}", i)).collect();
     form.categories = (1..=5).map(|i| format!("category_{}", i)).collect();
     form.items = (1..=15).map(|i| format!("item_{}", i)).collect();
-    
+
     // Test serialization performance
     let start = Instant::now();
     let json = serde_json::to_string(&form).unwrap();
     let serialization_time = start.elapsed();
-    
+
     // Serialization should be fast (less than 5ms)
-    assert!(serialization_time.as_micros() < 5000, "Serialization took too long: {:?}", serialization_time);
-    
+    assert!(
+        serialization_time.as_micros() < 5000,
+        "Serialization took too long: {:?}",
+        serialization_time
+    );
+
     // Test deserialization performance
     let start = Instant::now();
     let deserialized: LargeStressForm = serde_json::from_str(&json).unwrap();
     let deserialization_time = start.elapsed();
-    
+
     // Deserialization should be fast (less than 5ms)
-    assert!(deserialization_time.as_micros() < 5000, "Deserialization took too long: {:?}", deserialization_time);
-    
+    assert!(
+        deserialization_time.as_micros() < 5000,
+        "Deserialization took too long: {:?}",
+        deserialization_time
+    );
+
     // Verify data integrity
     assert_eq!(form, deserialized);
 }
@@ -681,10 +754,10 @@ fn test_memory_usage_large_form() {
             FormHandle::new(form)
         })
         .collect();
-    
+
     // 100 large forms should be manageable
     assert_eq!(forms.len(), 100);
-    
+
     // Test that we can still perform operations
     for (i, form_handle) in forms.iter().enumerate() {
         form_handle.set_field_value("name", FieldValue::String(format!("Form {}", i)));
@@ -699,51 +772,66 @@ fn test_memory_usage_large_form() {
 fn test_concurrent_field_access() {
     let form = LargeStressForm::default();
     let form_handle = FormHandle::new(form);
-    
+
     // Simulate concurrent access by rapidly reading and writing different fields
     let start = Instant::now();
-    
+
     for i in 0..500 {
         // Read from one field
         let read_field = format!("field_{}", (i % 20) + 1);
         let _value = form_handle.get_field_value(&read_field);
-        
+
         // Write to another field
         let write_field = format!("field_{}", ((i + 1) % 20) + 1);
-        form_handle.set_field_value(&write_field, FieldValue::String(format!("concurrent_{}", i)));
+        form_handle.set_field_value(
+            &write_field,
+            FieldValue::String(format!("concurrent_{}", i)),
+        );
     }
-    
+
     let access_time = start.elapsed();
-    
+
     // Concurrent access should be fast (less than 50ms)
-    assert!(access_time.as_millis() < 50, "Concurrent access took too long: {:?}", access_time);
+    assert!(
+        access_time.as_millis() < 50,
+        "Concurrent access took too long: {:?}",
+        access_time
+    );
 }
 
 #[test]
 fn test_array_field_stress() {
     let form = LargeStressForm::default();
     let form_handle = FormHandle::new(form);
-    
+
     // Test large arrays
     let large_tags: Vec<FieldValue> = (1..=1000)
         .map(|i| FieldValue::String(format!("tag_{}", i)))
         .collect();
-    
+
     let start = Instant::now();
     form_handle.set_field_value("tags", FieldValue::Array(large_tags));
     let set_time = start.elapsed();
-    
+
     // Setting large array should be reasonable (less than 20ms)
-    assert!(set_time.as_millis() < 20, "Large array set took too long: {:?}", set_time);
-    
+    assert!(
+        set_time.as_millis() < 20,
+        "Large array set took too long: {:?}",
+        set_time
+    );
+
     // Test reading large array
     let start = Instant::now();
     let retrieved = form_handle.get_field_value("tags");
     let get_time = start.elapsed();
-    
+
     // Reading large array should be fast (less than 5ms)
-    assert!(get_time.as_millis() < 5, "Large array get took too long: {:?}", get_time);
-    
+    assert!(
+        get_time.as_millis() < 5,
+        "Large array get took too long: {:?}",
+        get_time
+    );
+
     if let Some(FieldValue::Array(arr)) = retrieved {
         assert_eq!(arr.len(), 1000);
         // Verify some values

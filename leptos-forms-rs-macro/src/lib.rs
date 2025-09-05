@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Data, Fields, Type, Attribute, Meta};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Fields, Meta, Type};
 
 /// Derive macro for implementing the Form trait
 #[proc_macro_derive(Form, attributes(form))]
@@ -8,32 +8,32 @@ pub fn derive_form(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = input.ident;
     let generics = input.generics;
-    
+
     // Parse the struct fields and their attributes
     let fields = match input.data {
         Data::Struct(data) => data.fields,
         _ => panic!("Form derive macro only supports structs"),
     };
-    
+
     let field_metadata = generate_field_metadata(&fields);
     let field_accessors = generate_field_accessors(&fields);
     let field_setters = generate_field_setters(&fields);
     let default_values = generate_default_values(&fields);
     let validation_impl = generate_validation_impl(&fields);
-    
+
     let expanded = quote! {
         impl #generics leptos_forms_rs::core::traits::Form for #name #generics {
             fn field_metadata() -> Vec<leptos_forms_rs::core::traits::FieldMetadata> {
                 vec![#field_metadata]
             }
-            
+
             fn get_field(&self, name: &str) -> Option<leptos_forms_rs::core::types::FieldValue> {
                 match name {
                     #field_accessors
                     _ => None,
                 }
             }
-            
+
             fn set_field(&mut self, name: &str, value: leptos_forms_rs::core::types::FieldValue) -> Result<(), leptos_forms_rs::core::types::FieldError> {
                 match name {
                     #field_setters
@@ -43,37 +43,37 @@ pub fn derive_form(input: TokenStream) -> TokenStream {
                     )),
                 }
             }
-            
+
             fn default_values() -> Self {
                 Self {
                     #default_values
                 }
             }
-            
+
             fn validate(&self) -> Result<(), leptos_forms_rs::validation::ValidationErrors> {
     let mut errors = leptos_forms_rs::validation::ValidationErrors::new();
-                
+
                 #validation_impl
-                
+
                 if errors.is_empty() {
                     Ok(())
                 } else {
                     Err(errors)
                 }
             }
-            
+
             fn schema() -> leptos_forms_rs::core::traits::FormSchema {
     let mut schema = leptos_forms_rs::core::traits::FormSchema::new();
-                
+
                 for field in Self::field_metadata() {
                     schema.add_field(field);
                 }
-                
+
                 schema
             }
         }
     };
-    
+
     TokenStream::from(expanded)
 }
 
@@ -87,7 +87,7 @@ fn generate_field_metadata(fields: &Fields) -> proc_macro2::TokenStream {
             let validators = extract_validators(&field.attrs);
             let is_required = has_validator(&field.attrs, "required");
             let default_value = extract_default_value(&field.attrs, &field.ty);
-            
+
             quote! {
                 leptos_forms_rs::core::traits::FieldMetadata {
                     name: stringify!(#field_name).to_string(),
@@ -101,7 +101,7 @@ fn generate_field_metadata(fields: &Fields) -> proc_macro2::TokenStream {
             }
         })
         .collect();
-    
+
     quote! {
         #(#field_metadata),*
     }
@@ -113,7 +113,7 @@ fn generate_field_accessors(fields: &Fields) -> proc_macro2::TokenStream {
         .iter()
         .map(|field| {
             let field_name = &field.ident;
-            
+
             quote! {
                 stringify!(#field_name) => {
                     let value = &self.#field_name;
@@ -122,7 +122,7 @@ fn generate_field_accessors(fields: &Fields) -> proc_macro2::TokenStream {
             }
         })
         .collect();
-    
+
     quote! {
         #(#accessors),*
     }
@@ -134,7 +134,7 @@ fn generate_field_setters(fields: &Fields) -> proc_macro2::TokenStream {
         .iter()
         .map(|field| {
             let field_name = &field.ident;
-            
+
             quote! {
                 stringify!(#field_name) => {
                     match value {
@@ -155,7 +155,7 @@ fn generate_field_setters(fields: &Fields) -> proc_macro2::TokenStream {
             }
         })
         .collect();
-    
+
     quote! {
         #(#setters),*
     }
@@ -169,13 +169,13 @@ fn generate_default_values(fields: &Fields) -> proc_macro2::TokenStream {
             let field_name = &field.ident;
             let _field_type = &field.ty;
             let default_value = extract_default_value(&field.attrs, &field.ty);
-            
+
             quote! {
                 #field_name: #default_value
             }
         })
         .collect();
-    
+
     quote! {
         #(#defaults),*
     }
@@ -188,7 +188,7 @@ fn generate_validation_impl(fields: &Fields) -> proc_macro2::TokenStream {
         .map(|field| {
             let field_name = &field.ident;
             let validators = extract_validators(&field.attrs);
-            
+
             quote! {
                 // Validate field: #field_name
                 let field_value = leptos_forms_rs::utils::field_utils::convert_to_field_value(&self.#field_name);
@@ -200,7 +200,7 @@ fn generate_validation_impl(fields: &Fields) -> proc_macro2::TokenStream {
             }
         })
         .collect();
-    
+
     quote! {
         #(#validations)*
     }
@@ -227,7 +227,7 @@ fn determine_field_type(ty: &Type) -> proc_macro2::TokenStream {
 /// Extract validators from field attributes
 fn extract_validators(attrs: &[Attribute]) -> proc_macro2::TokenStream {
     let mut validators = Vec::new();
-    
+
     for attr in attrs {
         if attr.path().is_ident("form") {
             if let Meta::List(meta_list) = &attr.meta {
@@ -235,10 +235,12 @@ fn extract_validators(attrs: &[Attribute]) -> proc_macro2::TokenStream {
                 // This is a simplified version - in a real implementation you'd want more robust parsing
                 let tokens = meta_list.tokens.to_string();
                 if tokens.contains("required") {
-                    validators.push(quote! { leptos_forms_rs::core::types::ValidatorConfig::Required });
+                    validators
+                        .push(quote! { leptos_forms_rs::core::types::ValidatorConfig::Required });
                 }
                 if tokens.contains("email") {
-                    validators.push(quote! { leptos_forms_rs::core::types::ValidatorConfig::Email });
+                    validators
+                        .push(quote! { leptos_forms_rs::core::types::ValidatorConfig::Email });
                 }
                 if tokens.contains("url") {
                     validators.push(quote! { leptos_forms_rs::core::types::ValidatorConfig::Url });
@@ -253,7 +255,7 @@ fn extract_validators(attrs: &[Attribute]) -> proc_macro2::TokenStream {
             }
         }
     }
-    
+
     if validators.is_empty() {
         quote! {}
     } else {
@@ -309,7 +311,7 @@ fn extract_default_value(attrs: &[Attribute], field_type: &Type) -> proc_macro2:
             }
         }
     }
-    
+
     // Use the appropriate default based on the field type
     match field_type {
         Type::Path(type_path) => {

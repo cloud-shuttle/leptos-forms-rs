@@ -5,6 +5,7 @@ The `FieldArray` component is a powerful, flexible component for managing dynami
 ## Features
 
 ### ✨ Core Functionality
+
 - **Dynamic Item Management**: Add, remove, and manage form items dynamically
 - **Custom Rendering**: Flexible item rendering through callback functions
 - **Validation Support**: Built-in min/max constraints and validation
@@ -12,6 +13,7 @@ The `FieldArray` component is a powerful, flexible component for managing dynami
 - **Accessibility**: Proper ARIA labels, keyboard navigation, and focus management
 
 ### 🎨 UI/UX Features
+
 - **Modern Design**: Clean, professional appearance with smooth animations
 - **Interactive Elements**: Hover effects, focus states, and visual feedback
 - **Drag & Drop Ready**: Infrastructure for future drag-and-drop reordering
@@ -19,6 +21,7 @@ The `FieldArray` component is a powerful, flexible component for managing dynami
 - **Progress Indicators**: Visual feedback for validation constraints
 
 ### 🔧 Technical Features
+
 - **Leptos 0.8 Compatible**: Built with the latest Leptos framework
 - **Type Safe**: Full Rust type safety with generic support
 - **Performance Optimized**: Efficient signal handling and minimal re-renders
@@ -34,7 +37,7 @@ use leptos_forms_rs::core::{Form, FormHandle, FieldValue};
 #[component]
 pub fn MyForm() -> impl IntoView {
     let form_handle = use_form::<MyFormType>();
-    
+
     // Render function for each item
     let render_item = Callback::new(|(index, value): (usize, FieldValue)| {
         view! {
@@ -60,17 +63,17 @@ pub fn MyForm() -> impl IntoView {
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `field_name` | `String` | **Required** | The name of the field in the form |
-| `form_handle` | `FormHandle<T>` | **Required** | The form handle managing the form state |
-| `render_item` | `Callback<(usize, FieldValue), View<()>>` | **Required** | Function to render each array item |
-| `min` | `Option<usize>` | `None` | Minimum number of items required |
-| `max` | `Option<usize>` | `None` | Maximum number of items allowed |
-| `can_add` | `Option<Signal<bool>>` | `None` | Control whether items can be added |
-| `can_remove` | `Option<Signal<bool>>` | `None` | Control whether items can be removed |
-| `show_validation` | `Option<Signal<bool>>` | `None` | Show validation messages |
-| `allow_reordering` | `Option<Signal<bool>>` | `None` | Enable drag-and-drop reordering |
+| Prop               | Type                                      | Default      | Description                             |
+| ------------------ | ----------------------------------------- | ------------ | --------------------------------------- |
+| `field_name`       | `String`                                  | **Required** | The name of the field in the form       |
+| `form_handle`      | `FormHandle<T>`                           | **Required** | The form handle managing the form state |
+| `render_item`      | `Callback<(usize, FieldValue), View<()>>` | **Required** | Function to render each array item      |
+| `min`              | `Option<usize>`                           | `None`       | Minimum number of items required        |
+| `max`              | `Option<usize>`                           | `None`       | Maximum number of items allowed         |
+| `can_add`          | `Option<Signal<bool>>`                    | `None`       | Control whether items can be added      |
+| `can_remove`       | `Option<Signal<bool>>`                    | `None`       | Control whether items can be removed    |
+| `show_validation`  | `Option<Signal<bool>>`                    | `None`       | Show validation messages                |
+| `allow_reordering` | `Option<Signal<bool>>`                    | `None`       | Enable drag-and-drop reordering         |
 
 ## Advanced Usage
 
@@ -82,7 +85,7 @@ let render_complex_item = Callback::new(|(index, value): (usize, FieldValue)| {
         let title = obj.get("title").and_then(|v| v.as_string()).unwrap_or_default();
         let description = obj.get("description").and_then(|v| v.as_string()).unwrap_or_default();
         let active = obj.get("active").and_then(|v| v.as_boolean()).unwrap_or(false);
-        
+
         view! {
             <div class="complex-item">
                 <div class="item-header">
@@ -116,7 +119,7 @@ let render_complex_item = Callback::new(|(index, value): (usize, FieldValue)| {
 ```rust
 let render_item = Callback::new(|(index, value): (usize, FieldValue)| {
     let is_even = index % 2 == 0;
-    
+
     if is_even {
         view! {
             <div class="even-item">
@@ -144,7 +147,7 @@ let render_item = Callback::new(|(index, value): (usize, FieldValue)| {
         let text = value.as_string().unwrap_or_default();
         text.len() < 3
     });
-    
+
     view! {
         <div class="validated-item">
             <input
@@ -184,14 +187,14 @@ You can customize the appearance by overriding CSS variables or classes:
 
 ```css
 .field-array {
-    --primary-color: #8b5cf6;
-    --border-radius: 12px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --primary-color: #8b5cf6;
+  --border-radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .field-array-item {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border: 2px solid var(--primary-color);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid var(--primary-color);
 }
 ```
 
@@ -203,16 +206,16 @@ The Field Array component integrates seamlessly with the form validation system:
 // In your form validation
 fn validate(&self) -> Result<(), ValidationErrors> {
     let mut errors = ValidationErrors::new();
-    
+
     // Validate array constraints
     if self.items.len() < 2 {
         errors.add_field_error("items".to_string(), "At least 2 items are required".to_string());
     }
-    
+
     if self.items.len() > 10 {
         errors.add_field_error("items".to_string(), "Maximum 10 items allowed".to_string());
     }
-    
+
     // Validate individual items
     for (index, item) in self.items.iter().enumerate() {
         if item.title.is_empty() {
@@ -222,7 +225,7 @@ fn validate(&self) -> Result<(), ValidationErrors> {
             );
         }
     }
-    
+
     if errors.is_empty() {
         Ok(())
     } else {

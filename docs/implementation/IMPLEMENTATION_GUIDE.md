@@ -5,6 +5,7 @@
 ### 1. Project Setup
 
 **Create Cargo workspace:**
+
 ```toml
 # Cargo.toml
 [workspace]
@@ -24,6 +25,7 @@ syn = { version = "2.0", features = ["full"] }
 ```
 
 **Core library setup:**
+
 ```toml
 # leptos-forms/Cargo.toml
 [package]
@@ -48,6 +50,7 @@ hydrate = ["leptos/hydrate"]
 ```
 
 **Macro crate setup:**
+
 ```toml
 # leptos-forms-macro/Cargo.toml
 [package]
@@ -79,16 +82,16 @@ use std::collections::HashMap;
 pub trait Form: Clone + Serialize + for<'de> Deserialize<'de> + 'static {
     /// Get field metadata for runtime introspection
     fn field_metadata() -> Vec<FieldMetadata>;
-    
+
     /// Validate the entire form
     fn validate(&self) -> Result<(), ValidationErrors>;
-    
+
     /// Get a field value by name (for dynamic access)
     fn get_field(&self, name: &str) -> Option<FieldValue>;
-    
+
     /// Set a field value by name (for dynamic updates)
     fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), FieldError>;
-    
+
     /// Get default values
     fn default_values() -> Self;
 }
@@ -200,19 +203,19 @@ impl ValidationErrors {
     pub fn new() -> Self {
         Self::default()
     }
-    
+
     pub fn is_empty(&self) -> bool {
         self.field_errors.is_empty() && self.form_errors.is_empty()
     }
-    
+
     pub fn add_field_error(&mut self, field: String, message: String) {
         self.field_errors.insert(field, message);
     }
-    
+
     pub fn add_form_error(&mut self, message: String) {
         self.form_errors.push(message);
     }
-    
+
     pub fn clear_field(&mut self, field: &str) {
         self.field_errors.remove(field);
     }
@@ -244,7 +247,7 @@ impl Validators {
             _ => Ok(()),
         }
     }
-    
+
     pub fn email(value: &FieldValue) -> Result<(), String> {
         if let FieldValue::String(email) = value {
             let email_regex = Regex::new(r"^[^\s@]+@[^\s@]+\.[^\s@]+$").unwrap();
@@ -257,7 +260,7 @@ impl Validators {
             Err("Email must be a string".to_string())
         }
     }
-    
+
     pub fn min_length(value: &FieldValue, min: usize) -> Result<(), String> {
         if let FieldValue::String(s) = value {
             if s.len() >= min {
@@ -269,7 +272,7 @@ impl Validators {
             Err("Value must be a string".to_string())
         }
     }
-    
+
     pub fn max_length(value: &FieldValue, max: usize) -> Result<(), String> {
         if let FieldValue::String(s) = value {
             if s.len() <= max {
@@ -281,7 +284,7 @@ impl Validators {
             Err("Value must be a string".to_string())
         }
     }
-    
+
     pub fn pattern(value: &FieldValue, pattern: &str) -> Result<(), String> {
         if let FieldValue::String(s) = value {
             let regex = Regex::new(pattern).map_err(|_| "Invalid pattern".to_string())?;
@@ -327,13 +330,13 @@ pub struct FormHandle<T: Form> {
     pub errors: ReadSignal<ValidationErrors>,
     pub touched: ReadSignal<HashSet<String>>,
     pub dirty_fields: ReadSignal<HashSet<String>>,
-    
+
     // Derived state
     pub is_valid: Signal<bool>,
     pub is_dirty: Signal<bool>,
     pub is_submitting: ReadSignal<bool>,
     pub submit_count: ReadSignal<u32>,
-    
+
     // Actions
     pub set_values: WriteSignal<T>,
     pub set_field_value: Rc<dyn Fn(&str, FieldValue)>,
@@ -341,11 +344,11 @@ pub struct FormHandle<T: Form> {
     pub clear_field_error: Rc<dyn Fn(&str)>,
     pub touch_field: Rc<dyn Fn(&str)>,
     pub reset: Rc<dyn Fn()>,
-    
+
     // Form submission
     pub handle_submit: Rc<dyn Fn(web_sys::Event)>,
     pub submit_form: Rc<dyn Fn()>,
-    
+
     // Field registration
     pub register: Rc<dyn Fn(&str) -> FieldRegistration>,
 }
@@ -384,13 +387,13 @@ pub struct FieldRegistration {
     pub is_touched: Signal<bool>,
     pub is_dirty: Signal<bool>,
     pub is_focused: ReadSignal<bool>,
-    
+
     // Event handlers
     pub on_input: Callback<web_sys::Event>,
     pub on_change: Callback<web_sys::Event>,
     pub on_blur: Callback<web_sys::FocusEvent>,
     pub on_focus: Callback<web_sys::FocusEvent>,
-    
+
     // DOM props
     pub props: FieldProps,
 }
@@ -414,7 +417,7 @@ pub fn use_form<T: Form>(
     options: FormOptions<T>,
 ) -> FormHandle<T> {
     let initial = initial_values.unwrap_or_else(T::default_values);
-    
+
     // Core state signals
     let (values, set_values) = create_signal(initial.clone());
     let (errors, set_errors) = create_signal(ValidationErrors::new());
@@ -423,28 +426,28 @@ pub fn use_form<T: Form>(
     let (is_submitting, set_submitting) = create_signal(false);
     let (submit_count, set_submit_count) = create_signal(0u32);
     let (focused_field, set_focused_field) = create_signal(None::<String>);
-    
+
     // Derived state
     let is_valid = create_memo(move |_| errors.get().is_empty());
     let is_dirty = create_memo(move |_| !dirty_fields.get().is_empty());
-    
+
     // Field value setter
     let set_field_value = {
         let set_values = set_values.clone();
         let set_dirty_fields = set_dirty_fields.clone();
         let validation_mode = options.validation_mode.clone();
         let set_errors = set_errors.clone();
-        
+
         Rc::new(move |field_name: &str, field_value: FieldValue| {
             let field_name = field_name.to_string();
-            
+
             set_values.update(|form| {
                 if let Ok(()) = form.set_field(&field_name, field_value.clone()) {
                     // Mark field as dirty
                     set_dirty_fields.update(|dirty| {
                         dirty.insert(field_name.clone());
                     });
-                    
+
                     // Validate on change if configured
                     if validation_mode == ValidationMode::OnChange {
                         if let Err(validation_errors) = form.validate() {
@@ -459,7 +462,7 @@ pub fn use_form<T: Form>(
             });
         })
     };
-    
+
     // Field registration
     let register = {
         let values = values.clone();
@@ -470,46 +473,46 @@ pub fn use_form<T: Form>(
         let set_field_value = set_field_value.clone();
         let set_touched = set_touched.clone();
         let set_focused_field = set_focused_field.clone();
-        
+
         Rc::new(move |field_name: &str| -> FieldRegistration {
             let field_name_owned = field_name.to_string();
-            
+
             // Create field-specific signals
             let field_value = create_memo({
                 let field_name = field_name_owned.clone();
                 let values = values.clone();
                 move |_| values.get().get_field(&field_name).unwrap_or(FieldValue::Null)
             });
-            
+
             let field_error = create_memo({
                 let field_name = field_name_owned.clone();
                 let errors = errors.clone();
                 move |_| errors.get().field_errors.get(&field_name).cloned()
             });
-            
+
             let is_touched = create_memo({
                 let field_name = field_name_owned.clone();
                 let touched = touched.clone();
                 move |_| touched.get().contains(&field_name)
             });
-            
+
             let is_dirty = create_memo({
                 let field_name = field_name_owned.clone();
                 let dirty_fields = dirty_fields.clone();
                 move |_| dirty_fields.get().contains(&field_name)
             });
-            
+
             let is_focused = create_memo({
                 let field_name = field_name_owned.clone();
                 let focused_field = focused_field.clone();
                 move |_| focused_field.get().as_ref() == Some(&field_name)
             });
-            
+
             // Event handlers
             let on_input = {
                 let field_name = field_name_owned.clone();
                 let set_field_value = set_field_value.clone();
-                
+
                 Callback::new(move |ev: web_sys::Event| {
                     if let Some(target) = ev.target() {
                         if let Ok(input) = target.dyn_into::<web_sys::HtmlInputElement>() {
@@ -519,12 +522,12 @@ pub fn use_form<T: Form>(
                     }
                 })
             };
-            
+
             let on_blur = {
                 let field_name = field_name_owned.clone();
                 let set_touched = set_touched.clone();
                 let set_focused_field = set_focused_field.clone();
-                
+
                 Callback::new(move |_: web_sys::FocusEvent| {
                     set_touched.update(|touched| {
                         touched.insert(field_name.clone());
@@ -532,16 +535,16 @@ pub fn use_form<T: Form>(
                     set_focused_field.set(None);
                 })
             };
-            
+
             let on_focus = {
                 let field_name = field_name_owned.clone();
                 let set_focused_field = set_focused_field.clone();
-                
+
                 Callback::new(move |_: web_sys::FocusEvent| {
                     set_focused_field.set(Some(field_name.clone()));
                 })
             };
-            
+
             // Create props for DOM binding
             let props = FieldProps {
                 id: format!("field-{}", field_name_owned),
@@ -563,7 +566,7 @@ pub fn use_form<T: Form>(
                     field_error.get().is_some().then(|| format!("field-{}-error", field_name_owned))
                 }).into(),
             };
-            
+
             FieldRegistration {
                 name: field_name_owned,
                 value: field_value.into(),
@@ -579,7 +582,7 @@ pub fn use_form<T: Form>(
             }
         })
     };
-    
+
     // Form submission handler
     let handle_submit = {
         let values = values.clone();
@@ -588,18 +591,18 @@ pub fn use_form<T: Form>(
         let set_submit_count = set_submit_count.clone();
         let on_submit = options.on_submit.clone();
         let on_submit_async = options.on_submit_async.clone();
-        
+
         Rc::new(move |ev: web_sys::Event| {
             ev.prevent_default();
-            
+
             set_submit_count.update(|count| *count += 1);
-            
+
             let current_values = values.get();
             match current_values.validate() {
                 Ok(()) => {
                     set_errors.set(ValidationErrors::new());
                     set_submitting.set(true);
-                    
+
                     if let Some(handler) = &on_submit {
                         handler(current_values);
                         set_submitting.set(false);
@@ -608,7 +611,7 @@ pub fn use_form<T: Form>(
                         let values = current_values.clone();
                         let set_submitting = set_submitting.clone();
                         let set_errors = set_errors.clone();
-                        
+
                         spawn_local(async move {
                             match handler(values).await {
                                 Ok(()) => {
@@ -624,14 +627,14 @@ pub fn use_form<T: Form>(
                 }
                 Err(validation_errors) => {
                     set_errors.set(validation_errors);
-                    
+
                     // Focus first error field
                     // Implementation depends on DOM manipulation needs
                 }
             }
         })
     };
-    
+
     FormHandle {
         values: values.into(),
         errors: errors.into(),
@@ -687,7 +690,7 @@ use syn::{parse_macro_input, DeriveInput, Data, Fields, Field, Attribute, Meta, 
 pub fn derive_form(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = &input.ident;
-    
+
     let expanded = match input.data {
         Data::Struct(data_struct) => {
             match data_struct.fields {
@@ -712,7 +715,7 @@ pub fn derive_form(input: TokenStream) -> TokenStream {
             ).to_compile_error().into();
         }
     };
-    
+
     TokenStream::from(expanded)
 }
 
@@ -725,31 +728,31 @@ fn generate_form_impl(
     let get_field_impl = generate_get_field_impl(fields);
     let set_field_impl = generate_set_field_impl(fields);
     let default_values_impl = generate_default_values_impl(struct_name, fields);
-    
+
     quote! {
         impl Form for #struct_name {
             fn field_metadata() -> Vec<FieldMetadata> {
                 vec![#(#field_metadata),*]
             }
-            
+
             fn validate(&self) -> Result<(), ValidationErrors> {
                 let mut errors = ValidationErrors::new();
                 #validate_impl
-                
+
                 if errors.is_empty() {
                     Ok(())
                 } else {
                     Err(errors)
                 }
             }
-            
+
             fn get_field(&self, name: &str) -> Option<FieldValue> {
                 match name {
                     #get_field_impl
                     _ => None,
                 }
             }
-            
+
             fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), FieldError> {
                 match name {
                     #set_field_impl
@@ -759,7 +762,7 @@ fn generate_form_impl(
                     }),
                 }
             }
-            
+
             fn default_values() -> Self {
                 #default_values_impl
             }
@@ -775,7 +778,7 @@ fn generate_field_metadata(fields: &syn::punctuated::Punctuated<Field, syn::Toke
         let is_required = validators.iter().any(|v| matches!(v, ValidatorConfig::Required));
         let dependencies = extract_dependencies(&field.attrs);
         let attributes = extract_attributes(&field.attrs);
-        
+
         Some(quote! {
             FieldMetadata {
                 name: #field_name.to_string(),
@@ -802,8 +805,8 @@ fn determine_field_type(ty: &syn::Type) -> proc_macro2::TokenStream {
             match segment.ident.to_string().as_str() {
                 "String" => quote! { FieldType::Text },
                 "bool" => quote! { FieldType::Boolean },
-                "i32" | "i64" | "f32" | "f64" => quote! { 
-                    FieldType::Number(NumberType { min: None, max: None, step: None }) 
+                "i32" | "i64" | "f32" | "f64" => quote! {
+                    FieldType::Number(NumberType { min: None, max: None, step: None })
                 },
                 _ => quote! { FieldType::Text }, // Default fallback
             }
@@ -817,7 +820,7 @@ fn determine_field_type(ty: &syn::Type) -> proc_macro2::TokenStream {
 
 fn extract_validators(attrs: &[Attribute]) -> Vec<proc_macro2::TokenStream> {
     let mut validators = Vec::new();
-    
+
     for attr in attrs {
         if attr.path().is_ident("form") {
             if let Ok(Meta::List(meta_list)) = attr.meta {
@@ -834,7 +837,7 @@ fn extract_validators(attrs: &[Attribute]) -> Vec<proc_macro2::TokenStream> {
             }
         }
     }
-    
+
     validators
 }
 
@@ -855,11 +858,11 @@ fn generate_validate_impl(fields: &syn::punctuated::Punctuated<Field, syn::Token
         let field_name = field.ident.as_ref()?;
         let field_name_str = field_name.to_string();
         let validators = extract_validators(&field.attrs);
-        
+
         if validators.is_empty() {
             return None;
         }
-        
+
         Some(quote! {
             {
                 let field_value = match self.#field_name {
@@ -867,7 +870,7 @@ fn generate_validate_impl(fields: &syn::punctuated::Punctuated<Field, syn::Token
                     // This needs type-specific logic
                     ref val => FieldValue::String(val.to_string()), // Simplified
                 };
-                
+
                 #(
                     if let Err(error) = validate_field_value(&field_value, &#validators) {
                         errors.add_field_error(#field_name_str.to_string(), error);
@@ -876,7 +879,7 @@ fn generate_validate_impl(fields: &syn::punctuated::Punctuated<Field, syn::Token
             }
         })
     }).collect();
-    
+
     quote! {
         #(#validations)*
     }
@@ -886,7 +889,7 @@ fn generate_get_field_impl(fields: &syn::punctuated::Punctuated<Field, syn::Toke
     let cases: Vec<_> = fields.iter().filter_map(|field| {
         let field_name = field.ident.as_ref()?;
         let field_name_str = field_name.to_string();
-        
+
         Some(quote! {
             #field_name_str => Some({
                 // Convert field to FieldValue
@@ -895,7 +898,7 @@ fn generate_get_field_impl(fields: &syn::punctuated::Punctuated<Field, syn::Toke
             }),
         })
     }).collect();
-    
+
     quote! {
         #(#cases)*
     }
@@ -905,7 +908,7 @@ fn generate_set_field_impl(fields: &syn::punctuated::Punctuated<Field, syn::Toke
     let cases: Vec<_> = fields.iter().filter_map(|field| {
         let field_name = field.ident.as_ref()?;
         let field_name_str = field_name.to_string();
-        
+
         Some(quote! {
             #field_name_str => {
                 // Convert FieldValue back to field type
@@ -923,7 +926,7 @@ fn generate_set_field_impl(fields: &syn::punctuated::Punctuated<Field, syn::Toke
             },
         })
     }).collect();
-    
+
     quote! {
         #(#cases)*
     }
@@ -958,7 +961,7 @@ pub fn FormProvider<T: Form>(
     children: Children,
 ) -> impl IntoView {
     let context = FormContext { form_handle };
-    
+
     view! {
         <Provider value={context}>
             {children()}
@@ -976,7 +979,7 @@ pub fn use_form_context<T: Form>() -> FormContext<T> {
 pub fn use_field_registration(name: &str) -> FieldRegistration {
     let context = use_context::<FormContext<impl Form>>()
         .expect("use_field_registration must be used within FormProvider");
-    
+
     (context.form_handle.register)(name)
 }
 ```
@@ -999,14 +1002,14 @@ pub fn Form<T: Form>(
 ) -> impl IntoView {
     let prevent_default = prevent_default.unwrap_or(true);
     let handle_submit = form_handle.handle_submit.clone();
-    
+
     let on_submit = move |ev: web_sys::Event| {
         if prevent_default {
             ev.prevent_default();
         }
         handle_submit(ev);
     };
-    
+
     view! {
         <FormProvider form_handle={form_handle}>
             <form on:submit=on_submit class=class>
@@ -1036,32 +1039,32 @@ pub fn FormField(
 ) -> impl IntoView {
     let field = use_field_registration(&name);
     let required = required.unwrap_or(false);
-    
+
     view! {
         <div class=class>
-            <label 
-                for={&field.props.id} 
+            <label
+                for={&field.props.id}
                 class="form-label"
             >
                 {label}
-                {required.then(|| view! { 
-                    <span class="required-indicator" aria-label="required">"*"</span> 
+                {required.then(|| view! {
+                    <span class="required-indicator" aria-label="required">"*"</span>
                 })}
             </label>
-            
+
             {description.map(|desc| view! {
                 <p class="form-description" id={format!("{}-description", field.props.id)}>
                     {desc}
                 </p>
             })}
-            
+
             <div class="form-field-content">
                 {children()}
             </div>
-            
+
             <Show when=move || field.error.get().is_some()>
-                <p 
-                    class="form-error" 
+                <p
+                    class="form-error"
                     id={format!("{}-error", field.props.id)}
                     role="alert"
                     aria-live="polite"
@@ -1086,7 +1089,7 @@ pub fn TextInput(
     let field = use_field_registration(&name);
     let input_type = input_type.unwrap_or_else(|| "text".to_string());
     let disabled = disabled.unwrap_or(false);
-    
+
     view! {
         <input
             type={input_type}
@@ -1119,7 +1122,7 @@ pub fn TextArea(
     let field = use_field_registration(&name);
     let rows = rows.unwrap_or(4);
     let disabled = disabled.unwrap_or(false);
-    
+
     view! {
         <textarea
             id={&field.props.id}
@@ -1149,12 +1152,12 @@ pub fn Checkbox(
 ) -> impl IntoView {
     let field = use_field_registration(&name);
     let disabled = disabled.unwrap_or(false);
-    
+
     // Custom handler for checkbox
     let on_change = {
         let field_name = name.clone();
         let context = use_form_context::<impl Form>();
-        
+
         Callback::new(move |ev: web_sys::Event| {
             if let Some(target) = ev.target() {
                 if let Ok(input) = target.dyn_into::<web_sys::HtmlInputElement>() {
@@ -1164,7 +1167,7 @@ pub fn Checkbox(
             }
         })
     };
-    
+
     view! {
         <input
             type="checkbox"
@@ -1201,12 +1204,12 @@ use crate::hooks::*;
 /// Test utilities for form testing
 pub mod test_utils {
     use super::*;
-    
+
     /// Create a test form handle for testing
     pub fn create_test_form<T: Form>(initial: T) -> FormHandle<T> {
         use_form(Some(initial), FormOptions::default())
     }
-    
+
     /// Simulate user input on a field
     pub fn simulate_input<T: Form>(
         form: &FormHandle<T>,
@@ -1215,14 +1218,14 @@ pub mod test_utils {
     ) {
         (form.set_field_value)(field_name, value.into());
     }
-    
+
     /// Simulate form submission
     pub fn simulate_submit<T: Form>(form: &FormHandle<T>) {
         // Create a mock event
         let event = web_sys::Event::new("submit").unwrap();
         (form.handle_submit)(event);
     }
-    
+
     /// Assert that a field has a specific error
     pub fn assert_field_error<T: Form>(form: &FormHandle<T>, field: &str, expected: &str) {
         let errors = form.errors.get();
@@ -1234,7 +1237,7 @@ pub mod test_utils {
             errors.field_errors.get(field)
         );
     }
-    
+
     /// Assert that form is valid
     pub fn assert_form_valid<T: Form>(form: &FormHandle<T>) {
         assert!(
@@ -1243,7 +1246,7 @@ pub mod test_utils {
             form.errors.get()
         );
     }
-    
+
     /// Assert that form is invalid
     pub fn assert_form_invalid<T: Form>(form: &FormHandle<T>) {
         assert!(
@@ -1258,48 +1261,48 @@ mod tests {
     use super::test_utils::*;
     use super::*;
     use serde::{Serialize, Deserialize};
-    
+
     #[derive(Form, Clone, Debug, Serialize, Deserialize, Default)]
     struct TestForm {
         #[form(validators(required, min_length = 2))]
         name: String,
-        
+
         #[form(validators(required, email))]
         email: String,
-        
+
         age: Option<u32>,
     }
-    
+
     #[test]
     fn test_form_validation() {
         let form = create_test_form(TestForm::default());
-        
+
         // Test invalid form
         simulate_input(&form, "name", "a");
         simulate_input(&form, "email", "invalid-email");
-        
+
         assert_form_invalid(&form);
         assert_field_error(&form, "name", "Minimum length is 2 characters");
         assert_field_error(&form, "email", "Invalid email format");
-        
+
         // Test valid form
         simulate_input(&form, "name", "John Doe");
         simulate_input(&form, "email", "john@example.com");
-        
+
         assert_form_valid(&form);
     }
-    
+
     #[test]
     fn test_field_state() {
         let form = create_test_form(TestForm::default());
-        
+
         // Initially pristine
         assert!(!form.is_dirty.get());
-        
+
         // Becomes dirty after input
         simulate_input(&form, "name", "test");
         assert!(form.is_dirty.get());
-        
+
         // Reset makes it pristine again
         (form.reset)();
         assert!(!form.is_dirty.get());
@@ -1320,10 +1323,10 @@ use serde::{Serialize, Deserialize};
 struct ContactForm {
     #[form(validators(required, min_length = 2))]
     name: String,
-    
+
     #[form(validators(required, email))]
     email: String,
-    
+
     #[form(validators(required, min_length = 10))]
     message: String,
 }
@@ -1331,14 +1334,14 @@ struct ContactForm {
 #[component]
 fn App() -> impl IntoView {
     let form = use_form::<ContactForm>(
-        None, 
+        None,
         FormOptions {
             validation_mode: ValidationMode::OnBlur,
             on_submit_async: Some(Rc::new(|data| {
                 Box::pin(async move {
                     // Simulate API call
                     logging::log!("Submitting: {:?}", data);
-                    
+
                     // Simulate success/error
                     Ok(())
                 })
@@ -1346,29 +1349,29 @@ fn App() -> impl IntoView {
             ..Default::default()
         }
     );
-    
+
     view! {
         <div class="container">
             <h1>"Contact Form"</h1>
-            
+
             <Form form_handle={form.clone()}>
                 <FormField name="name" label="Your Name" required=true>
                     <TextInput name="name" placeholder="John Doe" />
                 </FormField>
-                
+
                 <FormField name="email" label="Email Address" required=true>
-                    <TextInput 
-                        name="email" 
+                    <TextInput
+                        name="email"
                         input_type="email".to_string()
-                        placeholder="john@example.com" 
+                        placeholder="john@example.com"
                     />
                 </FormField>
-                
+
                 <FormField name="message" label="Message" required=true>
                     <TextArea name="message" rows=5 placeholder="Your message here..." />
                 </FormField>
-                
-                <button 
+
+                <button
                     type="submit"
                     disabled=move || form.is_submitting.get() || !form.is_valid.get()
                     class="submit-button"
@@ -1389,18 +1392,21 @@ fn main() {
 ## Next Steps
 
 ### Week 7-8: Advanced Features
+
 1. Implement FieldArray component
 2. Add ConditionalField component
 3. Create FileInput with upload progress
 4. Build FormWizard for multi-step forms
 
 ### Week 9-10: UI Integrations
+
 1. Create shadcn-ui adapters
 2. Build radix-leptos integration
 3. Add theme support
 4. Implement CSS-in-JS compatibility
 
 ### Week 11-12: Production Ready
+
 1. Comprehensive test suite
 2. Documentation website
 3. Performance optimizations

@@ -1,12 +1,14 @@
 # Development Workflow Guide - Leptos Forms
-**Project**: Leptos Forms Library  
-**Version**: 1.0  
-**Date**: 2025-01-02  
-**Status**: Development Guide  
+
+**Project**: Leptos Forms Library
+**Version**: 1.0
+**Date**: 2025-01-02
+**Status**: Development Guide
 
 ## 1. Development Environment Setup
 
 ### 1.1 Prerequisites
+
 ```bash
 # Rust toolchain (required)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -33,6 +35,7 @@ npm install -g serve http-server
 ```
 
 ### 1.2 Repository Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/leptos-rs/leptos-forms.git
@@ -54,6 +57,7 @@ cd ../..
 ### 1.3 IDE Configuration
 
 #### VS Code Setup (`/.vscode/settings.json`)
+
 ```json
 {
   "rust-analyzer.cargo.features": ["all"],
@@ -78,6 +82,7 @@ cd ../..
 ```
 
 #### VS Code Extensions (`.vscode/extensions.json`)
+
 ```json
 {
   "recommendations": [
@@ -95,6 +100,7 @@ cd ../..
 ## 2. Git Workflow Strategy
 
 ### 2.1 Branch Naming Conventions
+
 ```
 feat/feature-name      # New features
 fix/issue-description  # Bug fixes
@@ -106,6 +112,7 @@ refactor/cleanup-api   # Code refactoring
 ```
 
 ### 2.2 Commit Message Format
+
 ```
 <type>(<scope>): <subject>
 
@@ -115,6 +122,7 @@ refactor/cleanup-api   # Code refactoring
 ```
 
 #### Types
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation only
@@ -126,6 +134,7 @@ refactor/cleanup-api   # Code refactoring
 - `build`: Build system or external dependency changes
 
 #### Examples
+
 ```
 feat(validation): add async validator support
 
@@ -143,6 +152,7 @@ Closes #123
 ### 2.3 Pull Request Workflow
 
 #### 1. Create Feature Branch
+
 ```bash
 git checkout main
 git pull origin main
@@ -150,6 +160,7 @@ git checkout -b feat/new-feature
 ```
 
 #### 2. Development Cycle
+
 ```bash
 # Make changes and commit frequently
 git add .
@@ -164,6 +175,7 @@ git push origin feat/new-feature
 ```
 
 #### 3. Pre-PR Checklist
+
 ```bash
 # Run all checks locally
 ./scripts/pre-pr-check.sh
@@ -178,24 +190,30 @@ git push origin feat/new-feature
 ```
 
 #### 4. Create Pull Request
+
 **PR Template** (`.github/pull_request_template.md`):
+
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change that fixes an issue)
 - [ ] New feature (non-breaking change that adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Tests pass locally
 - [ ] Added new tests for new functionality
 - [ ] Updated existing tests as needed
 - [ ] Manual testing completed
 
 ## Checklist
+
 - [ ] Code follows project style guidelines
 - [ ] Self-review of code completed
 - [ ] Code is commented where necessary
@@ -204,6 +222,7 @@ Brief description of changes
 - [ ] Performance impact considered
 
 ## Related Issues
+
 Fixes #(issue number)
 
 ## Screenshots (if applicable)
@@ -214,6 +233,7 @@ Fixes #(issue number)
 ### 2.4 Code Review Process
 
 #### Review Guidelines
+
 1. **Functionality**: Does the code do what it's supposed to do?
 2. **Architecture**: Is the code well-structured and maintainable?
 3. **Performance**: Are there any performance implications?
@@ -222,31 +242,37 @@ Fixes #(issue number)
 6. **Documentation**: Is the code properly documented?
 
 #### Review Checklist
+
 ```markdown
 ## Code Review Checklist
 
 ### Functionality
+
 - [ ] Code implements requirements correctly
 - [ ] Edge cases are handled appropriately
 - [ ] Error conditions are handled gracefully
 
 ### Code Quality
+
 - [ ] Code is readable and well-organized
 - [ ] Functions are focused and not too long
 - [ ] Variable names are descriptive
 - [ ] No code duplication
 
 ### Testing
+
 - [ ] Adequate test coverage (>90%)
 - [ ] Tests cover edge cases
 - [ ] Tests are readable and maintainable
 
 ### Performance
+
 - [ ] No obvious performance issues
 - [ ] Memory usage is reasonable
 - [ ] Algorithms are efficient
 
 ### Security
+
 - [ ] No security vulnerabilities
 - [ ] Input validation where appropriate
 - [ ] No sensitive data exposure
@@ -257,6 +283,7 @@ Fixes #(issue number)
 ### 3.1 Local Development Commands
 
 #### Basic Development
+
 ```bash
 # Watch and rebuild on changes (library)
 cargo watch -x "check --all-features"
@@ -279,6 +306,7 @@ cargo doc --all-features --open
 ```
 
 #### Testing Commands
+
 ```bash
 # Run all tests
 cargo test --all-features
@@ -303,6 +331,7 @@ cargo test -- --test-threads=1
 ```
 
 #### WASM Development
+
 ```bash
 # Build WASM package
 wasm-pack build --target web
@@ -326,6 +355,7 @@ npm run serve
 ### 3.2 Development Scripts
 
 #### Setup Verification (`scripts/verify-setup.sh`)
+
 ```bash
 #!/bin/bash
 set -e
@@ -379,6 +409,7 @@ echo "✅ Development setup verified!"
 ```
 
 #### Pre-PR Check (`scripts/pre-pr-check.sh`)
+
 ```bash
 #!/bin/bash
 set -e
@@ -423,13 +454,14 @@ echo "✅ All pre-PR checks passed!"
 ### 4.1 Rust Style Guide
 
 #### Naming Conventions
+
 ```rust
 // Types: PascalCase
 struct FormHandle<T> {}
 enum ValidationMode {}
 trait FormValidation {}
 
-// Functions and variables: snake_case  
+// Functions and variables: snake_case
 fn validate_field() {}
 let field_name = "email";
 
@@ -441,6 +473,7 @@ mod form_validation;
 ```
 
 #### Code Organization
+
 ```rust
 // File structure
 src/
@@ -469,7 +502,8 @@ use crate::core::Form;            // Internal crate imports
 ```
 
 #### Documentation Standards
-```rust
+
+````rust
 /// Creates a new form handle with the specified configuration.
 ///
 /// # Examples
@@ -499,21 +533,22 @@ pub fn use_form<T: Form>(
 ) -> FormHandle<T> {
     // Implementation
 }
-```
+````
 
 ### 4.2 Component Style Guide
 
 #### Component Structure
+
 ```rust
 /// Contact form component with validation and submission handling.
 #[component]
 pub fn ContactForm(
     /// Initial form values
     #[prop(optional)] initial_values: Option<ContactFormData>,
-    
+
     /// Form submission handler
     #[prop(into)] on_submit: Callback<ContactFormData>,
-    
+
     /// Additional CSS classes
     #[prop(optional, into)] class: Option<AttributeValue>,
 ) -> impl IntoView {
@@ -535,23 +570,24 @@ pub fn ContactForm(
 ```
 
 #### Props Documentation
+
 ```rust
 /// Props for the FormField component.
 #[derive(Debug, Clone, PartialEq)]
 pub struct FormFieldProps {
     /// Field name (required)
     pub name: String,
-    
+
     /// Field label text (required)
     pub label: String,
-    
+
     /// Optional description text
     pub description: Option<String>,
-    
+
     /// Whether the field is required
     #[prop(optional)]
     pub required: bool,
-    
+
     /// Additional CSS classes
     #[prop(optional, into)]
     pub class: Option<AttributeValue>,
@@ -561,40 +597,41 @@ pub struct FormFieldProps {
 ### 4.3 Testing Style Guide
 
 #### Test Organization
+
 ```rust
 #[cfg(test)]
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
-    
+
     mod form_handle_tests {
         use super::*;
-        
+
         #[test]
         fn test_field_registration_creates_signals() {
             // Arrange
             let form = create_test_form(TestForm::default());
-            
+
             // Act
             let field = form.register.call("test_field".to_string());
-            
+
             // Assert
             assert_eq!(field.name, "test_field");
             assert!(field.error.get().is_none());
         }
     }
-    
+
     mod validation_tests {
         use super::*;
-        
+
         #[test]
         fn test_email_validator_rejects_invalid_format() {
             // Arrange
             let invalid_email = FieldValue::String("invalid".to_string());
-            
+
             // Act
             let result = validators::email(&invalid_email);
-            
+
             // Assert
             assert!(result.is_err());
             assert_eq!(result.unwrap_err(), "Invalid email format");
@@ -604,6 +641,7 @@ mod tests {
 ```
 
 #### Test Utilities
+
 ```rust
 // tests/utils/mod.rs
 pub fn create_test_form<T: Form>(initial: T) -> FormHandle<T> {
@@ -625,27 +663,29 @@ pub fn assert_field_has_error(field: &FieldRegistration, expected_error: &str) {
 ## 5. Performance Development Guidelines
 
 ### 5.1 Performance Monitoring
+
 ```rust
 // Performance testing in development
 #[cfg(test)]
 mod performance_tests {
     use super::*;
     use std::time::Instant;
-    
+
     #[test]
     fn test_field_update_performance() {
         let form = create_large_test_form();
-        
+
         let start = Instant::now();
         form.set_field_value.call(("field_name".to_string(), FieldValue::String("value".to_string())));
         let duration = start.elapsed();
-        
+
         assert!(duration.as_millis() < 1, "Field update took {}ms, expected <1ms", duration.as_millis());
     }
 }
 ```
 
 ### 5.2 Bundle Size Monitoring
+
 ```bash
 # Check bundle size during development
 wasm-pack build --release --target web
@@ -662,6 +702,7 @@ wasm-twiggy top pkg/leptos_forms_bg.wasm
 ## 6. Debugging Guidelines
 
 ### 6.1 Development Debugging
+
 ```rust
 // Enable debug logging
 #[cfg(debug_assertions)]
@@ -681,6 +722,7 @@ debug_log!("Field {} updated with value: {:?}", field_name, value);
 ```
 
 ### 5.2 Browser DevTools Integration
+
 ```rust
 // Add debug information to form handle
 impl<T: Form> FormHandle<T> {
@@ -699,10 +741,12 @@ impl<T: Form> FormHandle<T> {
 ## 7. Release Preparation
 
 ### 7.1 Pre-release Checklist
+
 ```markdown
 ## Pre-release Checklist
 
 ### Code Quality
+
 - [ ] All tests passing (100%)
 - [ ] Test coverage >95%
 - [ ] No Clippy warnings
@@ -710,23 +754,27 @@ impl<T: Form> FormHandle<T> {
 - [ ] Examples working
 
 ### Performance
+
 - [ ] Bundle size <15KB gzipped
 - [ ] Field update time <1ms
 - [ ] Form validation time <2ms
 - [ ] Memory usage reasonable
 
 ### Security
+
 - [ ] Security audit passing
 - [ ] No known vulnerabilities
 - [ ] Dependencies up to date
 
 ### Documentation
+
 - [ ] Changelog updated
 - [ ] Version bumped
 - [ ] Migration guide (if breaking changes)
 - [ ] Examples updated
 
 ### Release
+
 - [ ] Git tag created
 - [ ] Release notes prepared
 - [ ] crates.io ready
@@ -734,6 +782,7 @@ impl<T: Form> FormHandle<T> {
 ```
 
 ### 7.2 Version Bumping
+
 ```bash
 # Bump version in all relevant files
 cargo install cargo-edit
@@ -755,6 +804,7 @@ This development workflow ensures consistent, high-quality code development with
 ---
 
 **Document Control**
+
 - **Created**: 2025-01-02
 - **Last Modified**: 2025-01-02
 - **Next Review**: Quarterly

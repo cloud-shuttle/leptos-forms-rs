@@ -1,36 +1,34 @@
-use leptos::prelude::*;
-use crate::core::{Form, FormHandle, FieldValue};
 use crate::components::{FormWizard, WizardStep};
+use crate::core::{FieldValue, Form, FormHandle};
 use crate::hooks::use_form;
+use leptos::prelude::*;
 
 #[component]
 pub fn FormWizardExample() -> impl IntoView {
     let form_handle = use_form::<WizardForm>();
-    
+
     // Current step state
     let (current_step, set_current_step) = signal(0);
-    
+
     // Step validation state
     let (step_validation, set_step_validation) = signal::<Vec<bool>>(vec![false, false, false]);
-    
+
     // Form data state
-    let form_data = Signal::derive(move || {
-        WizardForm {
-            personal_info: PersonalInfo {
-                first_name: "John".to_string(),
-                last_name: "Doe".to_string(),
-                email: "john.doe@example.com".to_string(),
-            },
-            preferences: Preferences {
-                theme: "dark".to_string(),
-                notifications: true,
-                newsletter: false,
-            },
-            confirmation: Confirmation {
-                terms_accepted: false,
-                privacy_accepted: false,
-            },
-        }
+    let form_data = Signal::derive(move || WizardForm {
+        personal_info: PersonalInfo {
+            first_name: "John".to_string(),
+            last_name: "Doe".to_string(),
+            email: "john.doe@example.com".to_string(),
+        },
+        preferences: Preferences {
+            theme: "dark".to_string(),
+            notifications: true,
+            newsletter: false,
+        },
+        confirmation: Confirmation {
+            terms_accepted: false,
+            privacy_accepted: false,
+        },
     });
 
     // Step validation callback
@@ -64,7 +62,7 @@ pub fn FormWizardExample() -> impl IntoView {
                 <div class="step-personal-info">
                     <h3>"Personal Information"</h3>
                     <p>"Please provide your basic contact information."</p>
-                    
+
                     <div class="form-group">
                         <label for="first-name">"First Name"</label>
                         <input
@@ -75,7 +73,7 @@ pub fn FormWizardExample() -> impl IntoView {
                             class="form-input"
                         />
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="last-name">"Last Name"</label>
                         <input
@@ -86,7 +84,7 @@ pub fn FormWizardExample() -> impl IntoView {
                             class="form-input"
                         />
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="email">"Email Address"</label>
                         <input
@@ -107,7 +105,7 @@ pub fn FormWizardExample() -> impl IntoView {
                 <div class="step-preferences">
                     <h3>"Preferences"</h3>
                     <p>"Customize your experience with these settings."</p>
-                    
+
                     <div class="form-group">
                         <label for="theme">"Theme"</label>
                         <select id="theme" class="form-select">
@@ -116,14 +114,14 @@ pub fn FormWizardExample() -> impl IntoView {
                             <option value="auto">"Auto"</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="checkbox-label">
                             <input type="checkbox" checked="true" />
                             <span>"Enable notifications"</span>
                         </label>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="checkbox-label">
                             <input type="checkbox" />
@@ -140,7 +138,7 @@ pub fn FormWizardExample() -> impl IntoView {
                 <div class="step-confirmation">
                     <h3>"Confirmation"</h3>
                     <p>"Please review your information and accept the terms."</p>
-                    
+
                     <div class="summary">
                         <h4>"Summary"</h4>
                         <div class="summary-item">
@@ -160,14 +158,14 @@ pub fn FormWizardExample() -> impl IntoView {
                             <span>"Enabled"</span>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="checkbox-label">
                             <input type="checkbox" />
                             <span>"I accept the terms and conditions"</span>
                         </label>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="checkbox-label">
                             <input type="checkbox" />
@@ -183,7 +181,7 @@ pub fn FormWizardExample() -> impl IntoView {
         <div class="form-wizard-example">
             <h1>"Form Wizard Example"</h1>
             <p>"This example demonstrates the enhanced Form Wizard component with validation, navigation, and step management."</p>
-            
+
             <FormWizard
                 steps=steps
                 current_step=current_step.into()
@@ -197,7 +195,7 @@ pub fn FormWizardExample() -> impl IntoView {
                 on_step_validation=Some(on_step_validation)
                 on_wizard_complete=Some(on_wizard_complete)
             />
-            
+
             <div class="example-info">
                 <h3>"Features Demonstrated"</h3>
                 <ul>
@@ -209,7 +207,7 @@ pub fn FormWizardExample() -> impl IntoView {
                     <li>"Custom step content rendering"</li>
                     <li>"Form completion handling"</li>
                 </ul>
-                
+
                 <div class="current-step-info">
                     <h4>"Current Step: {move || current_step.get() + 1}"</h4>
                     <p>"Step validation status: {move || {
@@ -420,12 +418,12 @@ pub const FORM_WIZARD_EXAMPLE_CSS: &str = r#"
     .form-wizard-example {
         padding: 1rem;
     }
-    
+
     .example-info {
         margin-top: 2rem;
         padding: 1rem;
     }
-    
+
     .summary-item {
         flex-direction: column;
         gap: 0.25rem;

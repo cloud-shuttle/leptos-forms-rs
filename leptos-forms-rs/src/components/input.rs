@@ -1,6 +1,6 @@
+use crate::core::FieldType;
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
-use crate::core::FieldType;
 
 /// Unified Input component that handles different field types
 #[component]
@@ -33,11 +33,11 @@ pub fn Input(
             FieldType::RichText | FieldType::Markdown | FieldType::Code => "text", // Default to text for nested forms
         })
         .unwrap_or("text");
-    
+
     let is_required = required.unwrap_or(false);
     let is_disabled = disabled.unwrap_or(false);
     let input_class = class.unwrap_or_else(|| "form-input".to_string());
-    
+
     view! {
         <div class="input-wrapper">
             <input

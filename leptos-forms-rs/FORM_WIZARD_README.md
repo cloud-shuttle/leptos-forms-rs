@@ -5,6 +5,7 @@ The `FormWizard` component is a powerful, feature-rich component for creating mu
 ## Features
 
 ### ✨ Core Functionality
+
 - **Multi-step Navigation**: Intuitive step-by-step form progression
 - **Progress Tracking**: Visual progress bar and step indicators
 - **Step Validation**: Built-in validation with error handling
@@ -13,6 +14,7 @@ The `FormWizard` component is a powerful, feature-rich component for creating mu
 - **Responsive Design**: Mobile-first responsive layout
 
 ### 🎨 UI/UX Features
+
 - **Modern Design**: Clean, professional appearance with smooth animations
 - **Visual Feedback**: Step completion indicators and validation states
 - **Interactive Elements**: Hover effects, focus states, and visual feedback
@@ -21,6 +23,7 @@ The `FormWizard` component is a powerful, feature-rich component for creating mu
 - **Error Handling**: Comprehensive error display and validation feedback
 
 ### 🔧 Technical Features
+
 - **Leptos 0.8 Compatible**: Built with the latest Leptos framework
 - **Type Safe**: Full Rust type safety with generic support
 - **Performance Optimized**: Efficient signal handling and minimal re-renders
@@ -36,7 +39,7 @@ use leptos_forms_rs::components::{FormWizard, WizardStep};
 #[component]
 pub fn MyWizard() -> impl IntoView {
     let (current_step, set_current_step) = signal(0);
-    
+
     let steps = vec![
         WizardStep {
             title: "Step 1".to_string(),
@@ -67,19 +70,19 @@ pub fn MyWizard() -> impl IntoView {
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `steps` | `Vec<WizardStep>` | **Required** | Array of wizard steps |
-| `current_step` | `Signal<usize>` | **Required** | Current step index |
-| `on_step_change` | `Callback<usize, ()>` | **Required** | Callback when step changes |
-| `form_handle` | `FormHandle<T>` | **Required** | Form handle for validation |
-| `show_progress_bar` | `Option<Signal<bool>>` | `true` | Show progress bar |
-| `show_step_numbers` | `Option<Signal<bool>>` | `true` | Show step numbers |
-| `allow_back_navigation` | `Option<Signal<bool>>` | `true` | Allow going back |
-| `allow_skip_steps` | `Option<Signal<bool>>` | `false` | Allow skipping steps |
-| `validate_on_step_change` | `Option<Signal<bool>>` | `true` | Validate on step change |
-| `on_step_validation` | `Option<Callback<(usize, bool), ()>>` | `None` | Step validation callback |
-| `on_wizard_complete` | `Option<Callback<T, ()>>` | `None` | Wizard completion callback |
+| Prop                      | Type                                  | Default      | Description                |
+| ------------------------- | ------------------------------------- | ------------ | -------------------------- |
+| `steps`                   | `Vec<WizardStep>`                     | **Required** | Array of wizard steps      |
+| `current_step`            | `Signal<usize>`                       | **Required** | Current step index         |
+| `on_step_change`          | `Callback<usize, ()>`                 | **Required** | Callback when step changes |
+| `form_handle`             | `FormHandle<T>`                       | **Required** | Form handle for validation |
+| `show_progress_bar`       | `Option<Signal<bool>>`                | `true`       | Show progress bar          |
+| `show_step_numbers`       | `Option<Signal<bool>>`                | `true`       | Show step numbers          |
+| `allow_back_navigation`   | `Option<Signal<bool>>`                | `true`       | Allow going back           |
+| `allow_skip_steps`        | `Option<Signal<bool>>`                | `false`      | Allow skipping steps       |
+| `validate_on_step_change` | `Option<Signal<bool>>`                | `true`       | Validate on step change    |
+| `on_step_validation`      | `Option<Callback<(usize, bool), ()>>` | `None`       | Step validation callback   |
+| `on_wizard_complete`      | `Option<Callback<T, ()>>`             | `None`       | Wizard completion callback |
 
 ## WizardStep Structure
 
@@ -131,7 +134,7 @@ let on_step_change = Callback::new(move |step_index: usize| {
 ```rust
 let on_wizard_complete = Callback::new(move |form_data: MyFormType| {
     log::info!("Wizard completed: {:?}", form_data);
-    
+
     // Submit form data
     spawn_local(async move {
         match submit_form(form_data).await {
@@ -189,14 +192,14 @@ You can customize the appearance by overriding CSS variables or classes:
 
 ```css
 .form-wizard {
-    --primary-color: #8b5cf6;
-    --border-radius: 12px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --primary-color: #8b5cf6;
+  --border-radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .wizard-step.current .step-number {
-    background: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+  background: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
 }
 ```
 
@@ -208,7 +211,7 @@ The Form Wizard integrates seamlessly with the form validation system:
 // In your form validation
 fn validate(&self) -> Result<(), ValidationErrors> {
     let mut errors = ValidationErrors::new();
-    
+
     // Validate current step based on step index
     match self.current_step {
         0 => self.validate_personal_info(&mut errors)?,
@@ -216,7 +219,7 @@ fn validate(&self) -> Result<(), ValidationErrors> {
         2 => self.validate_confirmation(&mut errors)?,
         _ => return Err(ValidationErrors::new()),
     }
-    
+
     Ok(())
 }
 
@@ -225,11 +228,11 @@ fn validate_personal_info(&self, errors: &mut ValidationErrors) -> Result<(), Va
     if self.personal_info.first_name.is_empty() {
         errors.add_field_error("first_name".to_string(), "First name is required".to_string());
     }
-    
+
     if self.personal_info.email.is_empty() {
         errors.add_field_error("email".to_string(), "Email is required".to_string());
     }
-    
+
     Ok(())
 }
 ```
@@ -280,6 +283,7 @@ See the `form_wizard_example.rs` file for complete working examples demonstratin
 ## Common Use Cases
 
 ### User Registration
+
 ```rust
 let steps = vec![
     WizardStep {
@@ -301,6 +305,7 @@ let steps = vec![
 ```
 
 ### Product Configuration
+
 ```rust
 let steps = vec![
     WizardStep {
@@ -322,6 +327,7 @@ let steps = vec![
 ```
 
 ### Settings Configuration
+
 ```rust
 let steps = vec![
     WizardStep {

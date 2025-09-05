@@ -22,7 +22,7 @@ The core trait that enables form functionality for your data structures.
 ```rust
 pub trait FormData: Clone + Debug + 'static {
     type ValidationError;
-    
+
     fn validate(&self) -> Result<(), ValidationErrors<Self::ValidationError>>;
     fn default_values() -> Self;
     fn field_names() -> Vec<String>;
@@ -30,6 +30,7 @@ pub trait FormData: Clone + Debug + 'static {
 ```
 
 **Implementations:**
+
 - Automatically implemented by the `#[derive(FormData)]` macro
 - Provides default implementations for common types
 - Can be manually implemented for custom types
@@ -45,6 +46,7 @@ pub struct FormHandle<T: FormData> {
 ```
 
 **Key Methods:**
+
 - `new()` - Create a new form instance
 - `with_persistence(key)` - Enable form persistence
 - `handle_input(event)` - Handle input events
@@ -73,7 +75,7 @@ pub struct UserForm {
 pub struct Form {
     #[form(required)]
     name: String,
-    
+
     #[form(required = "This field is required")]
     email: String,
 }
@@ -86,13 +88,13 @@ pub struct Form {
 pub struct Form {
     #[form(min_length = 3)]
     username: String,
-    
+
     #[form(max_length = 100)]
     description: String,
-    
+
     #[form(length = 10)]
     code: String,
-    
+
     #[form(pattern = r"^[A-Z]{2}\d{4}$")]
     product_id: String,
 }
@@ -105,10 +107,10 @@ pub struct Form {
 pub struct Form {
     #[form(min = 0)]
     age: u32,
-    
+
     #[form(max = 100)]
     percentage: f64,
-    
+
     #[form(range = 1..=10)]
     rating: u8,
 }
@@ -121,7 +123,7 @@ pub struct Form {
 pub struct Form {
     #[form(email)]
     primary_email: String,
-    
+
     #[form(email, custom = "validate_domain")]
     work_email: String,
 }
@@ -134,7 +136,7 @@ pub struct Form {
 pub struct Form {
     #[form(custom = "validate_username")]
     username: String,
-    
+
     #[form(custom = "validate_password_strength")]
     password: String,
 }
@@ -151,7 +153,7 @@ fn validate_password_strength(password: &str) -> Result<(), String> {
     let has_upper = password.chars().any(|c| c.is_uppercase());
     let has_lower = password.chars().any(|c| c.is_lowercase());
     let has_digit = password.chars().any(|c| c.is_numeric());
-    
+
     if has_upper && has_lower && has_digit {
         Ok(())
     } else {
@@ -167,10 +169,10 @@ fn validate_password_strength(password: &str) -> Result<(), String> {
 pub struct Form {
     #[form(required)]
     account_type: String,
-    
+
     #[form(required, when = "account_type == 'business'")]
     company_name: String,
-    
+
     #[form(required, when = "account_type == 'personal'")]
     birth_date: String,
 }
@@ -183,10 +185,10 @@ pub struct Form {
 pub struct Form {
     #[form(array)]
     tags: Vec<String>,
-    
+
     #[form(array, min_items = 1)]
     categories: Vec<String>,
-    
+
     #[form(array, max_items = 5)]
     images: Vec<String>,
 }
@@ -199,13 +201,13 @@ pub struct Form {
 pub struct Form {
     #[form(default = "Anonymous")]
     username: String,
-    
+
     #[form(default = false)]
     newsletter: bool,
-    
+
     #[form(default = 18)]
     age: u32,
-    
+
     #[form(default = vec!["general"])]
     tags: Vec<String>,
 }
@@ -218,7 +220,7 @@ pub struct Form {
 pub struct Form {
     #[form(optional)]
     phone: Option<String>,
-    
+
     #[form(optional, email)]
     backup_email: Option<String>,
 }
@@ -379,6 +381,7 @@ pub struct FieldError {
 ### **Built-in Validators**
 
 #### **String Validators**
+
 - `required` - Field must have a value
 - `email` - Must be a valid email format
 - `url` - Must be a valid URL format
@@ -388,6 +391,7 @@ pub struct FieldError {
 - `pattern(regex)` - Must match regex pattern
 
 #### **Numeric Validators**
+
 - `min(n)` - Minimum value
 - `max(n)` - Maximum value
 - `range(start..end)` - Value must be in range
@@ -395,6 +399,7 @@ pub struct FieldError {
 - `negative` - Must be negative
 
 #### **Collection Validators**
+
 - `min_items(n)` - Minimum number of items
 - `max_items(n)` - Maximum number of items
 - `unique` - All items must be unique
@@ -413,15 +418,15 @@ fn validate_complex_field(value: &str) -> Result<(), String> {
     if value.len() < 5 {
         return Err("Field must be at least 5 characters".to_string());
     }
-    
+
     if !value.chars().any(|c| c.is_uppercase()) {
         return Err("Field must contain uppercase letter".to_string());
     }
-    
+
     if !value.chars().any(|c| c.is_numeric()) {
         return Err("Field must contain a number".to_string());
     }
-    
+
     Ok(())
 }
 ```
@@ -442,6 +447,7 @@ fn validate_complex_field(value: &str) -> Result<(), String> {
 ```
 
 **Props:**
+
 - `name: String` - Field name
 - `label: String` - Field label
 - `form: FormHandle<T>` - Form instance
@@ -552,6 +558,7 @@ pub fn use_form<T: FormData>() -> FormHandle<T>
 ```
 
 **Usage:**
+
 ```rust
 let form = use_form::<UserForm>();
 ```
@@ -567,6 +574,7 @@ pub fn use_form_with_persistence<T: FormData>(
 ```
 
 **Usage:**
+
 ```rust
 let form = use_form_with_persistence::<UserForm>("user-form");
 ```
@@ -582,6 +590,7 @@ pub fn use_form_validation<T: FormData>(
 ```
 
 **Usage:**
+
 ```rust
 let form = use_form::<UserForm>();
 let validation = use_form_validation(&form);
@@ -749,7 +758,7 @@ mobile_field: String,
 ```rust
 // Error announcements
 <div role="alert" aria-live="polite">
-    {move || form.field_error("username").map(|error| 
+    {move || form.field_error("username").map(|error|
         view! { <span>{error}</span> }
     )}
 </div>

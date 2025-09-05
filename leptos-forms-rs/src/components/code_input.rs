@@ -1,53 +1,66 @@
-use leptos::prelude::*;
 use crate::core::types::FieldValue;
+use leptos::prelude::*;
 
 /// Code input component with syntax highlighting support
 #[component]
 pub fn CodeInput(
     /// Field name for the input
-    #[prop(into)] name: String,
+    #[prop(into)]
+    name: String,
     /// Current value of the field
-    #[prop(into)] value: Signal<FieldValue>,
+    #[prop(into)]
+    value: Signal<FieldValue>,
     /// Callback when the value changes
-    #[prop(into)] _on_change: Callback<FieldValue>,
+    #[prop(into)]
+    _on_change: Callback<FieldValue>,
     /// Placeholder text
-    #[prop(optional, into)] placeholder: Option<String>,
+    #[prop(optional, into)]
+    placeholder: Option<String>,
     /// Whether the field is required
-    #[prop(optional)] required: Option<bool>,
+    #[prop(optional)]
+    required: Option<bool>,
     /// Whether the field is disabled
-    #[prop(optional)] disabled: Option<bool>,
+    #[prop(optional)]
+    disabled: Option<bool>,
     /// CSS classes
-    #[prop(optional, into)] class: Option<String>,
+    #[prop(optional, into)]
+    class: Option<String>,
     /// Error message to display
-    #[prop(optional, into)] error: Option<String>,
+    #[prop(optional, into)]
+    error: Option<String>,
     /// Whether the field has an error
-    #[prop(optional)] has_error: Option<bool>,
+    #[prop(optional)]
+    has_error: Option<bool>,
     /// Programming language for syntax highlighting
-    #[prop(optional, into)] _language: Option<String>,
+    #[prop(optional, into)]
+    _language: Option<String>,
     /// Whether to show line numbers
-    #[prop(optional)] show_line_numbers: Option<bool>,
+    #[prop(optional)]
+    show_line_numbers: Option<bool>,
     /// Whether to show language selector
-    #[prop(optional)] show_language_selector: Option<bool>,
+    #[prop(optional)]
+    show_language_selector: Option<bool>,
     /// Whether to show fullscreen toggle
-    #[prop(optional)] show_fullscreen: Option<bool>,
+    #[prop(optional)]
+    show_fullscreen: Option<bool>,
     /// Minimum height in pixels
-    #[prop(optional)] min_height: Option<u32>,
+    #[prop(optional)]
+    min_height: Option<u32>,
     /// Maximum height in pixels
-    #[prop(optional)] max_height: Option<u32>,
+    #[prop(optional)]
+    max_height: Option<u32>,
 ) -> impl IntoView {
     let show_line_numbers = show_line_numbers.unwrap_or(true);
     let show_language_selector = show_language_selector.unwrap_or(true);
     let _show_fullscreen = show_fullscreen.unwrap_or(true);
     let min_height = min_height.unwrap_or(200);
     let max_height = max_height.unwrap_or(600);
-    
-    let current_value = move || {
-        match value.get() {
-            FieldValue::String(s) => s,
-            _ => String::new(),
-        }
+
+    let current_value = move || match value.get() {
+        FieldValue::String(s) => s,
+        _ => String::new(),
     };
-    
+
     let supported_languages = vec![
         ("rust", "Rust"),
         ("javascript", "JavaScript"),
@@ -65,7 +78,7 @@ pub fn CodeInput(
         ("toml", "TOML"),
         ("markdown", "Markdown"),
     ];
-    
+
     let language_selector_view = move || {
         if show_language_selector {
             Some(view! {
@@ -81,7 +94,7 @@ pub fn CodeInput(
             None
         }
     };
-    
+
     let error_view = move || {
         error.as_ref().map(|error_msg| {
             view! {
@@ -91,12 +104,12 @@ pub fn CodeInput(
             }
         })
     };
-    
+
     view! {
         <div class={format!("code-input {}", class.unwrap_or_default())}>
             <div class="code-toolbar">
                 {language_selector_view}
-                
+
                 <div class="toolbar-actions">
                     <button type="button" class="toolbar-btn">"📋"</button>
                     <button type="button" class="toolbar-btn">"💾"</button>
@@ -106,7 +119,7 @@ pub fn CodeInput(
                     <button type="button" class="toolbar-btn">"⛶"</button>
                 </div>
             </div>
-            
+
             <div class="code-editor-container">
                 <textarea
                     name={name.clone()}
@@ -129,7 +142,7 @@ pub fn CodeInput(
                     style={format!("min-height: {}px; max-height: {}px;", min_height, max_height)}
                 >{current_value}</textarea>
             </div>
-            
+
             {error_view}
         </div>
     }

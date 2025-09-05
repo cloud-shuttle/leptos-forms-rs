@@ -1,5 +1,5 @@
 //! Integration tests for Leptos Forms RS
-//! 
+//!
 //! This module contains integration tests that test the library as a whole.
 
 use leptos::*;
@@ -80,36 +80,45 @@ impl Form for IntegrationTestForm {
 
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         // Username validation
         if self.username.is_empty() {
             errors.add_field_error("username", FieldError::new("Username is required"));
         } else if self.username.len() < 3 {
-            errors.add_field_error("username", FieldError::new("Username must be at least 3 characters"));
+            errors.add_field_error(
+                "username",
+                FieldError::new("Username must be at least 3 characters"),
+            );
         }
-        
+
         // Email validation
         if self.email.is_empty() {
             errors.add_field_error("email", FieldError::new("Email is required"));
         } else if !self.email.contains('@') || !self.email.contains('.') {
             errors.add_field_error("email", FieldError::new("Invalid email format"));
         }
-        
+
         // Password validation
         if self.password.len() < 8 {
-            errors.add_field_error("password", FieldError::new("Password must be at least 8 characters"));
+            errors.add_field_error(
+                "password",
+                FieldError::new("Password must be at least 8 characters"),
+            );
         }
-        
+
         // Confirm password validation
         if self.password != self.confirm_password {
-            errors.add_field_error("confirm_password", FieldError::new("Passwords do not match"));
+            errors.add_field_error(
+                "confirm_password",
+                FieldError::new("Passwords do not match"),
+            );
         }
-        
+
         // Age validation
         if self.age < 13 {
             errors.add_field_error("age", FieldError::new("Must be at least 13 years old"));
         }
-        
+
         if errors.is_empty() {
             Ok(())
         } else {
@@ -203,21 +212,24 @@ impl Form for IntegrationTestForm {
 fn test_complete_form_workflow() {
     // Create a form
     let form = use_form::<IntegrationTestForm>();
-    
+
     // Initially should be invalid
     assert!(!form.is_valid().get());
-    
+
     // Fill out the form step by step
     let _ = form.set_field_value("username", FieldValue::String("johndoe".to_string()));
     let _ = form.set_field_value("email", FieldValue::String("john@example.com".to_string()));
     let _ = form.set_field_value("password", FieldValue::String("securepass123".to_string()));
-    let _ = form.set_field_value("confirm_password", FieldValue::String("securepass123".to_string()));
+    let _ = form.set_field_value(
+        "confirm_password",
+        FieldValue::String("securepass123".to_string()),
+    );
     let _ = form.set_field_value("age", FieldValue::Number(25));
     let _ = form.set_field_value("newsletter", FieldValue::Boolean(true));
-    
+
     // Now should be valid
     assert!(form.is_valid().get());
-    
+
     // Check all values are set correctly
     let values = form.get_values().get();
     assert_eq!(values.username, "johndoe");
@@ -231,21 +243,24 @@ fn test_complete_form_workflow() {
 #[wasm_bindgen_test]
 fn test_form_validation_errors() {
     let form = use_form::<IntegrationTestForm>();
-    
+
     // Set some invalid values
     let _ = form.set_field_value("username", FieldValue::String("ab".to_string())); // Too short
     let _ = form.set_field_value("email", FieldValue::String("invalid-email".to_string())); // Invalid email
     let _ = form.set_field_value("password", FieldValue::String("123".to_string())); // Too short
-    let _ = form.set_field_value("confirm_password", FieldValue::String("different".to_string())); // Mismatch
+    let _ = form.set_field_value(
+        "confirm_password",
+        FieldValue::String("different".to_string()),
+    ); // Mismatch
     let _ = form.set_field_value("age", FieldValue::Number(10)); // Too young
-    
+
     // Should be invalid
     assert!(!form.is_valid().get());
-    
+
     // Check that validation errors exist
     let validation_errors = form.validation_errors();
     assert!(validation_errors.is_some());
-    
+
     if let Some(errors) = validation_errors {
         assert!(!errors.is_empty());
         assert!(errors.has_field_error("username"));
@@ -259,22 +274,25 @@ fn test_form_validation_errors() {
 #[wasm_bindgen_test]
 fn test_form_reset_functionality() {
     let form = use_form::<IntegrationTestForm>();
-    
+
     // Fill out the form
     let _ = form.set_field_value("username", FieldValue::String("testuser".to_string()));
     let _ = form.set_field_value("email", FieldValue::String("test@example.com".to_string()));
     let _ = form.set_field_value("password", FieldValue::String("password123".to_string()));
-    let _ = form.set_field_value("confirm_password", FieldValue::String("password123".to_string()));
+    let _ = form.set_field_value(
+        "confirm_password",
+        FieldValue::String("password123".to_string()),
+    );
     let _ = form.set_field_value("age", FieldValue::Number(30));
     let _ = form.set_field_value("newsletter", FieldValue::Boolean(true));
-    
+
     // Verify values are set
     let values = form.get_values().get();
     assert_eq!(values.username, "testuser");
-    
+
     // Reset the form
     form.reset();
-    
+
     // Verify form is back to default values
     let values = form.get_values().get();
     assert!(values.username.is_empty());
@@ -283,7 +301,7 @@ fn test_form_reset_functionality() {
     assert!(values.confirm_password.is_empty());
     assert_eq!(values.age, 0);
     assert_eq!(values.newsletter, false);
-    
+
     // Should be invalid again
     assert!(!form.is_valid().get());
 }
@@ -291,17 +309,17 @@ fn test_form_reset_functionality() {
 #[wasm_bindgen_test]
 fn test_form_schema_integration() {
     let form = use_form::<IntegrationTestForm>();
-    
+
     // Test that the schema is properly integrated
     let schema = form.schema();
     assert_eq!(schema.fields().len(), 6);
-    
+
     // Check specific fields exist
     let username_field = schema.get_field("username");
     assert!(username_field.is_some());
     assert_eq!(username_field.unwrap().name, "username");
     assert!(username_field.unwrap().is_required);
-    
+
     let newsletter_field = schema.get_field("newsletter");
     assert!(newsletter_field.is_some());
     assert!(!newsletter_field.unwrap().is_required);

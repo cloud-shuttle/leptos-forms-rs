@@ -64,7 +64,7 @@ impl Form for BenchmarkForm {
 
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationErrors::new();
-        
+
         if self.field1.is_empty() {
             errors.add_field_error("field1", FieldError::new("Field 1 is required"));
         }
@@ -80,7 +80,7 @@ impl Form for BenchmarkForm {
         if self.field5.is_empty() {
             errors.add_field_error("field5", FieldError::new("Field 5 is required"));
         }
-        
+
         if errors.is_empty() {
             Ok(())
         } else {

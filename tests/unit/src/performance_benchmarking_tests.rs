@@ -1,9 +1,9 @@
 use leptos::prelude::*;
 use leptos_forms_rs::core::types::FieldValue;
-use leptos_forms_rs::core::FormHandle;
 use leptos_forms_rs::core::Form;
+use leptos_forms_rs::core::FormHandle;
 use leptos_forms_rs::hooks::use_form_performance;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -115,10 +115,10 @@ impl Form for PerformanceTestForm {
             },
         ]
     }
-    
+
     fn validate(&self) -> Result<(), leptos_forms_rs::validation::ValidationErrors> {
         let mut errors = leptos_forms_rs::validation::ValidationErrors::new();
-        
+
         if self.field_1.trim().is_empty() {
             errors.add_field_error("field_1", "Field 1 is required".to_string());
         }
@@ -149,14 +149,14 @@ impl Form for PerformanceTestForm {
         if self.field_10.trim().is_empty() {
             errors.add_field_error("field_10", "Field 10 is required".to_string());
         }
-        
+
         if errors.is_empty() {
             Ok(())
         } else {
             Err(errors)
         }
     }
-    
+
     fn default_values() -> Self {
         Self {
             field_1: "".to_string(),
@@ -171,7 +171,7 @@ impl Form for PerformanceTestForm {
             field_10: "".to_string(),
         }
     }
-    
+
     fn schema() -> leptos_forms_rs::core::FormSchema {
         leptos_forms_rs::core::FormSchema {
             name: "PerformanceTestForm".to_string(),
@@ -183,9 +183,10 @@ impl Form for PerformanceTestForm {
 #[test]
 fn test_performance_hook_creation() {
     // Test that we can create the performance hook
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let (_metrics, _benchmark) = use_form_performance(&form);
-    
+
     // If we get here, the hook compiles and can be created
     assert!(true);
 }
@@ -193,16 +194,17 @@ fn test_performance_hook_creation() {
 #[test]
 fn test_performance_hook_types() {
     // Test that the hook returns the correct types
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let (metrics, benchmark) = use_form_performance(&form);
-    
+
     // Test that we can access the performance metrics (without running async operations)
     let _current_metrics = metrics.get_untracked();
-    
+
     // Test that we can create the benchmark callback (without running it to avoid async issues)
     // Just verify the callback types are correct
     let _callback_input = ();
-    
+
     // If we get here, all types are correct and callbacks work
     assert!(true);
 }
@@ -210,11 +212,12 @@ fn test_performance_hook_types() {
 #[test]
 fn test_performance_metrics_initialization() {
     // Test that performance metrics are properly initialized
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let (metrics, _benchmark) = use_form_performance(&form);
-    
+
     let initial_metrics = metrics.get();
-    
+
     // Check that initial metrics are reasonable
     assert_eq!(initial_metrics.form_creation_time, Duration::ZERO);
     assert_eq!(initial_metrics.field_operations, 0);
@@ -227,14 +230,15 @@ fn test_performance_metrics_initialization() {
 fn test_performance_benchmark_form_creation() {
     // Test that form creation performance is measured
     let start = Instant::now();
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let creation_time = start.elapsed();
-    
+
     let (metrics, _benchmark) = use_form_performance(&form);
-    
+
     // The hook should measure form creation time
     let _current_metrics = metrics.get();
-    
+
     // If we get here, the benchmark can be created
     assert!(true);
 }
@@ -242,16 +246,17 @@ fn test_performance_benchmark_form_creation() {
 #[test]
 fn test_performance_benchmark_field_operations() {
     // Test that field operations are tracked
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let (metrics, _benchmark) = use_form_performance(&form);
-    
+
     // Perform some field operations
     let _ = form.set_field_value("field_1", FieldValue::String("test1".to_string()));
     let _ = form.set_field_value("field_2", FieldValue::String("test2".to_string()));
     let _ = form.set_field_value("field_3", FieldValue::String("test3".to_string()));
-    
+
     let _current_metrics = metrics.get();
-    
+
     // If we get here, field operations can be tracked
     assert!(true);
 }
@@ -259,18 +264,19 @@ fn test_performance_benchmark_field_operations() {
 #[test]
 fn test_performance_benchmark_validation_operations() {
     // Test that validation operations are tracked
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let (metrics, _benchmark) = use_form_performance(&form);
-    
+
     // Set some field values to trigger validation
     let _ = form.set_field_value("field_1", FieldValue::String("test1".to_string()));
     let _ = form.set_field_value("field_2", FieldValue::String("test2".to_string()));
-    
+
     // Trigger validation
     let _ = form.validate();
-    
+
     let _current_metrics = metrics.get();
-    
+
     // If we get here, validation operations can be tracked
     assert!(true);
 }
@@ -278,11 +284,12 @@ fn test_performance_benchmark_validation_operations() {
 #[test]
 fn test_performance_benchmark_memory_usage() {
     // Test that memory usage is tracked
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let (metrics, _benchmark) = use_form_performance(&form);
-    
+
     let _current_metrics = metrics.get();
-    
+
     // If we get here, memory usage can be tracked
     assert!(true);
 }
@@ -290,11 +297,12 @@ fn test_performance_benchmark_memory_usage() {
 #[test]
 fn test_performance_benchmark_rendering_metrics() {
     // Test that rendering metrics are tracked
-    let form: FormHandle<PerformanceTestForm> = FormHandle::new(PerformanceTestForm::default_values());
+    let form: FormHandle<PerformanceTestForm> =
+        FormHandle::new(PerformanceTestForm::default_values());
     let (metrics, _benchmark) = use_form_performance(&form);
-    
+
     let _current_metrics = metrics.get();
-    
+
     // If we get here, rendering metrics can be tracked
     assert!(true);
 }

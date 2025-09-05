@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page, expect } from "@playwright/test";
 
 /**
  * Utility functions for E2E testing
@@ -7,9 +7,9 @@ export class TestHelpers {
   /**
    * Wait for form to be ready and interactive
    */
-  static async waitForFormReady(page: Page, formSelector = 'form') {
+  static async waitForFormReady(page: Page, formSelector = "form") {
     await page.waitForSelector(formSelector, { timeout: 10000 });
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState("networkidle");
   }
 
   /**
@@ -56,7 +56,10 @@ export class TestHelpers {
   /**
    * Submit a form and wait for completion
    */
-  static async submitForm(page: Page, submitSelector = 'button[type="submit"]') {
+  static async submitForm(
+    page: Page,
+    submitSelector = 'button[type="submit"]',
+  ) {
     await page.click(submitSelector);
     await page.waitForTimeout(1000); // Wait for submission to complete
   }
@@ -81,7 +84,9 @@ export class TestHelpers {
    * Verify that validation errors are shown
    */
   static async expectValidationErrors(page: Page, count: number) {
-    const errorMessages = page.locator('.error-message, [data-testid="error"], .validation-error');
+    const errorMessages = page.locator(
+      '.error-message, [data-testid="error"], .validation-error',
+    );
     await expect(errorMessages).toHaveCount(count);
   }
 
@@ -89,14 +94,20 @@ export class TestHelpers {
    * Verify that no validation errors are shown
    */
   static async expectNoValidationErrors(page: Page) {
-    const errorMessages = page.locator('.error-message, [data-testid="error"], .validation-error');
+    const errorMessages = page.locator(
+      '.error-message, [data-testid="error"], .validation-error',
+    );
     await expect(errorMessages).toHaveCount(0);
   }
 
   /**
    * Verify form field has expected value
    */
-  static async expectFieldValue(page: Page, selector: string, expectedValue: string) {
+  static async expectFieldValue(
+    page: Page,
+    selector: string,
+    expectedValue: string,
+  ) {
     await expect(page.locator(selector)).toHaveValue(expectedValue);
   }
 
@@ -104,7 +115,7 @@ export class TestHelpers {
    * Verify form field is empty
    */
   static async expectFieldEmpty(page: Page, selector: string) {
-    await expect(page.locator(selector)).toHaveValue('');
+    await expect(page.locator(selector)).toHaveValue("");
   }
 
   /**
@@ -159,7 +170,11 @@ export class TestHelpers {
   /**
    * Verify element does not have specific class
    */
-  static async expectNotHasClass(page: Page, selector: string, className: string) {
+  static async expectNotHasClass(
+    page: Page,
+    selector: string,
+    className: string,
+  ) {
     await expect(page.locator(selector)).not.toHaveClass(new RegExp(className));
   }
 
@@ -196,7 +211,7 @@ export class TestHelpers {
    */
   static async navigateWithTab(page: Page, times = 1) {
     for (let i = 0; i < times; i++) {
-      await page.keyboard.press('Tab');
+      await page.keyboard.press("Tab");
     }
   }
 
@@ -205,7 +220,7 @@ export class TestHelpers {
    */
   static async navigateWithShiftTab(page: Page, times = 1) {
     for (let i = 0; i < times; i++) {
-      await page.keyboard.press('Shift+Tab');
+      await page.keyboard.press("Shift+Tab");
     }
   }
 
@@ -213,21 +228,21 @@ export class TestHelpers {
    * Press Enter key
    */
   static async pressEnter(page: Page) {
-    await page.keyboard.press('Enter');
+    await page.keyboard.press("Enter");
   }
 
   /**
    * Press Escape key
    */
   static async pressEscape(page: Page) {
-    await page.keyboard.press('Escape');
+    await page.keyboard.press("Escape");
   }
 
   /**
    * Wait for a specific timeout
    */
   static async wait(ms: number) {
-    await new Promise(resolve => setTimeout(resolve, ms));
+    await new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -259,27 +274,27 @@ export const FormSelectors = {
   TEXTAREA_INPUT: '[data-testid="textarea-input"]',
   RADIO_INPUT: '[data-testid="radio-input"]',
   FILE_INPUT: '[data-testid="file-input"]',
-  
+
   // Form actions
   SUBMIT_BUTTON: '[data-testid="submit-button"]',
   RESET_BUTTON: '[data-testid="reset-button"]',
   NEXT_BUTTON: '[data-testid="next-button"]',
   PREV_BUTTON: '[data-testid="prev-button"]',
-  
+
   // Validation
   VALIDATION_ERROR: '[data-testid="validation-error"]',
   ERROR_MESSAGE: '[data-testid="error-message"]',
   SUCCESS_MESSAGE: '[data-testid="success-message"]',
-  
+
   // Form state
-  FORM: 'form',
+  FORM: "form",
   FORM_WIZARD: '[data-testid="form-wizard"]',
   STEP_INDICATOR: '[data-testid="step-indicator"]',
-  
+
   // Field arrays
   ADD_FIELD: '[data-testid="add-field"]',
   REMOVE_FIELD: '[data-testid="remove-field"]',
-  
+
   // Conditional fields
   SHOW_CONDITIONAL: '[data-testid="show-conditional"]',
   CONDITIONAL_FIELD: '[data-testid="conditional-field"]',
@@ -290,25 +305,21 @@ export const FormSelectors = {
  */
 export const TestData = {
   VALID_EMAILS: [
-    'test@example.com',
-    'user.name@domain.co.uk',
-    'user+tag@example.org',
+    "test@example.com",
+    "user.name@domain.co.uk",
+    "user+tag@example.org",
   ],
   INVALID_EMAILS: [
-    'invalid',
-    '@domain.com',
-    'user@',
-    'user@domain',
-    'user name@domain.com',
+    "invalid",
+    "@domain.com",
+    "user@",
+    "user@domain",
+    "user name@domain.com",
   ],
   VALID_URLS: [
-    'https://example.com',
-    'http://domain.org/path',
-    'https://sub.domain.com:8080/path?query=1',
+    "https://example.com",
+    "http://domain.org/path",
+    "https://sub.domain.com:8080/path?query=1",
   ],
-  INVALID_URLS: [
-    'invalid',
-    'ftp://example.com',
-    '//example.com',
-  ],
+  INVALID_URLS: ["invalid", "ftp://example.com", "//example.com"],
 } as const;

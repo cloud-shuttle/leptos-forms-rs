@@ -1,5 +1,5 @@
+use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use serde::{Serialize, Deserialize};
 
 /// Performance metrics for form operations
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,48 +60,54 @@ impl FormPerformanceMetrics {
     pub fn new() -> Self {
         Self::default()
     }
-    
+
     /// Record form creation time
     pub fn record_form_creation(&mut self, duration: Duration) {
         self.form_creation_time = duration;
     }
-    
+
     /// Record a field operation
     pub fn record_field_operation(&mut self, duration: Duration) {
         self.field_operations += 1;
         self.total_field_operation_time += duration;
         self.avg_field_operation_time = if self.field_operations > 0 {
-            Duration::from_nanos((self.total_field_operation_time.as_nanos() as u64) / self.field_operations)
+            Duration::from_nanos(
+                (self.total_field_operation_time.as_nanos() as u64) / self.field_operations,
+            )
         } else {
             Duration::ZERO
         };
         self.total_operations += 1;
     }
-    
+
     /// Record a validation operation
     pub fn record_validation(&mut self, duration: Duration) {
         self.validation_operations += 1;
         self.total_validation_time += duration;
         self.avg_validation_time = if self.validation_operations > 0 {
-            Duration::from_nanos((self.total_validation_time.as_nanos() as u64) / self.validation_operations)
+            Duration::from_nanos(
+                (self.total_validation_time.as_nanos() as u64) / self.validation_operations,
+            )
         } else {
             Duration::ZERO
         };
         self.total_operations += 1;
     }
-    
+
     /// Record a submission operation
     pub fn record_submission(&mut self, duration: Duration) {
         self.submission_operations += 1;
         self.total_submission_time += duration;
         self.avg_submission_time = if self.submission_operations > 0 {
-            Duration::from_nanos((self.total_submission_time.as_nanos() as u64) / self.submission_operations)
+            Duration::from_nanos(
+                (self.total_submission_time.as_nanos() as u64) / self.submission_operations,
+            )
         } else {
             Duration::ZERO
         };
         self.total_operations += 1;
     }
-    
+
     /// Record memory usage
     pub fn record_memory_usage(&mut self, bytes: u64) {
         self.memory_usage_bytes = bytes;
@@ -109,12 +115,12 @@ impl FormPerformanceMetrics {
             self.peak_memory_usage_bytes = bytes;
         }
     }
-    
+
     /// Record a re-render
     pub fn record_re_render(&mut self) {
         self.re_render_count += 1;
     }
-    
+
     /// Get performance summary as a string
     pub fn summary(&self) -> String {
         format!(
@@ -145,7 +151,7 @@ impl FormPerformanceMetrics {
             self.total_submission_time
         )
     }
-    
+
     /// Check if performance is within acceptable thresholds
     pub fn is_performance_acceptable(&self, thresholds: &PerformanceThresholds) -> bool {
         self.form_creation_time <= thresholds.max_form_creation_time
@@ -202,7 +208,7 @@ impl BenchmarkResults {
         let meets_thresholds = metrics.is_performance_acceptable(thresholds);
         let performance_score = Self::calculate_performance_score(&metrics, thresholds);
         let recommendations = Self::generate_recommendations(&metrics, thresholds);
-        
+
         Self {
             metrics,
             meets_thresholds,
@@ -210,11 +216,14 @@ impl BenchmarkResults {
             recommendations,
         }
     }
-    
+
     /// Calculate performance score (0-100)
-    fn calculate_performance_score(metrics: &FormPerformanceMetrics, thresholds: &PerformanceThresholds) -> f64 {
+    fn calculate_performance_score(
+        metrics: &FormPerformanceMetrics,
+        thresholds: &PerformanceThresholds,
+    ) -> f64 {
         let mut score: f64 = 100.0;
-        
+
         // Deduct points for exceeding thresholds
         if metrics.form_creation_time > thresholds.max_form_creation_time {
             score -= 20.0;
@@ -231,38 +240,50 @@ impl BenchmarkResults {
         if metrics.memory_usage_bytes > thresholds.max_memory_usage_bytes {
             score -= 10.0;
         }
-        
+
         score.max(0.0_f64)
     }
-    
+
     /// Generate performance improvement recommendations
-    fn generate_recommendations(metrics: &FormPerformanceMetrics, thresholds: &PerformanceThresholds) -> Vec<String> {
+    fn generate_recommendations(
+        metrics: &FormPerformanceMetrics,
+        thresholds: &PerformanceThresholds,
+    ) -> Vec<String> {
         let mut recommendations = Vec::new();
-        
+
         if metrics.form_creation_time > thresholds.max_form_creation_time {
             recommendations.push("Form creation is slow. Consider lazy initialization or reducing initial field count.".to_string());
         }
-        
+
         if metrics.avg_field_operation_time > thresholds.max_field_operation_time {
-            recommendations.push("Field operations are slow. Consider batching updates or optimizing field access.".to_string());
+            recommendations.push(
+                "Field operations are slow. Consider batching updates or optimizing field access."
+                    .to_string(),
+            );
         }
-        
+
         if metrics.avg_validation_time > thresholds.max_field_operation_time {
-            recommendations.push("Validation is slow. Consider async validation or reducing validation complexity.".to_string());
+            recommendations.push(
+                "Validation is slow. Consider async validation or reducing validation complexity."
+                    .to_string(),
+            );
         }
-        
+
         if metrics.avg_submission_time > thresholds.max_submission_time {
             recommendations.push("Form submission is slow. Consider optimizing submission logic or using background processing.".to_string());
         }
-        
+
         if metrics.memory_usage_bytes > thresholds.max_memory_usage_bytes {
             recommendations.push("Memory usage is high. Consider reducing field count or optimizing data structures.".to_string());
         }
-        
+
         if recommendations.is_empty() {
-            recommendations.push("Performance is within acceptable thresholds. No immediate improvements needed.".to_string());
+            recommendations.push(
+                "Performance is within acceptable thresholds. No immediate improvements needed."
+                    .to_string(),
+            );
         }
-        
+
         recommendations
     }
 }

@@ -14,7 +14,7 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
-        
+
         rustToolchain = pkgs.rust-bin.stable.latest.default.override {
           extensions = [ "rust-src" "rust-analyzer" ];
           targets = [ "wasm32-unknown-unknown" ];
@@ -31,27 +31,27 @@
           buildInputs = with pkgs; [
             # Rust toolchain
             rustToolchain
-            
+
             # WASM tools
             wasm-pack
             wasm-bindgen-cli
-            
+
             # Development tools
             cargo-watch
             cargo-edit
             cargo-audit
             cargo-tarpaulin
-            
+
             # System tools
             pkg-config
             openssl
             curl
             git
-            
+
             # For wasm-bindgen-test (platform-specific)
             geckodriver
           ] ++ browserPackages;
-          
+
           shellHook = ''
             echo "🚀 Leptos Forms Development Environment"
             echo "📦 Rust: $(rustc --version)"

@@ -1,30 +1,32 @@
-use leptos::prelude::*;
-use crate::core::{Form, FormHandle, FieldValue};
 use crate::components::FieldArray;
+use crate::core::{FieldValue, Form, FormHandle};
 use crate::hooks::use_form;
+use leptos::prelude::*;
 
 #[component]
 pub fn FieldArrayExample() -> impl IntoView {
     let form_handle = use_form::<ExampleForm>();
-    
+
     // Example form data
-    let form_data = Signal::derive(move || {
-        ExampleForm {
-            name: "Example Form".to_string(),
-            tags: vec!["rust".to_string(), "leptos".to_string(), "forms".to_string()],
-            items: vec![
-                ExampleItem {
-                    title: "Item 1".to_string(),
-                    description: "First example item".to_string(),
-                    active: true,
-                },
-                ExampleItem {
-                    title: "Item 2".to_string(),
-                    description: "Second example item".to_string(),
-                    active: false,
-                },
-            ],
-        }
+    let form_data = Signal::derive(move || ExampleForm {
+        name: "Example Form".to_string(),
+        tags: vec![
+            "rust".to_string(),
+            "leptos".to_string(),
+            "forms".to_string(),
+        ],
+        items: vec![
+            ExampleItem {
+                title: "Item 1".to_string(),
+                description: "First example item".to_string(),
+                active: true,
+            },
+            ExampleItem {
+                title: "Item 2".to_string(),
+                description: "Second example item".to_string(),
+                active: false,
+            },
+        ],
     });
 
     // Render function for tags
@@ -43,16 +45,19 @@ pub fn FieldArrayExample() -> impl IntoView {
     // Render function for items
     let render_item = Callback::new(|(index, value): (usize, FieldValue)| {
         if let FieldValue::Object(obj) = value {
-            let title = obj.get("title")
+            let title = obj
+                .get("title")
                 .and_then(|v| v.as_string())
                 .unwrap_or("No title");
-            let description = obj.get("description")
+            let description = obj
+                .get("description")
                 .and_then(|v| v.as_string())
                 .unwrap_or("No description");
-            let active = obj.get("active")
+            let active = obj
+                .get("active")
                 .and_then(|v| v.as_boolean())
                 .unwrap_or(false);
-            
+
             view! {
                 <div class="example-item">
                     <div class="item-header">
@@ -72,11 +77,11 @@ pub fn FieldArrayExample() -> impl IntoView {
     view! {
         <div class="field-array-example">
             <h2>"Field Array Examples"</h2>
-            
+
             <div class="example-section">
                 <h3>"Tags Array"</h3>
                 <p>"A simple array of string tags with add/remove functionality."</p>
-                
+
                 <FieldArray
                     field_name="tags".to_string()
                     form_handle=form_handle.clone()
@@ -89,7 +94,7 @@ pub fn FieldArrayExample() -> impl IntoView {
             <div class="example-section">
                 <h3>"Items Array"</h3>
                 <p>"A complex array of objects with custom rendering and validation."</p>
-                
+
                 <FieldArray
                     field_name="items".to_string()
                     form_handle=form_handle.clone()
@@ -109,7 +114,7 @@ pub fn FieldArrayExample() -> impl IntoView {
                 >
                     "Submit Form"
                 </button>
-                
+
                 <button
                     type="button"
                     class="btn btn-secondary"

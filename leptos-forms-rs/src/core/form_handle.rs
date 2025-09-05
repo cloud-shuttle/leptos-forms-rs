@@ -1,14 +1,17 @@
-
-use leptos::prelude::*;
-use leptos::prelude::GetUntracked;
 use crate::core::traits::Form;
-use crate::core::types::FieldValue;
 use crate::core::traits::FormState;
-use crate::validation::{ValidationErrors, Validator};
+use crate::core::types::FieldValue;
 use crate::error::FormError;
+use crate::validation::{ValidationErrors, Validator};
+use leptos::prelude::GetUntracked;
+use leptos::prelude::*;
 
 /// Form handle for managing form state and operations
-pub struct FormHandle<T: Form> where T: Send, T: std::marker::Sync {
+pub struct FormHandle<T: Form>
+where
+    T: Send,
+    T: std::marker::Sync,
+{
     state: RwSignal<FormState<T>>,
 }
 
@@ -21,26 +24,26 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
     }
 
     /// Helper function to update array field and set form state
-    fn update_array_field<F>(&self, field_name: &str, mutator: F) 
-    where 
-        F: FnOnce(&mut Vec<FieldValue>)
+    fn update_array_field<F>(&self, field_name: &str, mutator: F)
+    where
+        F: FnOnce(&mut Vec<FieldValue>),
     {
         let current_state = self.state.get_untracked();
         let mut new_values = current_state.values.clone();
-        
+
         let current_array = new_values.get_field_value(field_name);
         if let FieldValue::Array(mut array) = current_array {
             mutator(&mut array);
-            
+
             new_values.set_field_value(field_name, FieldValue::Array(array));
-            
+
             let new_state = FormState {
                 values: new_values,
                 is_dirty: true,
                 is_submitting: current_state.is_submitting,
                 errors: current_state.errors,
             };
-            
+
             self.state.set(new_state);
         }
     }
@@ -84,7 +87,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
     pub fn get_field_value(&self, field_name: &str) -> Option<FieldValue> {
         let state = self.state.get_untracked();
         let schema = T::schema();
-        
+
         // Check if the field exists in the schema
         if schema.get_field(field_name).is_some() {
             Some(state.values.get_field_value(field_name))
@@ -92,17 +95,17 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
             None
         }
     }
-    
+
     /// Set a field value
     pub fn set_field_value(&self, field_name: &str, value: FieldValue) {
         let current_state = self.state.get_untracked();
-        
+
         // Create a new form instance with the updated field
         let mut new_form = current_state.values.clone();
-        
+
         // Update the field using the form's set_field_value method
         new_form.set_field_value(field_name, value);
-        
+
         // Create new state with updated form and mark as dirty
         let new_state = FormState {
             values: new_form,
@@ -110,7 +113,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
             is_submitting: current_state.is_submitting,
             errors: current_state.errors,
         };
-        
+
         self.state.set(new_state);
     }
 
@@ -120,11 +123,11 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
         let form_data = &state.values;
         let binding = T::schema();
         let metadata = binding.get_field(field_name);
-        
+
         if let Some(field_meta) = metadata {
             let _default_value = FieldValue::String(String::new());
             let field_value = form_data.get_field_value(field_name);
-            
+
             // Validate field
             for validator in &field_meta.validators {
                 if let Err(error) = self.validate_field_value(field_value.clone(), validator) {
@@ -134,21 +137,21 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
                 }
             }
         }
-        
+
         Ok(())
     }
-    
+
     /// Validate the entire form
     pub fn validate(&self) -> Result<(), FormError> {
         let state = self.state.get_untracked();
         let form_data = &state.values;
         let metadata = T::schema().field_metadata.clone();
         let mut errors = ValidationErrors::new();
-        
+
         for field_meta in metadata {
             let field_name = &field_meta.name;
             let field_value = form_data.get_field_value(field_name);
-            
+
             // Validate field
             for validator in &field_meta.validators {
                 if let Err(error) = self.validate_field_value(field_value.clone(), validator) {
@@ -156,7 +159,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
                 }
             }
         }
-        
+
         // Also call the form's own validate method for custom validation logic
         if let Err(form_errors) = form_data.validate() {
             for (field_name, error_msgs) in form_errors.field_errors {
@@ -165,13 +168,16 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
                 }
             }
         }
-        
+
         if errors.has_errors() {
             // Update state with errors
             let new_state = state.with_errors(errors.clone());
             self.state.set(new_state);
-            
-            Err(FormError::validation_error("Form validation failed".to_string(), errors.to_field_errors()))
+
+            Err(FormError::validation_error(
+                "Form validation failed".to_string(),
+                errors.to_field_errors(),
+            ))
         } else {
             // Clear any existing errors
             let new_state = state.with_errors(ValidationErrors::new());
@@ -179,16 +185,16 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
             Ok(())
         }
     }
-    
+
     /// Submit the form
     pub fn submit(&self) -> Result<T, FormError> {
         // Validate first
         self.validate()?;
-        
+
         let state = self.state.get_untracked();
         let new_state = state.mark_submitting();
         self.state.set(new_state.clone());
-        
+
         // In a real implementation, you would send the data here
         // For now, just return the values
         Ok(new_state.values)
@@ -274,7 +280,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
     pub fn get_array_length(&self, field_name: &str) -> Option<usize> {
         let current_state = self.state.get_untracked();
         let field_value = current_state.values.get_field_value(field_name);
-        
+
         if let FieldValue::Array(array) = field_value {
             Some(array.len())
         } else {
@@ -286,14 +292,14 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
     pub fn get_array_item(&self, field_name: &str, index: usize) -> Option<FieldValue> {
         let current_state = self.state.get_untracked();
         let field_value = current_state.values.get_field_value(field_name);
-        
+
         if let FieldValue::Array(array) = field_value {
             array.get(index).cloned()
         } else {
             None
         }
     }
-    
+
     /// Set an item in a field array at a specific index
     pub fn set_array_item(&self, field_name: &str, index: usize, value: FieldValue) {
         self.update_array_field(field_name, |array| {
@@ -325,7 +331,10 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
     }
 
     /// Get field metadata
-    pub fn get_field_metadata(&self, field_name: &str) -> Option<crate::core::traits::FieldMetadata> {
+    pub fn get_field_metadata(
+        &self,
+        field_name: &str,
+    ) -> Option<crate::core::traits::FieldMetadata> {
         let binding = T::schema();
         binding.get_field(field_name).cloned()
     }
@@ -346,10 +355,10 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
     /// Private helper to validate a field value against a validator
     fn validate_field_value(&self, value: FieldValue, validator: &Validator) -> Result<(), String> {
         use crate::validation::ValidationRuleEngine;
-        
+
         let mut engine = ValidationRuleEngine::new();
         engine.add_validator(validator.clone());
-        
+
         match engine.validate_value(value) {
             Ok(_) => Ok(()),
             Err(errors) => {
