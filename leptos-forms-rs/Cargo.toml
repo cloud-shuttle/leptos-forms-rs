@@ -9,7 +9,7 @@ repository = "https://github.com/cloud-shuttle/leptos-forms-rs"
 homepage = "https://github.com/cloud-shuttle/leptos-forms-rs"
 documentation = "https://docs.rs/leptos-forms-rs"
 readme = "README.md"
-keywords = ["leptos", "forms", "validation", "web", "wasm", "reactive", "typescript"]
+keywords = ["leptos", "forms", "validation", "web", "wasm"]
 categories = ["web-programming", "wasm"]
 
 [dependencies]
