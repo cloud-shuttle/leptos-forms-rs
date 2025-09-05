@@ -2,7 +2,8 @@
 use leptos::prelude::*;
 use leptos::prelude::GetUntracked;
 use crate::core::traits::Form;
-use crate::core::types::{FormState, FieldValue};
+use crate::core::types::FieldValue;
+use crate::core::traits::FormState;
 use crate::validation::{ValidationErrors, Validator};
 use crate::error::FormError;
 
@@ -15,8 +16,33 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
     /// Create a new form handle
     pub fn new(form: T) -> Self {
         let initial_state = FormState::new(form);
-        let state = create_rw_signal(initial_state);
+        let state = RwSignal::new(initial_state);
         Self { state }
+    }
+
+    /// Helper function to update array field and set form state
+    fn update_array_field<F>(&self, field_name: &str, mutator: F) 
+    where 
+        F: FnOnce(&mut Vec<FieldValue>)
+    {
+        let current_state = self.state.get_untracked();
+        let mut new_values = current_state.values.clone();
+        
+        let current_array = new_values.get_field_value(field_name);
+        if let FieldValue::Array(mut array) = current_array {
+            mutator(&mut array);
+            
+            new_values.set_field_value(field_name, FieldValue::Array(array));
+            
+            let new_state = FormState {
+                values: new_values,
+                is_dirty: true,
+                is_submitting: current_state.is_submitting,
+                errors: current_state.errors,
+            };
+            
+            self.state.set(new_state);
+        }
     }
 
     /// Get the form state signal
@@ -66,7 +92,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
             None
         }
     }
-
+    
     /// Set a field value
     pub fn set_field_value(&self, field_name: &str, value: FieldValue) {
         let current_state = self.state.get_untracked();
@@ -96,7 +122,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
         let metadata = binding.get_field(field_name);
         
         if let Some(field_meta) = metadata {
-            let default_value = FieldValue::String(String::new());
+            let _default_value = FieldValue::String(String::new());
             let field_value = form_data.get_field_value(field_name);
             
             // Validate field
@@ -111,7 +137,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
         
         Ok(())
     }
-
+    
     /// Validate the entire form
     pub fn validate(&self) -> Result<(), FormError> {
         let state = self.state.get_untracked();
@@ -153,14 +179,14 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
             Ok(())
         }
     }
-
+    
     /// Submit the form
     pub fn submit(&self) -> Result<T, FormError> {
         // Validate first
         self.validate()?;
         
         let state = self.state.get_untracked();
-        let mut new_state = state.mark_submitting();
+        let new_state = state.mark_submitting();
         self.state.set(new_state.clone());
         
         // In a real implementation, you would send the data here
@@ -170,7 +196,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
 
     /// Reset the form to initial values
     pub fn reset(&self) {
-        let state = self.state.get_untracked();
+        let _state = self.state.get_untracked();
         let initial_values = T::default_values();
         let new_state = FormState::new(initial_values);
         self.state.set(new_state);
@@ -194,63 +220,103 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
 
     /// Add an item to a field array
     pub fn add_array_item(&self, field_name: &str, value: FieldValue) {
-        let mut current_state = self.state.get_untracked();
-        let mut new_values = current_state.values.clone();
-        
-        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+        self.update_array_field(field_name, |array| {
             array.push(value);
-            
-            let new_state = current_state.mark_dirty();
-            
-            self.state.set(new_state);
-        }
+        });
     }
 
     /// Remove an item from a field array
     pub fn remove_array_item(&self, field_name: &str, index: usize) {
-        let mut current_state = self.state.get_untracked();
-        let mut new_values = current_state.values.clone();
-        
-        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+        self.update_array_field(field_name, |array| {
             if index < array.len() {
                 array.remove(index);
-                
-                let new_state = current_state.mark_dirty();
-                
-                self.state.set(new_state);
             }
-        }
+        });
     }
 
     /// Move an item in a field array
     pub fn move_array_item(&self, field_name: &str, from_index: usize, to_index: usize) {
-        let mut current_state = self.state.get_untracked();
-        let mut new_values = current_state.values.clone();
-        
-        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+        self.update_array_field(field_name, |array| {
             if from_index < array.len() && to_index < array.len() {
                 let item = array.remove(from_index);
                 array.insert(to_index, item);
-                
-                let new_state = current_state.mark_dirty();
-                
-                self.state.set(new_state);
             }
-        }
+        });
     }
 
     /// Clear all items in a field array
     pub fn clear_array(&self, field_name: &str) {
-        let mut current_state = self.state.get_untracked();
-        let mut new_values = current_state.values.clone();
-        
-        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+        self.update_array_field(field_name, |array| {
             array.clear();
-            
-            let new_state = current_state.mark_dirty();
-            
-            self.state.set(new_state);
+        });
+    }
+
+    /// Insert an item at a specific index in a field array
+    pub fn insert_array_item(&self, field_name: &str, index: usize, value: FieldValue) {
+        self.update_array_field(field_name, |array| {
+            if index <= array.len() {
+                array.insert(index, value);
+            }
+        });
+    }
+
+    /// Duplicate an item at a specific index in a field array
+    pub fn duplicate_array_item(&self, field_name: &str, index: usize) {
+        self.update_array_field(field_name, |array| {
+            if index < array.len() {
+                let item_to_duplicate = array[index].clone();
+                array.insert(index + 1, item_to_duplicate);
+            }
+        });
+    }
+
+    /// Get the length of a field array
+    pub fn get_array_length(&self, field_name: &str) -> Option<usize> {
+        let current_state = self.state.get_untracked();
+        let field_value = current_state.values.get_field_value(field_name);
+        
+        if let FieldValue::Array(array) = field_value {
+            Some(array.len())
+        } else {
+            None
         }
+    }
+
+    /// Get an item from a field array by index
+    pub fn get_array_item(&self, field_name: &str, index: usize) -> Option<FieldValue> {
+        let current_state = self.state.get_untracked();
+        let field_value = current_state.values.get_field_value(field_name);
+        
+        if let FieldValue::Array(array) = field_value {
+            array.get(index).cloned()
+        } else {
+            None
+        }
+    }
+    
+    /// Set an item in a field array at a specific index
+    pub fn set_array_item(&self, field_name: &str, index: usize, value: FieldValue) {
+        self.update_array_field(field_name, |array| {
+            if index < array.len() {
+                array[index] = value;
+            }
+        });
+    }
+
+    /// Swap two items in a field array
+    pub fn swap_array_items(&self, field_name: &str, index1: usize, index2: usize) {
+        self.update_array_field(field_name, |array| {
+            if index1 < array.len() && index2 < array.len() && index1 != index2 {
+                array.swap(index1, index2);
+            }
+        });
+    }
+
+    /// Batch add multiple items to a field array
+    pub fn batch_add_array_items(&self, field_name: &str, items: Vec<FieldValue>) {
+        self.update_array_field(field_name, |array| {
+            array.extend(items);
+        });
     }
 
     /// Get the form schema

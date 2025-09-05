@@ -7,7 +7,7 @@ pub fn FormWizard(
     #[prop(into)] children: Children,
     #[prop(optional)] class: Option<String>,
 ) -> impl IntoView {
-    let (current_step_index, set_current_step_index) = create_signal(0);
+    let (current_step_index, set_current_step_index) = signal(0);
     let steps1 = steps.clone();
     let steps2 = steps.clone();
     let steps3 = steps.clone();
@@ -28,7 +28,7 @@ pub fn FormWizard(
         }
     };
     
-    let go_to_step = Callback::new(move |step: usize| {
+    let _go_to_step = Callback::new(move |step: usize| {
         if step < steps2.len() {
             set_current_step_index.set(step);
         }

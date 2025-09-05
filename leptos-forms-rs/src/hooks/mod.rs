@@ -2,7 +2,6 @@ use leptos::prelude::*;
 use leptos::task::spawn_local;
 use crate::core::FormHandle;
 use crate::core::types::FieldValue;
-use crate::validation::ValidationErrors;
 use crate::core::traits::Form;
 
 /// Hook for managing form state
@@ -67,7 +66,7 @@ pub fn use_field_dirty<T: Form + PartialEq + Clone + Send + Sync>(
 
 /// Hook for checking if a field has been touched
 pub fn use_field_touched<T: Form + PartialEq + Clone + Send + Sync>(
-    form_handle: &FormHandle<T>,
+    _form_handle: &FormHandle<T>,
 ) -> Memo<bool> {
     // For now, return false - this would need to be tracked in FormState
     Memo::new(move |_| false)
@@ -113,7 +112,7 @@ pub fn use_form_submission<T: Form + PartialEq + Clone + Send + Sync>(
 
 /// Hook for form persistence
 pub fn use_form_persistence<T: Form + PartialEq + Clone + Send + Sync>(
-    form_handle: &FormHandle<T>,
+    _form_handle: &FormHandle<T>,
     storage_key: &str,
 ) -> (Callback<()>, Callback<()>, Callback<()>) {
     let storage_key = storage_key.to_string();
@@ -234,7 +233,7 @@ pub struct FieldArrayHandle<U: 'static> {
 pub fn use_form_wizard<T: Form + PartialEq + Clone + Send + Sync>(
     steps: Vec<String>,
 ) -> (ReadSignal<usize>, Callback<()>, Callback<()>, Callback<usize>, Callback<()>) {
-    let current_step = create_rw_signal(0);
+    let current_step = RwSignal::new(0);
     let steps1 = steps.clone();
     
     let next_step = Callback::new(move |_| {
@@ -271,12 +270,12 @@ pub fn use_real_time_validation<T: Form + PartialEq + Clone + Send + Sync>(
     field_name: &str,
     delay_ms: u32,
 ) -> (ReadSignal<Option<String>>, Callback<FieldValue>) {
-    let validation_error = create_rw_signal(None::<String>);
+    let validation_error = RwSignal::new(None::<String>);
     
     let form_clone = form_handle.clone();
     let field_name = field_name.to_string();
     let set_error = validation_error.clone();
-    let validate_field = Callback::new(move |value: FieldValue| {
+    let validate_field = Callback::new(move |_value: FieldValue| {
         let form_clone = form_clone.clone();
         let field_name = field_name.clone();
         let set_error = set_error.clone();

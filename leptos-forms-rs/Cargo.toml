@@ -1,6 +1,6 @@
 [package]
 name = "leptos-forms-rs"
-version = "0.4.0"
+version = "1.0.0"
 edition = "2021"
 description = "Type-safe, reactive form handling library for Leptos applications"
 license = "MIT"
@@ -15,7 +15,7 @@ leptos = { version = "0.8", features = ["csr"] }
 # Common dependencies
 serde = { workspace = true }
 serde_json = { workspace = true }
-leptos-forms-rs-macro = "0.4.0"
+leptos-forms-rs-macro = { path = "../leptos-forms-rs-macro" }
 web-sys = { version = "0.3", features = ["Window", "Storage"] }
 wasm-bindgen = { workspace = true }
 chrono = { workspace = true }
@@ -36,3 +36,7 @@ hydrate = ["leptos/hydrate"]
 [lib]
 name = "leptos_forms_rs"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

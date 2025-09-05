@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{NaiveDate, DateTime, Utc};
-use crate::core::traits::Form;
 
 /// Supported field types
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -404,53 +403,4 @@ impl Clone for AnalyticsOptions {
     }
 }
 
-/// Form state for internal management
-#[derive(Debug, Clone, PartialEq)]
-pub struct FormState<T: Form> {
-    pub values: T,
-    pub errors: crate::validation::ValidationErrors,
-    pub is_dirty: bool,
-    pub is_submitting: bool,
-}
 
-impl<T: Form> FormState<T> {
-    pub fn new(values: T) -> Self {
-        Self {
-            values,
-            errors: crate::validation::ValidationErrors::new(),
-            is_dirty: false,
-            is_submitting: false,
-        }
-    }
-    
-    pub fn with_errors(mut self, errors: crate::validation::ValidationErrors) -> Self {
-        let is_empty = errors.is_empty();
-        self.errors = errors;
-        self.is_dirty = !is_empty;
-        self
-    }
-    
-    pub fn with_values(mut self, values: T) -> Self {
-        self.values = values;
-        self
-    }
-    
-    pub fn mark_dirty(mut self) -> Self {
-        self.is_dirty = true;
-        self
-    }
-    
-    pub fn mark_submitting(mut self) -> Self {
-        self.is_submitting = true;
-        self
-    }
-    
-    pub fn mark_not_submitting(mut self) -> Self {
-        self.is_submitting = false;
-        self
-    }
-    
-    pub fn is_valid(&self) -> bool {
-        self.errors.is_empty()
-    }
-}

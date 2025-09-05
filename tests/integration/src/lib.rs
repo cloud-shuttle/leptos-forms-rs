@@ -306,3 +306,6 @@ fn test_form_schema_integration() {
     assert!(newsletter_field.is_some());
     assert!(!newsletter_field.unwrap().is_required);
 }
+
+// Include module integration tests
+mod module_integration_tests;

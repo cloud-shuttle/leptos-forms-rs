@@ -11,8 +11,8 @@ pub fn Input(
     #[prop(optional)] placeholder: Option<String>,
     #[prop(optional)] required: Option<bool>,
     #[prop(optional)] disabled: Option<bool>,
-    #[prop(optional)] error: Option<String>,
-    #[prop(optional)] has_error: Option<bool>,
+    #[prop(optional)] _error: Option<String>,
+    #[prop(optional)] _has_error: Option<bool>,
     #[prop(optional)] on_change: Option<Callback<String>>,
     #[prop(optional)] class: Option<String>,
 ) -> impl IntoView {

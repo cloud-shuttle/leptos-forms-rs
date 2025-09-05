@@ -9,7 +9,7 @@ pub fn MarkdownInput(
     /// Current value of the field
     #[prop(into)] value: Signal<FieldValue>,
     /// Callback when the value changes
-    #[prop(into)] on_change: Callback<FieldValue>,
+    #[prop(into)] _on_change: Callback<FieldValue>,
     /// Placeholder text
     #[prop(optional, into)] placeholder: Option<String>,
     /// Whether the field is required
@@ -31,7 +31,7 @@ pub fn MarkdownInput(
     /// Maximum height in pixels
     #[prop(optional)] max_height: Option<u32>,
 ) -> impl IntoView {
-    let show_preview = show_preview.unwrap_or(true);
+    let _show_preview = show_preview.unwrap_or(true);
     let show_toolbar = show_toolbar.unwrap_or(true);
     let min_height = min_height.unwrap_or(200);
     let max_height = max_height.unwrap_or(600);

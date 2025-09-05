@@ -9,7 +9,7 @@ pub fn FileUploadInput(
     /// Current value of the field
     #[prop(into)] value: Signal<FieldValue>,
     /// Callback when the value changes
-    #[prop(into)] on_change: Callback<FieldValue>,
+    #[prop(into)] _on_change: Callback<FieldValue>,
     /// Whether the field is required
     #[prop(optional)] required: Option<bool>,
     /// Whether the field is disabled
@@ -19,7 +19,7 @@ pub fn FileUploadInput(
     /// Error message to display
     #[prop(optional, into)] error: Option<String>,
     /// Whether the field has an error
-    #[prop(optional)] has_error: Option<bool>,
+    #[prop(optional)] _has_error: Option<bool>,
     /// File constraints (types, size limits, etc.)
     #[prop(optional)] constraints: Option<FileConstraints>,
     /// Maximum number of files allowed
@@ -33,7 +33,7 @@ pub fn FileUploadInput(
 ) -> impl IntoView {
     let max_files = max_files.unwrap_or(10);
     let show_preview = show_preview.unwrap_or(true);
-    let show_progress = show_progress.unwrap_or(true);
+    let _show_progress = show_progress.unwrap_or(true);
     let multiple = multiple.unwrap_or(true);
     
     let current_files = move || {

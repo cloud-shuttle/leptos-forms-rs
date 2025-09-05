@@ -1,5 +1,4 @@
 use leptos::prelude::*;
-use leptos::task::spawn_local;
 use crate::hooks::FieldArrayHandle;
 
 /// Field array component for managing dynamic lists of fields
@@ -8,11 +7,11 @@ pub fn FieldArray<U: Clone + Send + Sync + Default + 'static>(
     #[prop(into)] field_name: String,
     #[prop(into)] items: Vec<U>,
     #[prop(optional)] class: Option<String>,
-    #[prop(optional)] children: Option<Children>,
+    #[prop(optional)] _children: Option<Children>,
 ) -> impl IntoView {
     // For now, we'll create a dummy array handle
     // In a real implementation, this would get the form handle from context
-    let array_handle = FieldArrayHandle {
+    let _array_handle = FieldArrayHandle {
         add_item: Callback::new(|_: U| {}),
         remove_item: Callback::new(|_: usize| {}),
         move_item: Callback::new(|_: (usize, usize)| {}),
@@ -58,7 +57,7 @@ pub fn FieldArray<U: Clone + Send + Sync + Default + 'static>(
             <div class="field-array-items">
                 {items.iter().enumerate().map(|(index, item)| {
                     let item_index = index;
-                    let item_value = item.clone();
+                    let _item_value = item.clone();
                     
                     view! {
                         <div class="field-array-item">

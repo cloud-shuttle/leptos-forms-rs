@@ -9,7 +9,7 @@ pub fn RichTextInput(
     /// Current value of the field
     #[prop(into)] value: Signal<FieldValue>,
     /// Callback when the value changes
-    #[prop(into)] on_change: Callback<FieldValue>,
+    #[prop(into)] _on_change: Callback<FieldValue>,
     /// Placeholder text
     #[prop(optional, into)] placeholder: Option<String>,
     /// Whether the field is required

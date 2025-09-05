@@ -363,7 +363,7 @@ impl ValidationRuleEngine {
         self.validators.insert(name.to_string(), validator);
     }
 
-    pub fn add_validator(&mut self, validator: Validator) {
+    pub fn add_validator(&mut self, _validator: Validator) {
         // This method allows adding Validator enum variants to the engine
         // For now, we'll just store them in a separate collection if needed
         // The actual validation logic is handled in validate_field

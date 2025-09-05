@@ -13,7 +13,7 @@ pub fn form_to_map<T: Form>(form: &T) -> HashMap<String, FieldValue> {
 
 /// Convert a HashMap of field values to a form
 pub fn map_to_form<T: Form>(map: &HashMap<String, FieldValue>) -> Result<T, String> {
-    let mut form = T::default_values();
+    let form = T::default_values();
     
     for (field_name, value) in map {
         // For now, we'll just log the operation
@@ -77,7 +77,7 @@ pub fn get_field_type<T: Form>(field_name: &str) -> Option<crate::core::types::F
 
 /// Validate a single field value
 pub fn validate_field_value<T: Form>(
-    form: &T,
+    _form: &T,
     field_name: &str,
     value: &FieldValue
 ) -> Result<(), String> {
@@ -251,7 +251,7 @@ pub fn forms_are_equal<T: Form + PartialEq>(form1: &T, form2: &T) -> bool {
 }
 
 /// Get form statistics
-pub fn get_form_stats<T: Form>(form: &T) -> FormStats {
+pub fn get_form_stats<T: Form>(_form: &T) -> FormStats {
     let metadata = T::field_metadata();
     let total_fields = metadata.len();
     let required_fields = metadata.iter().filter(|meta| meta.is_required).count();

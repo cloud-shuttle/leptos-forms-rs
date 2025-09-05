@@ -9,6 +9,7 @@ leptos-forms-rs = { path = "../../leptos-forms-rs" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 regex = { workspace = true }
+chrono = { workspace = true }
 
 [[test]]
 name = "integration_tests"

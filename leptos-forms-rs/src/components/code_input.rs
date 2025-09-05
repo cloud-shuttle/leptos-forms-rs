@@ -9,7 +9,7 @@ pub fn CodeInput(
     /// Current value of the field
     #[prop(into)] value: Signal<FieldValue>,
     /// Callback when the value changes
-    #[prop(into)] on_change: Callback<FieldValue>,
+    #[prop(into)] _on_change: Callback<FieldValue>,
     /// Placeholder text
     #[prop(optional, into)] placeholder: Option<String>,
     /// Whether the field is required
@@ -23,7 +23,7 @@ pub fn CodeInput(
     /// Whether the field has an error
     #[prop(optional)] has_error: Option<bool>,
     /// Programming language for syntax highlighting
-    #[prop(optional, into)] language: Option<String>,
+    #[prop(optional, into)] _language: Option<String>,
     /// Whether to show line numbers
     #[prop(optional)] show_line_numbers: Option<bool>,
     /// Whether to show language selector
@@ -37,7 +37,7 @@ pub fn CodeInput(
 ) -> impl IntoView {
     let show_line_numbers = show_line_numbers.unwrap_or(true);
     let show_language_selector = show_language_selector.unwrap_or(true);
-    let show_fullscreen = show_fullscreen.unwrap_or(true);
+    let _show_fullscreen = show_fullscreen.unwrap_or(true);
     let min_height = min_height.unwrap_or(200);
     let max_height = max_height.unwrap_or(600);
     

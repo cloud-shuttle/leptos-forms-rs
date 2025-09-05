@@ -9,10 +9,11 @@ pub mod error;
 pub mod hooks;
 pub mod components;
 pub mod utils;
+pub mod devtools;
 
 // Re-export core types and traits
 pub use core::{Form, FormHandle, FieldMetadata, FormSchema};
-pub use core::types::FormState;
+pub use core::traits::FormState;
 
 // Re-export validation types
 pub use validation::{ValidationErrors, Validators, validate_form};
@@ -28,3 +29,6 @@ pub use components::{Form as FormComponent, FormField, FormReset, FormDebug, Fie
 
 // Re-export utility functions
 pub use utils::{form_to_map, map_to_form, merge_validation_errors, has_validation_errors, get_form_field_names, get_required_field_names, is_field_required, get_field_type, validate_field_value, serialize_form, deserialize_form, form_from_json, form_to_json, forms_are_equal, get_form_stats, validate_form_detailed, FormStats, FormValidationResult};
+
+// Re-export devtools
+pub use devtools::{FormStateInspector, PerformanceMonitor, DebugUtilities, FormStateSnapshot, FieldState, PerformanceMetrics, FormSnapshot, SnapshotDiff, FieldChange, IntegrityCheck};
