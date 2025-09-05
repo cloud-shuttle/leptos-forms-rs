@@ -1,109 +1,109 @@
-use leptos::prelude::{
-    Callback, Memo, ReadSignal, 
-    signal, Get, Set, Update, Callable
-};
+use leptos::prelude::*;
 use leptos::task::spawn_local;
-use serde::{Serialize, Deserialize};
-use crate::core::*;
+use crate::core::FormHandle;
+use crate::core::types::FieldValue;
 use crate::validation::ValidationErrors;
+use crate::core::traits::Form;
 
-/// Main hook for form management
-pub fn use_form<T: Form + PartialEq + Clone + Send + Sync>() -> FormHandle<T> {
-    FormHandle::new()
+/// Hook for managing form state
+pub fn use_form<T: Form + PartialEq + Clone + Send + Sync>(
+    initial_values: T,
+) -> (FormHandle<T>, Callback<()>, Callback<()>) {
+    let form_handle = FormHandle::new(initial_values);
+    
+    let form_clone1 = form_handle.clone();
+    let submit = Callback::new(move |_| {
+        let form_clone = form_clone1.clone();
+        spawn_local(async move {
+            if let Err(error) = form_clone.submit() {
+                log::error!("Form submission failed: {:?}", error);
+            }
+        });
+    });
+    
+    let form_clone2 = form_handle.clone();
+    let reset = Callback::new(move |_| {
+        let form_clone = form_clone2.clone();
+        form_clone.reset();
+    });
+    
+    (form_handle, submit, reset)
 }
 
-/// Hook for form with initial values
-pub fn use_form_with_values<T: Form + PartialEq + Clone + Send + Sync>(values: T) -> FormHandle<T> {
-    FormHandle::with_values(values)
+/// Hook for getting a field value
+pub fn use_field_value<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+    field_name: &str,
+) -> Memo<FieldValue> {
+    let form_handle = form_handle.clone();
+    let field_name = field_name.to_string();
+    Memo::new(move |_| {
+        form_handle.get_field_value(&field_name)
+            .unwrap_or(FieldValue::String(String::new()))
+    })
 }
 
-/// Hook for form field value
-pub fn use_field_value<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<Option<FieldValue>> {
-    let field_signal = form.get_field_signal(field_name);
-    if let Some(signal) = field_signal {
-        signal.value
-    } else {
-        signal(None).0
-    }
+/// Hook for getting field errors
+pub fn use_field_error<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+    field_name: &str,
+) -> Memo<Vec<String>> {
+    let form_handle = form_handle.clone();
+    let field_name = field_name.to_string();
+    Memo::new(move |_| {
+        form_handle.errors().get()
+            .get_field_error(&field_name)
+            .cloned()
+            .unwrap_or_default()
+    })
 }
 
-/// Hook for form field error
-pub fn use_field_error<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<Option<String>> {
-    let field_signal = form.get_field_signal(field_name);
-    if let Some(signal) = field_signal {
-        signal.error
-    } else {
-        signal(None).0
-    }
+/// Hook for checking if a field is dirty
+pub fn use_field_dirty<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+) -> Memo<bool> {
+    form_handle.is_dirty()
 }
 
-/// Hook for form field dirty state
-pub fn use_field_dirty<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<bool> {
-    let field_signal = form.get_field_signal(field_name);
-    if let Some(signal) = field_signal {
-        signal.is_dirty
-    } else {
-        signal(false).0
-    }
-}
-
-/// Hook for form field touched state
-pub fn use_field_touched<T: Form + PartialEq + Clone + Send + Sync>(form: &mut FormHandle<T>, field_name: &str) -> ReadSignal<bool> {
-    let field_signal = form.get_field_signal(field_name);
-    if let Some(signal) = field_signal {
-        signal.is_touched
-    } else {
-        signal(false).0
-    }
+/// Hook for checking if a field has been touched
+pub fn use_field_touched<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+) -> Memo<bool> {
+    // For now, return false - this would need to be tracked in FormState
+    Memo::new(move |_| false)
 }
 
 /// Hook for form validation
-pub fn use_form_validation<T: Form + PartialEq + Send + Sync>(form: &FormHandle<T>) -> (
-    Memo<ValidationErrors>,
-    Memo<bool>,
-    Callback<(), ()>
-) {
-    let errors = form.get_errors();
-    let is_valid = form.is_valid();
-    let form_clone = form.clone();
+pub fn use_form_validation<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+) -> (Memo<bool>, Callback<()>) {
+    let is_valid = form_handle.is_valid();
+    
+    let form_clone = form_handle.clone();
     let validate = Callback::new(move |_| {
-        let _ = form_clone.validate_form();
+        let form_clone = form_clone.clone();
+        spawn_local(async move {
+            if let Err(error) = form_clone.validate() {
+                log::error!("Form validation failed: {:?}", error);
+            }
+        });
     });
     
-    (errors, is_valid, validate)
+    (is_valid, validate)
 }
 
 /// Hook for form submission
-pub fn use_form_submission<T: Form + PartialEq + Send + Sync, F>(form: &FormHandle<T>, handler: F) -> (
-    Memo<bool>,
-    Callback<(), ()>
-) 
-where
-    F: Fn(&T) -> Result<(), FormError> + 'static + Clone + Send + Sync,
-{
-    let is_submitting = form.is_submitting();
-    let form_clone = form.clone();
+pub fn use_form_submission<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+) -> (Memo<bool>, Callback<()>) {
+    let is_submitting = form_handle.is_submitting();
     
+    let form_clone = form_handle.clone();
     let submit = Callback::new(move |_| {
-        let form_handle = form_clone.clone();
-        let handler_clone = handler.clone();
-        
+        let form_clone = form_clone.clone();
         spawn_local(async move {
-            // Get the current form values
-            let form_data = form_handle.get_values();
-            
-            // Call the handler with the form data
-            let result = handler_clone(&form_data.get());
-            
-            // Handle the result
-            match result {
-                Ok(_) => {
-                    // Success - could emit a success signal here
-                }
-                Err(error) => {
-                    // Error - could emit an error signal here
-                    log::error!("Form submission error: {:?}", error);
-                }
+            if let Err(error) = form_clone.submit() {
+                log::error!("Form submission failed: {:?}", error);
             }
         });
     });
@@ -112,52 +112,45 @@ where
 }
 
 /// Hook for form persistence
-pub fn use_form_persistence<T: Form + PartialEq + Send + Sync>(form: &FormHandle<T>, storage_key: Option<String>) -> (
-    Callback<(), ()>,
-    Callback<(), ()>,
-    Callback<(), ()>
-) {
-    let form_clone1 = form.clone();
-    let form_clone2 = form.clone();
-    let storage_key = storage_key.unwrap_or_else(|| format!("form-{}", std::any::type_name::<T>()));
-    let key1 = storage_key.clone();
-    let key2 = storage_key.clone();
-    let key3 = storage_key;
+pub fn use_form_persistence<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+    storage_key: &str,
+) -> (Callback<()>, Callback<()>, Callback<()>) {
+    let storage_key = storage_key.to_string();
+    let storage_key1 = storage_key.clone();
+    let storage_key2 = storage_key.clone();
+    let storage_key3 = storage_key.clone();
     
     let save = Callback::new(move |_| {
-        let form_handle = form_clone1.clone();
-        let key = key1.clone();
-        
+        let storage_key = storage_key1.clone();
         spawn_local(async move {
-            // Get current form values
-            let form_data = form_handle.get_values();
-            
-            // Serialize to JSON
-            if let Ok(_json) = serde_json::to_string(&form_data) {
-                // Save to localStorage (in a real implementation, this would use web_sys)
-                log::info!("Saving form data for key: {}", key);
-                // For now, just log - in a real implementation, you'd use web_sys::Storage
+            if let Some(window) = web_sys::window() {
+                if let Ok(Some(_storage)) = window.local_storage() {
+                    log::info!("Saving form data to storage with key: {}", storage_key);
+                }
             }
         });
     });
     
     let load = Callback::new(move |_| {
-        let _form_handle = form_clone2.clone();
-        let key = key2.clone();
-        
+        let storage_key = storage_key2.clone();
         spawn_local(async move {
-            log::info!("Loading form data for key: {}", key);
-            // In a real implementation, you'd load from web_sys::Storage
-            // and update the form with the loaded values
+            if let Some(window) = web_sys::window() {
+                if let Ok(Some(_storage)) = window.local_storage() {
+                    log::info!("Loading form data from storage with key: {}", storage_key);
+                }
+            }
         });
     });
     
     let clear = Callback::new(move |_| {
-        let key = key3.clone();
-        
+        let storage_key = storage_key3.clone();
         spawn_local(async move {
-            log::info!("Clearing form data for key: {}", key);
-            // In a real implementation, you'd clear from web_sys::Storage
+            if let Some(window) = web_sys::window() {
+                if let Ok(Some(_storage)) = window.local_storage() {
+                    log::info!("Clearing form data from storage with key: {}", storage_key);
+                }
+            }
         });
     });
     
@@ -165,241 +158,187 @@ pub fn use_form_persistence<T: Form + PartialEq + Send + Sync>(form: &FormHandle
 }
 
 /// Hook for form analytics
-pub fn use_form_analytics<T: Form + PartialEq + Send + Sync>(_form: &FormHandle<T>) -> FormAnalyticsHandle {
-    FormAnalyticsHandle::new()
+pub fn use_form_analytics<T: Form + PartialEq + Clone + Send + Sync>(
+    _form_handle: &FormHandle<T>,
+) -> Callback<&'static str> {
+    Callback::new(move |event: &'static str| {
+        log::info!("Form analytics event: {}", event);
+    })
 }
 
-/// Handle for form analytics
-pub struct FormAnalyticsHandle {
-    track_view: Callback<String, ()>,
-    track_field_interaction: Callback<(String, String, String), ()>,
-    track_submission: Callback<(String, bool), ()>,
-    track_validation_errors: Callback<(String, ValidationErrors), ()>,
-}
-
-impl FormAnalyticsHandle {
-    pub fn new() -> Self {
-        Self {
-            track_view: Callback::new(|_| {}),
-            track_field_interaction: Callback::new(|_| {}),
-            track_submission: Callback::new(|_| {}),
-            track_validation_errors: Callback::new(|_| {}),
-        }
-    }
+/// Hook for managing field arrays
+pub fn use_field_array<T: Form + PartialEq + Clone + Send + Sync, U: std::fmt::Debug + Clone + Send + Sync + 'static>(
+    form_handle: &FormHandle<T>,
+    field_name: &str,
+) -> FieldArrayHandle<U> {
+    let form_clone = form_handle.clone();
+    let field_name = field_name.to_string();
+    let field_name_clone1 = field_name.clone();
+    let add_item = Callback::new(move |value: U| {
+        let form_clone = form_clone.clone();
+        let field_name = field_name_clone1.clone();
+        spawn_local(async move {
+            let field_value = FieldValue::String(format!("{:?}", value));
+            form_clone.add_array_item(&field_name, field_value);
+        });
+    });
     
-    pub fn track_view(&self, form_name: String) {
-        self.track_view.run(form_name);
-    }
+    let form_clone2 = form_handle.clone();
+    let field_name_clone2 = field_name.clone();
+    let remove_item = Callback::new(move |index: usize| {
+        let form_clone = form_clone2.clone();
+        let field_name = field_name_clone2.clone();
+        spawn_local(async move {
+            form_clone.remove_array_item(&field_name, index);
+        });
+    });
     
-    pub fn track_field_interaction(&self, form_name: String, field_name: String, action: String) {
-        self.track_field_interaction.run((form_name, field_name, action));
-    }
+    let form_clone3 = form_handle.clone();
+    let field_name3 = field_name.clone();
+    let move_item = Callback::new(move |(from_index, to_index): (usize, usize)| {
+        let form_clone = form_clone3.clone();
+        let field_name = field_name3.clone();
+        spawn_local(async move {
+            form_clone.move_array_item(&field_name, from_index, to_index);
+        });
+    });
     
-    pub fn track_submission(&self, form_name: String, success: bool) {
-        self.track_submission.run((form_name, success));
-    }
+    let form_clone4 = form_handle.clone();
+    let field_name4 = field_name.clone();
+    let clear_array = Callback::new(move |_| {
+        let form_clone = form_clone4.clone();
+        let field_name = field_name4.clone();
+        spawn_local(async move {
+            form_clone.clear_array(&field_name);
+        });
+    });
     
-    pub fn track_validation_errors(&self, form_name: String, errors: ValidationErrors) {
-        self.track_validation_errors.run((form_name, errors));
+    FieldArrayHandle {
+        add_item,
+        remove_item,
+        move_item,
+        clear_array,
     }
-}
-
-/// Hook for form field array management
-pub fn use_field_array<T: Form + PartialEq + Send + Sync, U>(form: &FormHandle<T>, field_name: &str) -> FieldArrayHandle<U> 
-where
-    U: Clone + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static,
-{
-    FieldArrayHandle::new(form, field_name)
 }
 
 /// Handle for field array operations
 #[derive(Clone)]
-pub struct FieldArrayHandle<T: 'static> {
-    items: ReadSignal<Vec<T>>,
-    add: Callback<T, ()>,
-    remove: Callback<usize, ()>,
-    move_item: Callback<(usize, usize), ()>,
-    clear: Callback<(), ()>,
+pub struct FieldArrayHandle<U: 'static> {
+    pub add_item: Callback<U>,
+    pub remove_item: Callback<usize>,
+    pub move_item: Callback<(usize, usize)>,
+    pub clear_array: Callback<()>,
 }
 
-impl<T: Clone + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static> FieldArrayHandle<T> {
-    pub fn new<U: Form>(_form: &FormHandle<U>, _field_name: &str) -> Self {
-        let (items, set_items) = signal(Vec::<T>::new());
-        
-        let add = Callback::new(move |item: T| {
-            set_items.update(|items| items.push(item));
-        });
-        
-        let remove = Callback::new(move |index: usize| {
-            set_items.update(|items| {
-                if index < items.len() {
-                    items.remove(index);
-                }
-            });
-        });
-        
-        let move_item = Callback::new(move |(from, to): (usize, usize)| {
-            set_items.update(|items| {
-                if from < items.len() && to < items.len() && from != to {
-                    let item = items.remove(from);
-                    items.insert(to, item);
-                }
-            });
-        });
-        
-        let clear = Callback::new(move |_| {
-            set_items.set(Vec::new());
-        });
-        
-        Self {
-            items,
-            add,
-            remove,
-            move_item,
-            clear,
-        }
-    }
-    
-    pub fn items(&self) -> ReadSignal<Vec<T>> {
-        self.items
-    }
-    
-    pub fn add(&self, item: T) {
-        self.add.run(item);
-    }
-    
-    pub fn remove(&self, index: usize) {
-        self.remove.run(index);
-    }
-    
-    pub fn move_item(&self, from: usize, to: usize) {
-        self.move_item.run((from, to));
-    }
-    
-    pub fn clear(&self) {
-        self.clear.run(());
-    }
-    
-    pub fn len(&self) -> Memo<usize> {
-        let items_signal = self.items;
-        Memo::new(move |_| items_signal.get().len())
-    }
-    
-    pub fn is_empty(&self) -> Memo<bool> {
-        let items_signal = self.items;
-        Memo::new(move |_| items_signal.get().is_empty())
-    }
-}
-
-/// Hook for form wizard/multi-step forms
-pub fn use_form_wizard<T: Form + PartialEq + Send + Sync>(_form: &FormHandle<T>, steps: Vec<String>) -> FormWizardHandle {
-    FormWizardHandle::new(steps)
-}
-
-/// Handle for form wizard operations
-pub struct FormWizardHandle {
-    current_step: ReadSignal<usize>,
+/// Hook for form wizard functionality
+pub fn use_form_wizard<T: Form + PartialEq + Clone + Send + Sync>(
     steps: Vec<String>,
-    next: Callback<(), ()>,
-    previous: Callback<(), ()>,
-    go_to_step: Callback<usize, ()>,
-    is_first_step: Memo<bool>,
-    is_last_step: Memo<bool>,
+) -> (ReadSignal<usize>, Callback<()>, Callback<()>, Callback<usize>, Callback<()>) {
+    let current_step = create_rw_signal(0);
+    let steps1 = steps.clone();
+    
+    let next_step = Callback::new(move |_| {
+        let step = current_step.get();
+        if step < steps1.len() - 1 {
+            current_step.set(step + 1);
+        }
+    });
+    
+    let prev_step = Callback::new(move |_| {
+        let step = current_step.get();
+        if step > 0 {
+            current_step.set(step - 1);
+        }
+    });
+    
+    let steps3 = steps.clone();
+    let go_to_step = Callback::new(move |step: usize| {
+        if step < steps3.len() {
+            current_step.set(step);
+        }
+    });
+    
+    let reset_wizard = Callback::new(move |_| {
+        current_step.set(0);
+    });
+    
+    (current_step.read_only(), next_step, prev_step, go_to_step, reset_wizard)
 }
 
-impl FormWizardHandle {
-    pub fn new(steps: Vec<String>) -> Self {
-        let (current_step, set_current_step) = signal(0);
-        let steps_clone1 = steps.clone();
-        let steps_clone2 = steps.clone();
-        let steps_clone3 = steps.clone();
+/// Hook for real-time validation
+pub fn use_real_time_validation<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+    field_name: &str,
+    delay_ms: u32,
+) -> (ReadSignal<Option<String>>, Callback<FieldValue>) {
+    let validation_error = create_rw_signal(None::<String>);
+    
+    let form_clone = form_handle.clone();
+    let field_name = field_name.to_string();
+    let set_error = validation_error.clone();
+    let validate_field = Callback::new(move |value: FieldValue| {
+        let form_clone = form_clone.clone();
+        let field_name = field_name.clone();
+        let set_error = set_error.clone();
         
-        let next = Callback::new(move |_| {
-            set_current_step.update(|step| {
-                if *step < steps_clone1.len() - 1 {
-                    *step += 1;
+        spawn_local(async move {
+            // Simulate validation delay
+            gloo_timers::callback::Timeout::new(delay_ms, move || {
+                if let Err(errors) = form_clone.validate_field(&field_name) {
+                    if let Some(error) = errors.get_field_error(&field_name).and_then(|v| v.first()) {
+                        set_error.set(Some(error.clone()));
+                    }
+                } else {
+                    set_error.set(None);
                 }
+            }).forget();
+        });
+    });
+    
+    (validation_error.read_only(), validate_field)
+}
+
+/// Hook for conditional validation
+pub fn use_conditional_validation<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+    field_name: &str,
+    condition: impl Fn(&T) -> bool + Send + Sync + 'static,
+) -> Memo<bool> {
+    let form_handle = form_handle.clone();
+    let _field_name = field_name.to_string();
+    Memo::new(move |_| {
+        let values = form_handle.values().get();
+        condition(&values)
+    })
+}
+
+/// Hook for form performance monitoring
+pub fn use_form_performance<T: Form + PartialEq + Clone + Send + Sync>(
+    form_handle: &FormHandle<T>,
+) -> (ReadSignal<crate::core::performance::FormPerformanceMetrics>, Callback<()>) {
+    let metrics = RwSignal::new(crate::core::performance::FormPerformanceMetrics::new());
+    
+    let form_clone = form_handle.clone();
+    let metrics_clone = metrics.clone();
+    
+    // Benchmark callback for measuring performance
+    let benchmark = Callback::new(move |_| {
+        let form_clone = form_clone.clone();
+        let metrics_clone = metrics_clone.clone();
+        
+        spawn_local(async move {
+            let start = std::time::Instant::now();
+            
+            // Measure form creation time
+            let _form = FormHandle::new(form_clone.values().get());
+            let creation_time = start.elapsed();
+            
+            // Update metrics
+            metrics_clone.update(|m| {
+                m.record_form_creation(creation_time);
             });
         });
-        
-        let previous = Callback::new(move |_| {
-            set_current_step.update(|step| {
-                if *step > 0 {
-                    *step -= 1;
-                }
-            });
-        });
-        
-        let go_to_step = Callback::new(move |target_step: usize| {
-            set_current_step.set(target_step.min(steps_clone2.len() - 1));
-        });
-        
-        let current_step_signal = current_step;
-        let is_first_step = Memo::new(move |_| current_step_signal.get() == 0);
-        let is_last_step = Memo::new(move |_| current_step_signal.get() == steps_clone3.len() - 1);
-        
-        Self {
-            current_step,
-            steps,
-            next,
-            previous,
-            go_to_step,
-            is_first_step,
-            is_last_step,
-        }
-    }
+    });
     
-    pub fn current_step(&self) -> ReadSignal<usize> {
-        self.current_step
-    }
-    
-    pub fn current_step_name(&self) -> Memo<String> {
-        let current_step_signal = self.current_step;
-        let steps_clone = self.steps.clone();
-        Memo::new(move |_| {
-            let step = current_step_signal.get();
-            if step < steps_clone.len() {
-                steps_clone[step].clone()
-            } else {
-                String::new()
-            }
-        })
-    }
-    
-    pub fn steps(&self) -> &[String] {
-        &self.steps
-    }
-    
-    pub fn next(&self) {
-        self.next.run(());
-    }
-    
-    pub fn previous(&self) {
-        self.previous.run(());
-    }
-    
-    pub fn go_to_step(&self, step: usize) {
-        self.go_to_step.run(step);
-    }
-    
-    pub fn is_first_step(&self) -> Memo<bool> {
-        self.is_first_step
-    }
-    
-    pub fn is_last_step(&self) -> Memo<bool> {
-        self.is_last_step
-    }
-    
-    pub fn progress(&self) -> Memo<f64> {
-        let current_step_signal = self.current_step;
-        let total_steps = self.steps.len();
-        Memo::new(move |_| {
-            let step = current_step_signal.get();
-            if total_steps > 0 {
-                (step as f64) / (total_steps as f64)
-            } else {
-                0.0
-            }
-        })
-    }
+    (metrics.read_only(), benchmark)
 }

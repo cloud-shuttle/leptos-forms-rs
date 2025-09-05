@@ -1,516 +1,312 @@
 
-use leptos::prelude::{ReadSignal, WriteSignal, signal, Memo, Get, Set};
-use std::collections::HashMap;
-use crate::core::traits::*;
-use crate::core::types::*;
-use crate::validation::ValidationErrors;
+use leptos::prelude::*;
+use leptos::prelude::GetUntracked;
+use crate::core::traits::Form;
+use crate::core::types::{FormState, FieldValue};
+use crate::validation::{ValidationErrors, Validator};
 use crate::error::FormError;
 
-/// Main form handle for managing form state and operations
-pub struct FormHandle<T: Form> {
-    /// Current form state (read signal)
-    state: ReadSignal<FormState<T>>,
-    /// Current form state (write signal)
-    write_state: WriteSignal<FormState<T>>,
-    /// Form schema
-    schema: FormSchema,
-    /// Validation mode
-    validation_mode: ValidationMode,
-    /// Submission mode
-    submission_mode: SubmissionMode,
-    /// Persistence options
-    persistence: PersistenceOptions,
-    /// Analytics options
-    analytics: AnalyticsOptions,
-    /// Field-specific signals
-    field_signals: HashMap<String, FieldSignal>,
-    /// Subscribers for state changes
-    subscribers: Vec<Box<dyn Fn(FormState<T>) + Send + Sync + 'static>>,
+/// Form handle for managing form state and operations
+pub struct FormHandle<T: Form> where T: Send, T: std::marker::Sync {
+    state: RwSignal<FormState<T>>,
 }
 
-/// Signal wrapper for individual field state
-#[derive(Clone)]
-pub struct FieldSignal {
-    pub value: ReadSignal<Option<FieldValue>>,
-    pub error: ReadSignal<Option<String>>,
-    pub is_dirty: ReadSignal<bool>,
-    pub is_touched: ReadSignal<bool>,
-}
+impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
+    /// Create a new form handle
+    pub fn new(form: T) -> Self {
+        let initial_state = FormState::new(form);
+        let state = create_rw_signal(initial_state);
+        Self { state }
+    }
 
-impl<T: Form + PartialEq + Clone + Send + Sync> FormHandle<T> {
-    /// Create a new form handle with default values
-    pub fn new() -> Self {
-        let default_values = T::default_values();
-        let schema = T::schema();
-        
-        let (read, write) = signal(FormState::new(default_values));
-        Self {
-            state: read,
-            write_state: write,
-            schema,
-            validation_mode: ValidationMode::OnBlur,
-            submission_mode: SubmissionMode::Manual,
-            persistence: PersistenceOptions::default(),
-            analytics: AnalyticsOptions::default(),
-            field_signals: HashMap::new(),
-            subscribers: Vec::new(),
-        }
+    /// Get the form state signal
+    pub fn state(&self) -> ReadSignal<FormState<T>> {
+        self.state.read_only()
     }
-    
-    /// Create a new form handle with custom initial values
-    pub fn with_values(values: T) -> Self {
-        let schema = T::schema();
-        
-        let (read, write) = signal(FormState::new(values));
-        Self {
-            state: read,
-            write_state: write,
-            schema,
-            validation_mode: ValidationMode::OnBlur,
-            submission_mode: SubmissionMode::Manual,
-            persistence: PersistenceOptions::default(),
-            analytics: AnalyticsOptions::default(),
-            field_signals: HashMap::new(),
-            subscribers: Vec::new(),
-        }
+
+    /// Get the form values signal
+    pub fn values(&self) -> Memo<T> {
+        let state = self.state.clone();
+        Memo::new(move |_| state.get().values.clone())
     }
-    
-    /// Get the current form state
-    pub fn get_state(&self) -> ReadSignal<FormState<T>> {
-        self.state
+
+    /// Get the form errors signal
+    pub fn errors(&self) -> Memo<ValidationErrors> {
+        let state = self.state.clone();
+        Memo::new(move |_| state.get().errors.clone())
     }
-    
-    /// Get the form values
-    pub fn get_values(&self) -> Memo<T> {
-        let state_signal = self.state;
-        Memo::new(move |_| {
-            let state = state_signal.get();
-            state.values.clone()
-        })
-    }
-    
-    /// Get form errors
-    pub fn get_errors(&self) -> Memo<ValidationErrors> {
-        let state_signal = self.state;
-        Memo::new(move |_| {
-            let state = state_signal.get();
-            state.errors.clone()
-        })
-    }
-    
-    /// Check if form is valid
+
+    /// Get the form validity signal
     pub fn is_valid(&self) -> Memo<bool> {
-        let state_signal = self.state;
-        Memo::new(move |_| {
-            let state = state_signal.get();
-            state.is_valid
-        })
+        let state = self.state.clone();
+        Memo::new(move |_| state.get().is_valid())
     }
-    
-    /// Check if form is dirty (has been modified)
+
+    /// Get the form dirty state signal
     pub fn is_dirty(&self) -> Memo<bool> {
-        let state_signal = self.state;
-        Memo::new(move |_| {
-            let state = state_signal.get();
-            state.is_dirty
-        })
+        let state = self.state.clone();
+        Memo::new(move |_| state.get().is_dirty)
     }
-    
-    /// Check if form is submitting
+
+    /// Get the form submitting state signal
     pub fn is_submitting(&self) -> Memo<bool> {
-        let state_signal = self.state;
-        Memo::new(move |_| {
-            state_signal.get().is_submitting
-        })
+        let state = self.state.clone();
+        Memo::new(move |_| state.get().is_submitting)
     }
-    
-    /// Get a field signal by name
-    pub fn get_field_signal(&mut self, field_name: &str) -> Option<&FieldSignal> {
-        if !self.field_signals.contains_key(field_name) {
-            self.create_field_signal(field_name);
-        }
-        self.field_signals.get(field_name)
-    }
-    
-    /// Create a field signal for a specific field
-    fn create_field_signal(&mut self, field_name: &str) {
-        // For now, we'll create simple signals
-        // In a real implementation, you'd want to create derived signals
-        let (value_signal, _) = signal(None::<FieldValue>);
-        let (error_signal, _) = signal(None::<String>);
-        let (is_dirty_signal, _) = signal(false);
-        let (is_touched_signal, _) = signal(false);
-        
-        let field_signal = FieldSignal {
-            value: value_signal,
-            error: error_signal,
-            is_dirty: is_dirty_signal,
-            is_touched: is_touched_signal,
-        };
-        
-        self.field_signals.insert(field_name.to_string(), field_signal);
-    }
-    
-    /// Set a field value
-    pub fn set_field_value(&self, field_name: &str, value: FieldValue) -> Result<(), FormError> {
-        let current_state = self.state.get();
-        let mut values = current_state.values.clone();
-        
-        values.set_field(field_name, value).map_err(FormError::from_field_error)?;
-        
-        let new_state = current_state
-            .with_errors(ValidationErrors::new())
-            .mark_dirty()
-            .mark_touched(field_name.to_string());
-        
-        // Validate field if needed
-        let validation_errors = if self.should_validate_field() {
-            self.validate_field(&values, field_name)
-        } else {
-            ValidationErrors::new()
-        };
-        
-        let final_state = new_state.with_errors(validation_errors);
-        self.write_state.set(final_state);
-        
-        // Track analytics
-        if self.analytics.track_field_interactions {
-            self.track_field_interaction(field_name, "value_change");
-        }
-        
-        Ok(())
-    }
-    
+
     /// Get a field value
     pub fn get_field_value(&self, field_name: &str) -> Option<FieldValue> {
-        let state = self.state.get();
-        state.values.get_field(field_name)
-    }
-    
-    /// Validate a single field
-    pub fn validate_field(&self, form: &T, field_name: &str) -> ValidationErrors {
-        let mut errors = ValidationErrors::new();
+        let state = self.state.get_untracked();
+        let schema = T::schema();
         
-        if let Some(field_metadata) = self.schema.get_field(field_name) {
-            if let Some(value) = form.get_field(field_name) {
-                for validator in &field_metadata.validators {
-                    if let Err(error) = self.validate_field_value(&value, validator) {
-                        errors.add_field_error(field_name.to_string(), error);
-                    }
-                }
-            } else if field_metadata.is_required {
-                errors.add_field_error(field_name.to_string(), "This field is required".to_string());
-            }
-        }
-        
-        errors
-    }
-    
-    /// Validate the entire form
-    pub fn validate_form(&self) -> Result<(), ValidationErrors> {
-        let state = self.state.get();
-        let validation_result = state.values.validate();
-        
-        match validation_result {
-            Ok(()) => {
-                let new_state = state.with_errors(ValidationErrors::new());
-                self.write_state.set(new_state);
-                Ok(())
-            }
-            Err(errors) => {
-                let new_state = state.with_errors(errors.clone());
-                self.write_state.set(new_state);
-                Err(errors)
-            }
-        }
-    }
-    
-    /// Validate field value against a specific validator
-    fn validate_field_value(&self, value: &FieldValue, validator: &ValidatorConfig) -> Result<(), String> {
-        use crate::validation::Validators;
-        
-        match validator {
-            ValidatorConfig::Required => Validators::required(value),
-            ValidatorConfig::Email => Validators::email(value),
-            ValidatorConfig::MinLength(min) => Validators::min_length(value, *min),
-            ValidatorConfig::MaxLength(max) => Validators::max_length(value, *max),
-            ValidatorConfig::Pattern(pattern) => Validators::pattern(value, pattern),
-            ValidatorConfig::Min(min) => Validators::min(value, *min),
-            ValidatorConfig::Max(max) => Validators::max(value, *max),
-            ValidatorConfig::Custom(_) => Ok(()), // Custom validators handled separately
-            _ => Ok(()),
-        }
-    }
-    
-    /// Reset the form to default values
-    pub fn reset(&self) {
-        let default_values = T::default_values();
-        let new_state = FormState::new(default_values);
-        self.write_state.set(new_state);
-        
-        // Track analytics
-        if self.analytics.track_field_interactions {
-            self.track_field_interaction("form", "reset");
-        }
-    }
-    
-    /// Submit the form
-    pub async fn submit(&self, handler: Box<dyn FormSubmitHandler<T>>) -> Result<(), crate::error::FormError> {
-        // Validate form first
-        if let Err(errors) = self.validate_form() {
-            if self.analytics.track_validation_errors {
-                self.track_validation_errors(&errors);
-            }
-            return Err(crate::error::FormError::validation_error("Form validation failed", 
-                errors.field_errors.iter()
-                    .map(|(field, msg)| crate::error::FieldError::new(field.clone(), msg.clone()))
-                    .collect()));
-        }
-        
-        // Mark as submitting
-        let current_state = self.state.get();
-        let submitting_state = current_state.mark_submitting();
-        self.write_state.set(submitting_state);
-        
-        // Track submission attempt
-        if self.analytics.track_submission_attempts {
-            self.track_submission_attempt(true);
-        }
-        
-        // Handle submission
-        let result = handler.handle_submit(&self.state.get().values);
-        
-        // Update state based on result
-        let mut final_state = self.state.get();
-        final_state.is_submitting = false;
-        
-        match result {
-            Ok(()) => {
-                // Clear form if configured
-                if self.persistence.clear_on_submit {
-                    self.reset();
-                }
-                
-                if self.analytics.track_submission_attempts {
-                    self.track_submission_attempt(false);
-                }
-            }
-            Err(ref error) => {
-                final_state.errors.form_errors.push(error.message.clone());
-                if self.analytics.track_submission_attempts {
-                    self.track_submission_attempt(false);
-                }
-            }
-        }
-        
-        self.write_state.set(final_state);
-        result.map_err(|e| crate::error::FormError::submission_error(e.message, None, None))
-    }
-    
-    /// Set validation mode
-    pub fn set_validation_mode(&mut self, mode: ValidationMode) {
-        self.validation_mode = mode;
-    }
-    
-    /// Set submission mode
-    pub fn set_submission_mode(&mut self, mode: SubmissionMode) {
-        self.submission_mode = mode;
-    }
-    
-    /// Set persistence options
-    pub fn set_persistence(&mut self, options: PersistenceOptions) {
-        self.persistence = options;
-    }
-    
-    /// Set analytics options
-    pub fn set_analytics(&mut self, options: AnalyticsOptions) {
-        self.analytics = options;
-    }
-    
-    /// Subscribe to form state changes
-    pub fn subscribe(&mut self, callback: Box<dyn Fn(FormState<T>) + Send + Sync + 'static>) {
-        self.subscribers.push(callback);
-    }
-    
-    /// Check if field should be validated based on current mode
-    fn should_validate_field(&self) -> bool {
-        matches!(self.validation_mode, 
-            ValidationMode::OnChange | ValidationMode::OnBlurAndChange)
-    }
-    
-    /// Track field interaction for analytics
-    fn track_field_interaction(&self, field_name: &str, action: &str) {
-        if let Some(custom_tracking) = &self.analytics.custom_tracking {
-            custom_tracking("field_interaction", field_name, action);
-        }
-    }
-    
-    /// Track validation errors for analytics
-    fn track_validation_errors(&self, errors: &ValidationErrors) {
-        if let Some(custom_tracking) = &self.analytics.custom_tracking {
-            let error_count = errors.field_errors.len() + errors.form_errors.len();
-            custom_tracking("validation_errors", "form", &error_count.to_string());
-        }
-    }
-    
-    /// Track submission attempt for analytics
-    fn track_submission_attempt(&self, success: bool) {
-        if let Some(custom_tracking) = &self.analytics.custom_tracking {
-            custom_tracking("submission_attempt", "form", if success { "success" } else { "failure" });
-        }
-    }
-    
-    /// Field Array Management Methods
-    
-    /// Add a new item to a field array
-    pub fn add_field_array_item(&mut self, field_name: &str) -> Result<(), FormError> {
-        let mut current_state = self.state.get();
-        
-        // Get the field metadata to understand the array structure
-        if let Some(field_meta) = self.schema.get_field(field_name) {
-            if let FieldType::Array(item_type) = &field_meta.field_type {
-                // Create a default value for the new item
-                let default_value = self.create_default_value_for_type(&item_type);
-                
-                // Add to the array field
-                if let Some(FieldValue::Array(ref mut array)) = current_state.values.get_field(field_name) {
-                    array.push(default_value);
-                } else {
-                    // Initialize array if it doesn't exist
-                    let mut new_array = Vec::new();
-                    new_array.push(default_value);
-                    current_state.values.set_field(field_name, FieldValue::Array(new_array))
-                        .map_err(|e| FormError::field_error(field_name.to_string(), e.message))?;
-                }
-                
-                // Clear any existing errors for this field
-                current_state.errors.field_errors.remove(field_name);
-                
-                // Update state
-                self.write_state.set(current_state);
-                
-                // Notify subscribers
-                self.notify_subscribers();
-                
-                Ok(())
-            } else {
-                Err(FormError::field_error(
-                    format!("Field '{}' is not an array type", field_name),
-                    field_name.to_string(),
-                ))
-            }
-        } else {
-            Err(FormError::field_error(
-                format!("Field '{}' not found in schema", field_name),
-                field_name.to_string(),
-            ))
-        }
-    }
-    
-    /// Remove an item from a field array
-    pub fn remove_field_array_item(&mut self, field_name: &str, index: usize) -> Result<(), FormError> {
-        let mut current_state = self.state.get();
-        
-        if let Some(FieldValue::Array(ref mut array)) = current_state.values.get_field(field_name) {
-            if index < array.len() {
-                array.remove(index);
-                
-                // Clear any existing errors for this field
-                current_state.errors.field_errors.remove(field_name);
-                
-                // Update state
-                self.write_state.set(current_state);
-                
-                // Notify subscribers
-                self.notify_subscribers();
-                
-                Ok(())
-            } else {
-                Err(FormError::field_error(
-                    format!("Index {} out of bounds for array field '{}'", index, field_name),
-                    field_name.to_string(),
-                ))
-            }
-        } else {
-            Err(FormError::field_error(
-                format!("Field '{}' is not an array or doesn't exist", field_name),
-                field_name.to_string(),
-            ))
-        }
-    }
-    
-    /// Get field array items
-    pub fn field_array(&self, field_name: &str) -> Option<Vec<FieldValue>> {
-        let current_state = self.state.get();
-        if let Some(FieldValue::Array(array)) = current_state.values.get_field(field_name) {
-            Some(array.clone())
+        // Check if the field exists in the schema
+        if schema.get_field(field_name).is_some() {
+            Some(state.values.get_field_value(field_name))
         } else {
             None
         }
     }
-    
-    /// Set field array item value
-    pub fn set_field_array_item_value(&mut self, field_name: &str, index: usize, value: FieldValue) -> Result<(), FormError> {
-        let current_state = self.state.get();
-        if let Some(FieldValue::Array(ref mut array)) = current_state.values.get_field(field_name) {
-            if index < array.len() {
-                array[index] = value;
-                self.write_state.set(current_state);
-                self.notify_subscribers();
-                Ok(())
-            } else {
-                Err(FormError::field_error(format!("Index {} out of bounds for array field '{}'", index, field_name), field_name.to_string()))
+
+    /// Set a field value
+    pub fn set_field_value(&self, field_name: &str, value: FieldValue) {
+        let current_state = self.state.get_untracked();
+        
+        // Create a new form instance with the updated field
+        let mut new_form = current_state.values.clone();
+        
+        // Update the field using the form's set_field_value method
+        new_form.set_field_value(field_name, value);
+        
+        // Create new state with updated form and mark as dirty
+        let new_state = FormState {
+            values: new_form,
+            is_dirty: true,
+            is_submitting: current_state.is_submitting,
+            errors: current_state.errors,
+        };
+        
+        self.state.set(new_state);
+    }
+
+    /// Validate a specific field
+    pub fn validate_field(&self, field_name: &str) -> Result<(), ValidationErrors> {
+        let state = self.state.get();
+        let form_data = &state.values;
+        let binding = T::schema();
+        let metadata = binding.get_field(field_name);
+        
+        if let Some(field_meta) = metadata {
+            let default_value = FieldValue::String(String::new());
+            let field_value = form_data.get_field_value(field_name);
+            
+            // Validate field
+            for validator in &field_meta.validators {
+                if let Err(error) = self.validate_field_value(field_value.clone(), validator) {
+                    let mut errors = ValidationErrors::new();
+                    errors.add_field_error(field_name, error);
+                    return Err(errors);
+                }
             }
+        }
+        
+        Ok(())
+    }
+
+    /// Validate the entire form
+    pub fn validate(&self) -> Result<(), FormError> {
+        let state = self.state.get_untracked();
+        let form_data = &state.values;
+        let metadata = T::schema().field_metadata.clone();
+        let mut errors = ValidationErrors::new();
+        
+        for field_meta in metadata {
+            let field_name = &field_meta.name;
+            let field_value = form_data.get_field_value(field_name);
+            
+            // Validate field
+            for validator in &field_meta.validators {
+                if let Err(error) = self.validate_field_value(field_value.clone(), validator) {
+                    errors.add_field_error(field_name, error);
+                }
+            }
+        }
+        
+        // Also call the form's own validate method for custom validation logic
+        if let Err(form_errors) = form_data.validate() {
+            for (field_name, error_msgs) in form_errors.field_errors {
+                for error_msg in error_msgs {
+                    errors.add_field_error(&field_name, error_msg);
+                }
+            }
+        }
+        
+        if errors.has_errors() {
+            // Update state with errors
+            let new_state = state.with_errors(errors.clone());
+            self.state.set(new_state);
+            
+            Err(FormError::validation_error("Form validation failed".to_string(), errors.to_field_errors()))
         } else {
-            Err(FormError::field_error(format!("Field '{}' is not an array or doesn't exist", field_name), field_name.to_string()))
+            // Clear any existing errors
+            let new_state = state.with_errors(ValidationErrors::new());
+            self.state.set(new_state);
+            Ok(())
         }
     }
-    
-    /// Helper method to create default values for different field types
-    fn create_default_value_for_type(&self, field_type: &FieldType) -> FieldValue {
-        match field_type {
-            FieldType::Text => FieldValue::String(String::new()),
-            FieldType::Email => FieldValue::String(String::new()),
-            FieldType::Password => FieldValue::String(String::new()),
-            FieldType::Number(_) => FieldValue::Number(0.0),
-            FieldType::Boolean => FieldValue::Boolean(false),
-            FieldType::Select(_) => FieldValue::String(String::new()),
-            FieldType::MultiSelect(_) => FieldValue::Array(Vec::new()),
-            FieldType::Date => FieldValue::Date(chrono::NaiveDate::from_ymd_opt(2024, 1, 1).unwrap()),
-            FieldType::DateTime => FieldValue::DateTime(chrono::Utc::now()),
-            FieldType::File(_) => FieldValue::Null,
-            FieldType::Array(_) => FieldValue::Array(Vec::new()),
-            FieldType::Nested(_) => FieldValue::Object(std::collections::HashMap::new()),
+
+    /// Submit the form
+    pub fn submit(&self) -> Result<T, FormError> {
+        // Validate first
+        self.validate()?;
+        
+        let state = self.state.get_untracked();
+        let mut new_state = state.mark_submitting();
+        self.state.set(new_state.clone());
+        
+        // In a real implementation, you would send the data here
+        // For now, just return the values
+        Ok(new_state.values)
+    }
+
+    /// Reset the form to initial values
+    pub fn reset(&self) {
+        let state = self.state.get_untracked();
+        let initial_values = T::default_values();
+        let new_state = FormState::new(initial_values);
+        self.state.set(new_state);
+    }
+
+    /// Clear all validation errors
+    pub fn clear_errors(&self) {
+        let state = self.state.get_untracked();
+        let new_state = state.with_errors(ValidationErrors::new());
+        self.state.set(new_state);
+    }
+
+    /// Clear errors for a specific field
+    pub fn clear_field_errors(&self, field_name: &str) {
+        let state = self.state.get_untracked();
+        let mut new_errors = state.errors.clone();
+        new_errors.remove_field_error(field_name);
+        let new_state = state.with_errors(new_errors);
+        self.state.set(new_state);
+    }
+
+    /// Add an item to a field array
+    pub fn add_array_item(&self, field_name: &str, value: FieldValue) {
+        let mut current_state = self.state.get_untracked();
+        let mut new_values = current_state.values.clone();
+        
+        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+            array.push(value);
+            
+            let new_state = current_state.mark_dirty();
+            
+            self.state.set(new_state);
         }
     }
-    
-    /// Notify all subscribers of state changes
-    fn notify_subscribers(&self) {
-        let current_state = self.state.get();
-        for subscriber in &self.subscribers {
-            subscriber(current_state.clone());
+
+    /// Remove an item from a field array
+    pub fn remove_array_item(&self, field_name: &str, index: usize) {
+        let mut current_state = self.state.get_untracked();
+        let mut new_values = current_state.values.clone();
+        
+        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+            if index < array.len() {
+                array.remove(index);
+                
+                let new_state = current_state.mark_dirty();
+                
+                self.state.set(new_state);
+            }
+        }
+    }
+
+    /// Move an item in a field array
+    pub fn move_array_item(&self, field_name: &str, from_index: usize, to_index: usize) {
+        let mut current_state = self.state.get_untracked();
+        let mut new_values = current_state.values.clone();
+        
+        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+            if from_index < array.len() && to_index < array.len() {
+                let item = array.remove(from_index);
+                array.insert(to_index, item);
+                
+                let new_state = current_state.mark_dirty();
+                
+                self.state.set(new_state);
+            }
+        }
+    }
+
+    /// Clear all items in a field array
+    pub fn clear_array(&self, field_name: &str) {
+        let mut current_state = self.state.get_untracked();
+        let mut new_values = current_state.values.clone();
+        
+        if let FieldValue::Array(ref mut array) = new_values.get_field_value(field_name) {
+            array.clear();
+            
+            let new_state = current_state.mark_dirty();
+            
+            self.state.set(new_state);
+        }
+    }
+
+    /// Get the form schema
+    pub fn schema(&self) -> crate::core::traits::FormSchema {
+        T::schema()
+    }
+
+    /// Get field metadata
+    pub fn get_field_metadata(&self, field_name: &str) -> Option<crate::core::traits::FieldMetadata> {
+        let binding = T::schema();
+        binding.get_field(field_name).cloned()
+    }
+
+    /// Check if a field is required
+    pub fn is_field_required(&self, field_name: &str) -> bool {
+        self.get_field_metadata(field_name)
+            .map(|meta| meta.is_required)
+            .unwrap_or(false)
+    }
+
+    /// Get the field type
+    pub fn get_field_type(&self, field_name: &str) -> Option<crate::core::types::FieldType> {
+        self.get_field_metadata(field_name)
+            .map(|meta| meta.field_type.clone())
+    }
+
+    /// Private helper to validate a field value against a validator
+    fn validate_field_value(&self, value: FieldValue, validator: &Validator) -> Result<(), String> {
+        use crate::validation::ValidationRuleEngine;
+        
+        let mut engine = ValidationRuleEngine::new();
+        engine.add_validator(validator.clone());
+        
+        match engine.validate_value(value) {
+            Ok(_) => Ok(()),
+            Err(errors) => {
+                if let Some(error) = errors.get_field_error("").and_then(|v| v.first()) {
+                    Err(error.clone())
+                } else {
+                    Err("Validation failed".to_string())
+                }
+            }
         }
     }
 }
 
-impl<T: Form + PartialEq + Clone + Send + Sync> Clone for FormHandle<T> {
+impl<T: Form + Send + Sync> Clone for FormHandle<T> {
     fn clone(&self) -> Self {
         Self {
-            state: self.state,
-            write_state: self.write_state,
-            schema: self.schema.clone(),
-            validation_mode: self.validation_mode,
-            submission_mode: self.submission_mode,
-            persistence: self.persistence.clone(),
-            analytics: self.analytics.clone(),
-            field_signals: self.field_signals.clone(),
-            subscribers: Vec::new(), // Don't clone subscribers
+            state: self.state.clone(),
         }
     }
 }
 
-impl<T: Form + PartialEq + Clone + Send + Sync> Default for FormHandle<T> {
-    fn default() -> Self {
-        Self::new()
+impl<T: Form + Send + Sync + PartialEq> PartialEq for FormHandle<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.state.get_untracked() == other.state.get_untracked()
     }
 }

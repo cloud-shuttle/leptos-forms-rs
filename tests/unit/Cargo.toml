@@ -7,8 +7,9 @@ edition = "2021"
 leptos = { workspace = true }
 leptos-forms-rs = { path = "../../leptos-forms-rs" }
 serde = { workspace = true }
+serde_json = { workspace = true }
+regex = { workspace = true }
 
 [[test]]
-name = "main"
-path = "src/main.rs"
-harness = false
+name = "integration_tests"
+path = "src/lib.rs"

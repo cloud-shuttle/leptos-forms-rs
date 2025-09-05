@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 use leptos_forms_rs::*;
-use leptos_forms_rs::core::types::{FieldType, FieldValue, ValidatorConfig};
+use leptos_forms_rs::core::types::{FieldType, FieldValue};
+use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::core::traits::{FieldMetadata, FormSchema};
 use leptos_forms_rs::validation::ValidationErrors;
 use leptos_forms_rs::core::types::FieldError;
@@ -23,7 +24,7 @@ impl Form for LoginForm {
             FieldMetadata {
                 name: "email".to_string(),
                 field_type: FieldType::Email,
-                validators: vec![ValidatorConfig::Required, ValidatorConfig::Email],
+                validators: vec![Validator::Required, Validator::Email],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -32,7 +33,7 @@ impl Form for LoginForm {
             FieldMetadata {
                 name: "password".to_string(),
                 field_type: FieldType::Password,
-                validators: vec![ValidatorConfig::Required, ValidatorConfig::MinLength(8)],
+                validators: vec![Validator::Required, Validator::MinLength(8)],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -55,14 +56,14 @@ impl Form for LoginForm {
         
         // Validate email
         if self.email.is_empty() {
-            errors.add_field_error("email".to_string(), "Email is required".to_string());
+            errors.add_field_error("email", "Email is required".to_string());
         } else if !self.email.contains('@') {
-            errors.add_field_error("email".to_string(), "Invalid email format".to_string());
+            errors.add_field_error("email", "Invalid email format".to_string());
         }
         
         // Validate password
         if self.password.len() < 8 {
-            errors.add_field_error("password".to_string(), "Password must be at least 8 characters".to_string());
+            errors.add_field_error("password", "Password must be at least 8 characters".to_string());
         }
         
         if errors.is_empty() {
@@ -72,42 +73,12 @@ impl Form for LoginForm {
         }
     }
     
-    fn get_field(&self, name: &str) -> Option<FieldValue> {
+    fn get_field_value(&self, name: &str) -> FieldValue {
         match name {
-            "email" => Some(FieldValue::String(self.email.clone())),
-            "password" => Some(FieldValue::String(self.password.clone())),
-            "remember_me" => Some(FieldValue::Boolean(self.remember_me)),
-            _ => None,
-        }
-    }
-    
-    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), FieldError> {
-        match name {
-            "email" => {
-                if let FieldValue::String(s) = value {
-                    self.email = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "password" => {
-                if let FieldValue::String(s) = value {
-                    self.password = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "remember_me" => {
-                if let FieldValue::Boolean(b) = value {
-                    self.remember_me = b;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected boolean value".to_string()))
-                }
-            }
-            _ => Err(FieldError::new(name.to_string(), "Unknown field".to_string())),
+            "email" => FieldValue::String(self.email.clone()),
+            "password" => FieldValue::String(self.password.clone()),
+            "remember_me" => FieldValue::Boolean(self.remember_me),
+            _ => FieldValue::String(String::new()),
         }
     }
     
@@ -120,21 +91,20 @@ impl Form for LoginForm {
     }
     
     fn schema() -> FormSchema {
-        let mut schema = FormSchema::new();
-        for field in Self::field_metadata() {
-            schema.add_field(field);
+        FormSchema {
+            name: "LoginForm".to_string(),
+            field_metadata: Self::field_metadata(),
         }
-        schema
     }
 }
 
 #[component]
 fn LoginPage() -> impl IntoView {
-    let form = use_form::<LoginForm>();
+    let (form, submit_callback, reset_callback) = use_form(LoginForm::default_values());
     
     let form_clone = form.clone();
     let handle_submit = move |_| {
-        let form_data = form_clone.get_values().get();
+        let form_data = form_clone.values().get();
         log::info!("Form submitted: {:?}", form_data);
         // In a real app, you would send this to your backend
         if let Some(window) = web_sys::window() {
@@ -201,7 +171,7 @@ fn LoginPage() -> impl IntoView {
                 <div class="form-debug">
                     <h3>"Form Debug Info"</h3>
                     <p>"Form is working! This demonstrates the current API."</p>
-                    <p>"Form values: " {move || format!("{:?}", form_clone3.get_values().get())}</p>
+                    <p>"Form values: " {move || format!("{:?}", form_clone3.values().get())}</p>
                 </div>
             </div>
         </div>

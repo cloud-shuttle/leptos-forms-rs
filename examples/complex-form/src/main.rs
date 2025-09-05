@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 use leptos_forms_rs::*;
-use leptos_forms_rs::core::types::{FieldType, FieldValue, ValidatorConfig};
+use leptos_forms_rs::core::types::{FieldType, FieldValue};
+use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::core::traits::{FieldMetadata, FormSchema};
 use leptos_forms_rs::validation::ValidationErrors;
 use leptos_forms_rs::core::types::FieldError;
@@ -42,7 +43,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "first_name".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -51,7 +52,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "last_name".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -60,7 +61,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "email".to_string(),
                 field_type: FieldType::Email,
-                validators: vec![ValidatorConfig::Required, ValidatorConfig::Email],
+                validators: vec![Validator::Required, Validator::Email],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -69,7 +70,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "password".to_string(),
                 field_type: FieldType::Password,
-                validators: vec![ValidatorConfig::Required, ValidatorConfig::MinLength(8)],
+                validators: vec![Validator::Required, Validator::MinLength(8)],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -78,7 +79,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "confirm_password".to_string(),
                 field_type: FieldType::Password,
-                validators: vec![ValidatorConfig::Required, ValidatorConfig::MinLength(8)],
+                validators: vec![Validator::Required, Validator::MinLength(8)],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -105,7 +106,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "street_address".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -114,7 +115,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "city".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -123,7 +124,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "state".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -132,7 +133,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "postal_code".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -141,7 +142,7 @@ impl Form for UserRegistrationForm {
             FieldMetadata {
                 name: "country".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -182,45 +183,45 @@ impl Form for UserRegistrationForm {
         
         // Basic validation
         if self.first_name.is_empty() {
-            errors.add_field_error("first_name".to_string(), "First name is required".to_string());
+            errors.add_field_error("first_name", "First name is required".to_string());
         }
         
         if self.last_name.is_empty() {
-            errors.add_field_error("last_name".to_string(), "Last name is required".to_string());
+            errors.add_field_error("last_name", "Last name is required".to_string());
         }
         
         if self.email.is_empty() {
-            errors.add_field_error("email".to_string(), "Email is required".to_string());
+            errors.add_field_error("email", "Email is required".to_string());
         } else if !self.email.contains('@') {
-            errors.add_field_error("email".to_string(), "Invalid email format".to_string());
+            errors.add_field_error("email", "Invalid email format".to_string());
         }
         
         if self.password.len() < 8 {
-            errors.add_field_error("password".to_string(), "Password must be at least 8 characters".to_string());
+            errors.add_field_error("password", "Password must be at least 8 characters".to_string());
         }
         
         if self.password != self.confirm_password {
-            errors.add_field_error("confirm_password".to_string(), "Passwords do not match".to_string());
+            errors.add_field_error("confirm_password", "Passwords do not match".to_string());
         }
         
         if self.street_address.is_empty() {
-            errors.add_field_error("street_address".to_string(), "Street address is required".to_string());
+            errors.add_field_error("street_address", "Street address is required".to_string());
         }
         
         if self.city.is_empty() {
-            errors.add_field_error("city".to_string(), "City is required".to_string());
+            errors.add_field_error("city", "City is required".to_string());
         }
         
         if self.state.is_empty() {
-            errors.add_field_error("state".to_string(), "State is required".to_string());
+            errors.add_field_error("state", "State is required".to_string());
         }
         
         if self.postal_code.is_empty() {
-            errors.add_field_error("postal_code".to_string(), "Postal code is required".to_string());
+            errors.add_field_error("postal_code", "Postal code is required".to_string());
         }
         
         if self.country.is_empty() {
-            errors.add_field_error("country".to_string(), "Country is required".to_string());
+            errors.add_field_error("country", "Country is required".to_string());
         }
         
         if errors.is_empty() {
@@ -230,152 +231,27 @@ impl Form for UserRegistrationForm {
         }
     }
     
-    fn get_field(&self, name: &str) -> Option<FieldValue> {
+    fn get_field_value(&self, name: &str) -> FieldValue {
         match name {
-            "first_name" => Some(FieldValue::String(self.first_name.clone())),
-            "last_name" => Some(FieldValue::String(self.last_name.clone())),
-            "email" => Some(FieldValue::String(self.email.clone())),
-            "password" => Some(FieldValue::String(self.password.clone())),
-            "confirm_password" => Some(FieldValue::String(self.confirm_password.clone())),
-            "phone" => self.phone.as_ref().map(|p| FieldValue::String(p.clone())),
-            "website" => self.website.as_ref().map(|w| FieldValue::String(w.clone())),
-            "street_address" => Some(FieldValue::String(self.street_address.clone())),
-            "city" => Some(FieldValue::String(self.city.clone())),
-            "state" => Some(FieldValue::String(self.state.clone())),
-            "postal_code" => Some(FieldValue::String(self.postal_code.clone())),
-            "country" => Some(FieldValue::String(self.country.clone())),
-            "newsletter" => Some(FieldValue::Boolean(self.newsletter)),
-            "marketing_emails" => Some(FieldValue::Boolean(self.marketing_emails)),
-            "language" => Some(FieldValue::String(self.language.clone())),
-            _ => None,
+            "first_name" => FieldValue::String(self.first_name.clone()),
+            "last_name" => FieldValue::String(self.last_name.clone()),
+            "email" => FieldValue::String(self.email.clone()),
+            "password" => FieldValue::String(self.password.clone()),
+            "confirm_password" => FieldValue::String(self.confirm_password.clone()),
+            "phone" => self.phone.as_ref().map(|p| FieldValue::String(p.clone())).unwrap_or(FieldValue::String(String::new())),
+            "website" => self.website.as_ref().map(|w| FieldValue::String(w.clone())).unwrap_or(FieldValue::String(String::new())),
+            "street_address" => FieldValue::String(self.street_address.clone()),
+            "city" => FieldValue::String(self.city.clone()),
+            "state" => FieldValue::String(self.state.clone()),
+            "postal_code" => FieldValue::String(self.postal_code.clone()),
+            "country" => FieldValue::String(self.country.clone()),
+            "newsletter" => FieldValue::Boolean(self.newsletter),
+            "marketing_emails" => FieldValue::Boolean(self.marketing_emails),
+            "language" => FieldValue::String(self.language.clone()),
+            _ => FieldValue::String(String::new()),
         }
     }
     
-    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), FieldError> {
-        match name {
-            "first_name" => {
-                if let FieldValue::String(s) = value {
-                    self.first_name = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "last_name" => {
-                if let FieldValue::String(s) = value {
-                    self.last_name = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "email" => {
-                if let FieldValue::String(s) = value {
-                    self.email = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "password" => {
-                if let FieldValue::String(s) = value {
-                    self.password = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "confirm_password" => {
-                if let FieldValue::String(s) = value {
-                    self.confirm_password = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "phone" => {
-                if let FieldValue::String(s) = value {
-                    self.phone = Some(s);
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "website" => {
-                if let FieldValue::String(s) = value {
-                    self.website = Some(s);
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "street_address" => {
-                if let FieldValue::String(s) = value {
-                    self.street_address = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "city" => {
-                if let FieldValue::String(s) = value {
-                    self.city = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "state" => {
-                if let FieldValue::String(s) = value {
-                    self.state = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "postal_code" => {
-                if let FieldValue::String(s) = value {
-                    self.postal_code = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "country" => {
-                if let FieldValue::String(s) = value {
-                    self.country = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            "newsletter" => {
-                if let FieldValue::Boolean(b) = value {
-                    self.newsletter = b;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected boolean value".to_string()))
-                }
-            }
-            "marketing_emails" => {
-                if let FieldValue::Boolean(b) = value {
-                    self.marketing_emails = b;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected boolean value".to_string()))
-                }
-            }
-            "language" => {
-                if let FieldValue::String(s) = value {
-                    self.language = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new(name.to_string(), "Expected string value".to_string()))
-                }
-            }
-            _ => Err(FieldError::new(name.to_string(), "Unknown field".to_string())),
-        }
-    }
     
     fn default_values() -> Self {
         Self {
@@ -398,21 +274,20 @@ impl Form for UserRegistrationForm {
     }
     
     fn schema() -> FormSchema {
-        let mut schema = FormSchema::new();
-        for field in Self::field_metadata() {
-            schema.add_field(field);
+        FormSchema {
+            name: "UserRegistrationForm".to_string(),
+            field_metadata: Self::field_metadata(),
         }
-        schema
     }
 }
 
 #[component]
 fn UserRegistrationPage() -> impl IntoView {
-    let form = use_form::<UserRegistrationForm>();
+    let (form, submit_callback, reset_callback) = use_form(UserRegistrationForm::default_values());
     
     let form_clone = form.clone();
     let handle_submit = move |_| {
-        let form_data = form_clone.get_values().get();
+        let form_data = form_clone.values().get();
         log::info!("Form submitted: {:?}", form_data);
         // In a real app, you would send this to your backend
         if let Some(window) = web_sys::window() {
@@ -557,7 +432,7 @@ fn UserRegistrationPage() -> impl IntoView {
                 <div class="form-debug">
                     <h3>"Form Debug Info"</h3>
                     <p>"Form is working! This demonstrates the current API."</p>
-                    <p>"Form values: " {move || format!("{:?}", form.get_values().get())}</p>
+                    <p>"Form values: " {move || format!("{:?}", form.values().get())}</p>
                 </div>
             </div>
         </div>

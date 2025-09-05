@@ -15,9 +15,17 @@ pub mod textarea;
 pub mod file_input;
 pub mod field_array;
 pub mod form_wizard;
+pub mod rich_text_input;
+pub mod markdown_input;
+pub mod code_input;
+pub mod file_upload_input;
 
 pub use input::*;
 pub use field_array::FieldArray;
+pub use rich_text_input::RichTextInput;
+pub use markdown_input::MarkdownInput;
+pub use code_input::CodeInput;
+pub use file_upload_input::FileUploadInput;
 
 /// Main Form component
 #[component]
@@ -75,16 +83,16 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
     
     let _field_value = use_field_value(&mut form, &name);
     let field_error = use_field_error(&mut form, &name);
-    let field_dirty = use_field_dirty(&mut form, &name);
+    let field_dirty = use_field_dirty(&mut form);
     let _ = &field_dirty;
-    let field_touched = use_field_touched(&mut form, &name);
+    let field_touched = use_field_touched(&mut form);
     
     let field_class = class.unwrap_or_else(|| "form-field".to_string());
     let is_required = required.unwrap_or(false);
     let is_disabled = disabled.unwrap_or(false);
     
     let show_error = move || {
-        field_error.get().is_some() && field_touched.get()
+        !field_error.get().is_empty() && field_touched.get()
     };
     
     view! {
@@ -147,7 +155,7 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
             {if show_error() {
                 view! {
                     <div class="form-error">
-                        {field_error.get().unwrap_or_default()}
+                        {field_error.get().join(", ")}
                     </div>
                 }
             } else {
@@ -229,7 +237,7 @@ where
         let on_submit_clone = on_submit.clone();
         
         spawn_local(async move {
-            let form_data = form_clone.get_values().get();
+            let form_data = form_clone.values().get();
             if let Err(error) = on_submit_clone(&form_data) {
                 log::error!("Form submission error: {}", error);
             }
@@ -334,8 +342,8 @@ pub fn FormDebug<T: Form + PartialEq + Clone + Send + Sync + std::fmt::Debug>(
     #[prop(optional)] class: Option<String>,
 ) -> impl IntoView {
     let debug_class = class.unwrap_or_else(|| "form-debug".to_string());
-    let values = form.get_values();
-    let errors = form.get_errors();
+    let values = form.values();
+    let errors = form.errors();
     let is_valid = form.is_valid();
     let is_dirty = form.is_dirty();
     let is_submitting = form.is_submitting();

@@ -29,7 +29,8 @@ pub fn Input(
             FieldType::DateTime => "datetime-local",
             FieldType::File(_) => "file",
             FieldType::Array(_) => "text", // Default to text for arrays
-            FieldType::Nested(_) => "text", // Default to text for nested forms
+            FieldType::Nested(_) => "text",
+            FieldType::RichText | FieldType::Markdown | FieldType::Code => "text", // Default to text for nested forms
         })
         .unwrap_or("text");
     

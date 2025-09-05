@@ -1,4 +1,5 @@
-use leptos_forms_rs::core::{FieldType, FieldValue, ValidatorConfig, FieldMetadata, FormSchema, FieldError};
+use leptos_forms_rs::core::{FieldType, FieldValue, FieldMetadata, FormSchema, FieldError};
+use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::{Form, ValidationErrors};
 use serde::{Serialize, Deserialize};
 
@@ -14,7 +15,7 @@ impl Form for TestForm {
             FieldMetadata {
                 name: "username".to_string(),
                 field_type: FieldType::Text,
-                validators: vec![ValidatorConfig::Required],
+                validators: vec![Validator::Required],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -23,7 +24,7 @@ impl Form for TestForm {
             FieldMetadata {
                 name: "email".to_string(),
                 field_type: FieldType::Email,
-                validators: vec![ValidatorConfig::Required, ValidatorConfig::Email],
+                validators: vec![Validator::Required, Validator::Email],
                 is_required: true,
                 default_value: None,
                 dependencies: vec![],
@@ -36,13 +37,13 @@ impl Form for TestForm {
         let mut errors = ValidationErrors::new();
         
         if self.username.is_empty() {
-            errors.add_field_error("username".to_string(), "Username is required".to_string());
+            errors.add_field_error("username", "Username is required".to_string());
         }
         
         if self.email.is_empty() {
-            errors.add_field_error("email".to_string(), "Email is required".to_string());
+            errors.add_field_error("email", "Email is required".to_string());
         } else if !self.email.contains('@') {
-            errors.add_field_error("email".to_string(), "Invalid email format".to_string());
+            errors.add_field_error("email", "Invalid email format".to_string());
         }
         
         if errors.has_errors() {
@@ -52,35 +53,14 @@ impl Form for TestForm {
         }
     }
 
-    fn get_field(&self, name: &str) -> Option<FieldValue> {
+    fn get_field_value(&self, name: &str) -> FieldValue {
         match name {
-            "username" => Some(FieldValue::String(self.username.clone())),
-            "email" => Some(FieldValue::String(self.email.clone())),
-            _ => None,
+            "username" => FieldValue::String(self.username.clone()),
+            "email" => FieldValue::String(self.email.clone()),
+            _ => FieldValue::String(String::new()),
         }
     }
 
-    fn set_field(&mut self, name: &str, value: FieldValue) -> Result<(), FieldError> {
-        match name {
-            "username" => {
-                if let FieldValue::String(s) = value {
-                    self.username = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new("username".to_string(), "Expected string value".to_string()))
-                }
-            },
-            "email" => {
-                if let FieldValue::String(s) = value {
-                    self.email = s;
-                    Ok(())
-                } else {
-                    Err(FieldError::new("email".to_string(), "Expected string value".to_string()))
-                }
-            },
-            _ => Err(FieldError::new(name.to_string(), "Unknown field".to_string())),
-        }
-    }
 
     fn default_values() -> Self {
         Self {
@@ -90,11 +70,10 @@ impl Form for TestForm {
     }
 
     fn schema() -> FormSchema {
-        let mut schema = FormSchema::new();
-        for field in Self::field_metadata() {
-            schema.add_field(field);
+        FormSchema {
+            name: "TestForm".to_string(),
+            field_metadata: Self::field_metadata(),
         }
-        schema
     }
 }
 

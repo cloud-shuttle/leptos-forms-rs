@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{NaiveDate, DateTime, Utc};
+use crate::core::traits::Form;
 
 /// Supported field types
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -15,6 +16,9 @@ pub enum FieldType {
     Date,
     DateTime,
     File(FileConstraints),
+    RichText,
+    Markdown,
+    Code,
     Array(Box<FieldType>),
     Nested(String), // Type name for nested forms
 }
@@ -61,6 +65,21 @@ impl FieldValue {
         match self {
             FieldValue::String(s) => Some(s),
             _ => None,
+        }
+    }
+    
+    pub fn to_string(&self) -> String {
+        match self {
+            FieldValue::String(s) => s.clone(),
+            FieldValue::Number(n) => n.to_string(),
+            FieldValue::Integer(i) => i.to_string(),
+            FieldValue::Boolean(b) => b.to_string(),
+            FieldValue::Date(d) => d.to_string(),
+            FieldValue::DateTime(dt) => dt.to_string(),
+            FieldValue::Array(_) => "[]".to_string(),
+            FieldValue::Object(_) => "{}".to_string(),
+            FieldValue::File(_) => "file".to_string(),
+            FieldValue::Null => "null".to_string(),
         }
     }
     
@@ -382,5 +401,56 @@ impl Clone for AnalyticsOptions {
             track_submission_attempts: self.track_submission_attempts,
             custom_tracking: None, // Cannot clone the function, so we set it to None
         }
+    }
+}
+
+/// Form state for internal management
+#[derive(Debug, Clone, PartialEq)]
+pub struct FormState<T: Form> {
+    pub values: T,
+    pub errors: crate::validation::ValidationErrors,
+    pub is_dirty: bool,
+    pub is_submitting: bool,
+}
+
+impl<T: Form> FormState<T> {
+    pub fn new(values: T) -> Self {
+        Self {
+            values,
+            errors: crate::validation::ValidationErrors::new(),
+            is_dirty: false,
+            is_submitting: false,
+        }
+    }
+    
+    pub fn with_errors(mut self, errors: crate::validation::ValidationErrors) -> Self {
+        let is_empty = errors.is_empty();
+        self.errors = errors;
+        self.is_dirty = !is_empty;
+        self
+    }
+    
+    pub fn with_values(mut self, values: T) -> Self {
+        self.values = values;
+        self
+    }
+    
+    pub fn mark_dirty(mut self) -> Self {
+        self.is_dirty = true;
+        self
+    }
+    
+    pub fn mark_submitting(mut self) -> Self {
+        self.is_submitting = true;
+        self
+    }
+    
+    pub fn mark_not_submitting(mut self) -> Self {
+        self.is_submitting = false;
+        self
+    }
+    
+    pub fn is_valid(&self) -> bool {
+        self.errors.is_empty()
     }
 }
