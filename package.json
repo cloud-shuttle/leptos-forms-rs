@@ -1,6 +1,6 @@
 {
   "name": "leptos-forms-rs",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "Type-safe, reactive form handling library for Leptos applications",
   "private": true,
   "packageManager": "pnpm@8.15.0",
