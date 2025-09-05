@@ -1,0 +1,105 @@
+repos:
+  # Rust formatting and linting
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        name: rustfmt
+        description: Format Rust code
+        entry: cargo fmt --all
+        language: system
+        types: [rust]
+      - id: clippy
+        name: clippy
+        description: Lint Rust code
+        entry: cargo clippy --all-targets --all-features
+        language: system
+        types: [rust]
+        args: [--, -W, "clippy::all"]
+      - id: cargo-check
+        name: cargo check
+        description: Check Rust code compiles
+        entry: cargo check --all-targets --all-features
+        language: system
+        types: [rust]
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        description: Remove trailing whitespace
+      - id: end-of-file-fixer
+        description: Ensure files end with newline
+      - id: check-yaml
+        description: Check YAML syntax
+      - id: check-json
+        description: Check JSON syntax
+        exclude: ^(e2e_results\.json|test-results/.*\.json)
+      - id: check-toml
+        description: Check TOML syntax
+      - id: check-merge-conflict
+        description: Check for merge conflict markers
+      - id: check-added-large-files
+        description: Check for large files
+        args: [--maxkb=1000]
+      - id: mixed-line-ending
+        description: Ensure consistent line endings
+        args: [--fix=lf]
+
+  # TypeScript/JavaScript formatting and linting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        description: Format JavaScript/TypeScript/CSS/HTML/Markdown
+        types_or: [javascript, jsx, ts, tsx, css, html, markdown, json, yaml]
+        exclude: ^(target/|node_modules/|\.git/|e2e_results\.json|test-results/.*\.json)
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.45.0
+    hooks:
+      - id: markdownlint
+        description: Lint Markdown files
+        args: [--fix, --config, .markdownlint.yaml]
+        exclude: ^(target/|node_modules/|\.git/)
+
+  # Security checks
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        description: Detect secrets in code
+        args: [--baseline, .secrets.baseline]
+        exclude: ^(target/|node_modules/|\.git/|pnpm-lock\.yaml|tests/.*\.rs)
+
+  # Custom hooks for this project
+  - repo: local
+    hooks:
+      - id: cargo-test
+        name: cargo test
+        description: Run Rust tests
+        entry: bash -c 'cd /Users/peterhanssens/consulting/CloudShuttle/leptos-forms && cargo test --all --lib'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+      - id: cargo-doc
+        name: cargo doc check
+        description: Check documentation builds
+        entry: bash -c 'cd /Users/peterhanssens/consulting/CloudShuttle/leptos-forms && cargo doc --all --no-deps'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+      - id: workspace-check
+        name: workspace consistency check
+        description: Check workspace consistency
+        entry: bash -c 'cd /Users/peterhanssens/consulting/CloudShuttle/leptos-forms && cargo check --workspace'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]

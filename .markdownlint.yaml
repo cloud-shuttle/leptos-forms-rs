@@ -1,0 +1,29 @@
+# Markdownlint configuration for leptos-forms project
+# Relaxed rules for documentation files
+
+# Line length - allow longer lines for documentation
+MD013: false
+
+# Allow emphasis as headings in some contexts
+MD036: false
+
+# Allow fenced code blocks without language specification
+MD040: false
+
+# Allow multiple consecutive blank lines
+MD012: false
+
+# Allow inline HTML
+MD033: false
+
+# Allow bare URLs
+MD034: false
+
+# Allow duplicate headers
+MD024: false
+
+# Allow first line to not be a heading
+MD041: false
+
+# Allow link fragments
+MD051: false
