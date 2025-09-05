@@ -2,10 +2,14 @@
 name = "leptos-forms-rs"
 version = "1.0.0"
 edition = "2021"
+authors = ["Cloud Shuttle <info@cloudshuttle.com>"]
 description = "Type-safe, reactive form handling library for Leptos applications"
 license = "MIT"
-repository = "https://github.com/your-org/leptos-forms-rs"
-keywords = ["leptos", "forms", "validation", "web", "wasm"]
+repository = "https://github.com/cloud-shuttle/leptos-forms-rs"
+homepage = "https://github.com/cloud-shuttle/leptos-forms-rs"
+documentation = "https://docs.rs/leptos-forms-rs"
+readme = "README.md"
+keywords = ["leptos", "forms", "validation", "web", "wasm", "reactive", "typescript"]
 categories = ["web-programming", "wasm"]
 
 [dependencies]
