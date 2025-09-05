@@ -8,7 +8,6 @@ license = "MIT"
 repository = "https://github.com/cloud-shuttle/leptos-forms-rs"
 homepage = "https://github.com/cloud-shuttle/leptos-forms-rs"
 documentation = "https://docs.rs/leptos-forms-rs-macro"
-readme = "README.md"
 keywords = ["leptos", "forms", "macro", "procedural-macro", "derive"]
 categories = ["web-programming", "wasm"]
 
