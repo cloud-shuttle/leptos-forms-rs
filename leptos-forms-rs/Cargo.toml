@@ -15,7 +15,7 @@ leptos = { version = "0.8", features = ["csr"] }
 # Common dependencies
 serde = { workspace = true }
 serde_json = { workspace = true }
-leptos-forms-rs-macro = { path = "../leptos-forms-rs-macro", version = "0.4.0" }
+leptos-forms-rs-macro = "0.4.0"
 web-sys = { version = "0.3", features = ["Window", "Storage"] }
 wasm-bindgen = { workspace = true }
 chrono = { workspace = true }
