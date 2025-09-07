@@ -544,12 +544,12 @@ pub fn aria_attributes(field: &FieldRegistration) -> Vec<(&'static str, Attribut
 
 ```rust
 // Memoize expensive computations
-let validation_result = create_memo(move |_| {
+let validation_result = Memo::new(move |_| {
     values.get().validate()
 });
 
 // Memoize field-specific state
-let field_value = create_memo(move |_| {
+let field_value = Memo::new(move |_| {
     values.get().get_field(&field_name)
 });
 ```

@@ -770,18 +770,18 @@ mobile_field: String,
 
 ```rust
 // Use memoization for expensive computations
-let expensive_value = create_memo(move |_| {
+let expensive_value = Memo::new(move |_| {
     // Expensive computation
     compute_expensive_value(form.form_data())
 });
 
 // Debounce input handlers
-let debounced_handler = create_memo(move |_| {
+let debounced_handler = Memo::new(move |_| {
     debounce(100, form.handle_input)
 });
 
 // Lazy load large forms
-let form_sections = create_memo(move |_| {
+let form_sections = Memo::new(move |_| {
     if form.current_step() > 0 {
         load_form_section(form.current_step())
     } else {

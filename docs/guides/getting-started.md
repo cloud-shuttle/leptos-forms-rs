@@ -549,7 +549,7 @@ mod integration_tests {
 ### **4. Performance**
 
 - **Debounce input handlers** for better performance
-- **Use `create_memo`** for expensive computations
+- **Use `Memo::new`** for expensive computations
 - **Avoid unnecessary re-renders** by optimizing dependencies
 - **Lazy load** large forms when possible
 

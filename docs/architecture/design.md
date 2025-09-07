@@ -275,26 +275,26 @@ let initial = initial_values.unwrap_or_else(T::default_values);
             let field_name_owned = field_name.to_string();
 
             // Create derived signals for this field
-            let field_value = create_memo({
+            let field_value = Memo::new({
                 let field_name = field_name_owned.clone();
                 move |_| {
                     values.get().get_field(&field_name).unwrap_or(FieldValue::Null)
                 }
             });
 
-            let field_error = create_memo({
+            let field_error = Memo::new({
                 let field_name = field_name_owned.clone();
                 move |_| {
                     errors.get().field_errors.get(&field_name).cloned()
                 }
             });
 
-            let is_touched = create_memo({
+            let is_touched = Memo::new({
                 let field_name = field_name_owned.clone();
                 move |_| touched.get().contains(&field_name)
             });
 
-            let is_dirty = create_memo({
+            let is_dirty = Memo::new({
                 let field_name = field_name_owned.clone();
                 move |_| dirty_fields.get().contains(&field_name)
             });
@@ -402,8 +402,8 @@ let initial = initial_values.unwrap_or_else(T::default_values);
         errors: errors.into(),
         touched: touched.into(),
         dirty_fields: dirty_fields.into(),
-        is_valid: create_memo(move |_| errors.get().is_empty()).into(),
-        is_dirty: create_memo(move |_| !dirty_fields.get().is_empty()).into(),
+        is_valid: Memo::new(move |_| errors.get().is_empty()).into(),
+        is_dirty: Memo::new(move |_| !dirty_fields.get().is_empty()).into(),
         is_submitting: is_submitting.into(),
         submit_count: submit_count.into(),
         set_value: set_values,
@@ -831,7 +831,7 @@ let (current_step, set_current_step) = create_signal(0);
 let (completed_steps, set_completed_steps) = create_signal(HashSet::new());
 let form = use_form::<T>(None, Default::default());
 
-    let can_proceed = create_memo(move |_| {
+    let can_proceed = Memo::new(move |_| {
         let step = &steps[current_step.get()];
         // Validate only fields in current step
         step.fields.iter().all(|field| {

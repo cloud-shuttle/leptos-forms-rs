@@ -428,8 +428,8 @@ pub fn use_form<T: Form>(
     let (focused_field, set_focused_field) = create_signal(None::<String>);
 
     // Derived state
-    let is_valid = create_memo(move |_| errors.get().is_empty());
-    let is_dirty = create_memo(move |_| !dirty_fields.get().is_empty());
+    let is_valid = Memo::new(move |_| errors.get().is_empty());
+    let is_dirty = Memo::new(move |_| !dirty_fields.get().is_empty());
 
     // Field value setter
     let set_field_value = {
@@ -478,31 +478,31 @@ pub fn use_form<T: Form>(
             let field_name_owned = field_name.to_string();
 
             // Create field-specific signals
-            let field_value = create_memo({
+            let field_value = Memo::new({
                 let field_name = field_name_owned.clone();
                 let values = values.clone();
                 move |_| values.get().get_field(&field_name).unwrap_or(FieldValue::Null)
             });
 
-            let field_error = create_memo({
+            let field_error = Memo::new({
                 let field_name = field_name_owned.clone();
                 let errors = errors.clone();
                 move |_| errors.get().field_errors.get(&field_name).cloned()
             });
 
-            let is_touched = create_memo({
+            let is_touched = Memo::new({
                 let field_name = field_name_owned.clone();
                 let touched = touched.clone();
                 move |_| touched.get().contains(&field_name)
             });
 
-            let is_dirty = create_memo({
+            let is_dirty = Memo::new({
                 let field_name = field_name_owned.clone();
                 let dirty_fields = dirty_fields.clone();
                 move |_| dirty_fields.get().contains(&field_name)
             });
 
-            let is_focused = create_memo({
+            let is_focused = Memo::new({
                 let field_name = field_name_owned.clone();
                 let focused_field = focused_field.clone();
                 move |_| focused_field.get().as_ref() == Some(&field_name)
@@ -549,7 +549,7 @@ pub fn use_form<T: Form>(
             let props = FieldProps {
                 id: format!("field-{}", field_name_owned),
                 name: field_name_owned.clone(),
-                value: create_memo(move |_| {
+                value: Memo::new(move |_| {
                     match field_value.get() {
                         FieldValue::String(s) => s,
                         FieldValue::Number(n) => n.to_string(),
@@ -562,7 +562,7 @@ pub fn use_form<T: Form>(
                 on_blur: on_blur.clone(),
                 on_focus: on_focus.clone(),
                 aria_invalid: field_error.clone().into(),
-                aria_describedby: create_memo(move |_| {
+                aria_describedby: Memo::new(move |_| {
                     field_error.get().is_some().then(|| format!("field-{}-error", field_name_owned))
                 }).into(),
             };
