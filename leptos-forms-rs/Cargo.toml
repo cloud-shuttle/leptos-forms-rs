@@ -19,7 +19,7 @@ leptos = { version = "0.8", features = ["csr"] }
 # Common dependencies
 serde = { workspace = true }
 serde_json = { workspace = true }
-leptos-forms-rs-macro = "1.1.2"
+leptos-forms-rs-macro = "1.1.3"
 web-sys = { version = "0.3", features = ["Window", "Storage", "Performance", "HtmlElement", "Event", "EventTarget", "Document"] }
 wasm-bindgen = { workspace = true }
 js-sys = "0.3"
