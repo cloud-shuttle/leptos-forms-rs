@@ -1,6 +1,10 @@
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt;
+
+/// Type alias for custom tracking functions
+pub type TrackingFunction = Box<dyn Fn(&str, &str, &str) + Send + Sync>;
 
 /// Supported field types
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -59,26 +63,28 @@ pub enum FieldValue {
     Null,
 }
 
+impl fmt::Display for FieldValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            FieldValue::String(s) => write!(f, "{}", s),
+            FieldValue::Number(n) => write!(f, "{}", n),
+            FieldValue::Integer(i) => write!(f, "{}", i),
+            FieldValue::Boolean(b) => write!(f, "{}", b),
+            FieldValue::Date(d) => write!(f, "{}", d),
+            FieldValue::DateTime(dt) => write!(f, "{}", dt),
+            FieldValue::Array(_) => write!(f, "[]"),
+            FieldValue::Object(_) => write!(f, "{{}}"),
+            FieldValue::File(_) => write!(f, "file"),
+            FieldValue::Null => write!(f, "null"),
+        }
+    }
+}
+
 impl FieldValue {
     pub fn as_string(&self) -> Option<&String> {
         match self {
             FieldValue::String(s) => Some(s),
             _ => None,
-        }
-    }
-
-    pub fn to_string(&self) -> String {
-        match self {
-            FieldValue::String(s) => s.clone(),
-            FieldValue::Number(n) => n.to_string(),
-            FieldValue::Integer(i) => i.to_string(),
-            FieldValue::Boolean(b) => b.to_string(),
-            FieldValue::Date(d) => d.to_string(),
-            FieldValue::DateTime(dt) => dt.to_string(),
-            FieldValue::Array(_) => "[]".to_string(),
-            FieldValue::Object(_) => "{}".to_string(),
-            FieldValue::File(_) => "file".to_string(),
-            FieldValue::Null => "null".to_string(),
         }
     }
 
@@ -364,7 +370,7 @@ pub struct AnalyticsOptions {
     pub track_field_interactions: bool,
     pub track_validation_errors: bool,
     pub track_submission_attempts: bool,
-    pub custom_tracking: Option<Box<dyn Fn(&str, &str, &str) + Send + Sync>>,
+    pub custom_tracking: Option<TrackingFunction>,
 }
 
 impl Default for AnalyticsOptions {

@@ -1,0 +1,207 @@
+name: API Contract Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run contract tests daily to catch any drift
+    - cron: "0 2 * * *"
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Cache cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run Contract Tests
+        run: |
+          cd tests/contracts
+          cargo test --verbose
+
+      - name: Generate API Schema
+        run: |
+          cd tests/contracts
+          cargo test generate_api_schema -- --nocapture
+
+      - name: Save API Schema
+        run: |
+          mkdir -p schema
+          cd tests/contracts
+          cargo test generate_api_schema -- --nocapture > ../../schema/current_schema.json
+
+      - name: Upload Schema Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-schema
+          path: schema/
+
+      - name: Check for Breaking Changes
+        if: github.event_name == 'pull_request'
+        run: |
+          # Download baseline schema if available
+          if [ -f "schema/baseline_schema.json" ]; then
+            export BASELINE_SCHEMA_PATH="schema/baseline_schema.json"
+            cd tests/contracts
+            cargo test contract_monitoring -- --nocapture
+          else
+            echo "No baseline schema found, skipping breaking change detection"
+          fi
+
+      - name: Comment PR with Contract Test Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Read contract test results if available
+            const resultsPath = path.join(process.cwd(), 'tests/contracts/target/test-results.json');
+            if (fs.existsSync(resultsPath)) {
+              const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+
+              const comment = `## 📋 API Contract Test Results
+
+              **Status**: ${results.success ? '✅ Passed' : '❌ Failed'}
+              **Total Tests**: ${results.total}
+              **Passed**: ${results.passed}
+              **Failed**: ${results.failed}
+              **Success Rate**: ${(results.success_rate * 100).toFixed(1)}%
+
+              ${results.failed > 0 ? '### ❌ Failed Tests\n' + results.failures.map(f => `- ${f.name}: ${f.error}`).join('\n') : ''}
+
+              ${results.breaking_changes ? '### ⚠️ Breaking Changes Detected\n' + results.breaking_changes.map(c => `- ${c}`).join('\n') : ''}
+              `;
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+  schema-validation:
+    runs-on: ubuntu-latest
+    needs: contract-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Schema Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: api-schema
+          path: schema/
+
+      - name: Validate Schema Format
+        run: |
+          if [ -f "schema/current_schema.json" ]; then
+            python3 -c "
+            import json
+            import sys
+
+            try:
+              with open('schema/current_schema.json', 'r') as f:
+                schema = json.load(f)
+
+              # Validate required fields
+              required_fields = ['version', 'traits', 'types']
+              for field in required_fields:
+                if field not in schema:
+                  print(f'Missing required field: {field}')
+                  sys.exit(1)
+
+              # Validate Form trait exists
+              if 'Form' not in schema['traits']:
+                print('Missing Form trait in schema')
+                sys.exit(1)
+
+              print('Schema validation passed')
+            except Exception as e:
+              print(f'Schema validation failed: {e}')
+              sys.exit(1)
+            "
+          else
+            echo "No schema file found"
+            exit 1
+          fi
+
+      - name: Compare with Baseline
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Download previous schema from releases
+          if [ -f "schema/baseline_schema.json" ]; then
+            python3 -c "
+            import json
+            import sys
+
+            with open('schema/current_schema.json', 'r') as f:
+              current = json.load(f)
+
+            with open('schema/baseline_schema.json', 'r') as f:
+              baseline = json.load(f)
+
+            # Check for breaking changes
+            breaking_changes = []
+
+            # Check Form trait methods
+            current_methods = set(current['traits']['Form']['required_methods'])
+            baseline_methods = set(baseline['traits']['Form']['required_methods'])
+
+            removed_methods = baseline_methods - current_methods
+            if removed_methods:
+              breaking_changes.extend([f'Removed method: {method}' for method in removed_methods])
+
+            # Check method signatures
+            current_sigs = current['traits']['Form']['signatures']
+            baseline_sigs = baseline['traits']['Form']['signatures']
+
+            for method, baseline_sig in baseline_sigs.items():
+              if method in current_sigs and current_sigs[method] != baseline_sig:
+                breaking_changes.append(f'Signature changed for {method}: {baseline_sig} -> {current_sigs[method]}')
+
+            if breaking_changes:
+              print('Breaking changes detected:')
+              for change in breaking_changes:
+                print(f'  - {change}')
+              sys.exit(1)
+            else:
+              print('No breaking changes detected')
+            "
+          else
+            echo "No baseline schema found, skipping comparison"
+          fi
+
+      - name: Update Baseline Schema
+        if: github.ref == 'refs/heads/main' && success()
+        run: |
+          # Save current schema as new baseline
+          cp schema/current_schema.json schema/baseline_schema.json
+
+      - name: Upload Updated Baseline
+        if: github.ref == 'refs/heads/main' && success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: baseline-schema
+          path: schema/baseline_schema.json

@@ -5,7 +5,8 @@ members = [
     "leptos-forms-rs-macro",
     "examples/basic-form",
     "examples/complex-form",
-    "tests/unit"
+    "tests/unit",
+    "tests/contracts"
 ]
 
 [workspace.dependencies]

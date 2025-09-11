@@ -1,6 +1,6 @@
 [package]
 name = "leptos-forms-rs"
-version = "1.1.1"
+version = "1.1.2"
 edition = "2021"
 authors = ["Cloud Shuttle <info@cloudshuttle.com>"]
 description = "🚀 Type-safe, reactive form handling library for Leptos applications. Production-ready with 100% test success rate, cross-browser compatibility, and comprehensive validation. Built with Rust/WASM for high performance."

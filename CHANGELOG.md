@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2024-12-19
+
+### 🔧 **Code Quality Improvements**
+
+This release focuses on comprehensive code quality improvements and clippy compliance across the entire codebase.
+
+### ✨ **Added**
+
+- **Type Aliases**: Added type aliases for complex function types to improve readability:
+  - `FieldValidator` for validation functions
+  - `TrackingFunction` for analytics tracking
+  - `ChangeListener` for devtools listeners
+  - `WizardHookReturn` for wizard hook return type
+- **Default Implementations**: Added `Default` implementations for all structs with `new()` methods:
+  - `FormSchema`
+  - `FormValidationResult`
+  - `ValidationErrors`
+  - `ValidationRuleEngine`
+  - `ContractTestResults`
+- **Display Trait**: Implemented `Display` trait for `FieldValue` enum
+
+### 🐛 **Fixed**
+
+- **Clippy Compliance**: Fixed all clippy warnings and errors across the codebase:
+  - Removed unnecessary `clone()` calls on `Copy` types
+  - Fixed multiple bound locations in function signatures
+  - Replaced single-arm matches with if statements
+  - Used `?` operator instead of if-let blocks where appropriate
+  - Fixed invalid regex syntax (look-ahead patterns)
+  - Replaced `is_digit(10)` with `is_ascii_digit()`
+  - Used `or_default()` instead of `or_insert_with(Vec::new)`
+  - Removed unused enumerate indices
+  - Fixed empty lines after doc comments
+  - Replaced manual `Default` implementations with `#[derive(Default)]`
+- **Performance**: Improved performance by removing unnecessary operations and using more efficient patterns
+- **Code Readability**: Enhanced code readability through better type definitions and cleaner patterns
+
+### 🔄 **Changed**
+
+- **Validation Engine**: Improved regex pattern validation by replacing unsupported look-ahead syntax with character-based checks
+- **Form Components**: Removed unnecessary mutable references from component functions
+- **Contract Testing**: Enhanced contract testing framework with better type safety
+
+### 📚 **Documentation**
+
+- Updated documentation to reflect new type aliases and improved patterns
+- Enhanced code examples with best practices
+
+### 🧪 **Testing**
+
+- All existing tests continue to pass
+- Contract testing framework remains fully functional
+- Improved test code quality and consistency
+
 ## [1.0.0] - 2024-12-19
 
 ### 🎉 **Major Release - Production Ready**

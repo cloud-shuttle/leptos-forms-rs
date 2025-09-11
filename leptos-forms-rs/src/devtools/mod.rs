@@ -4,10 +4,13 @@ use leptos::prelude::GetUntracked;
 use std::collections::HashMap;
 use std::time::{Duration, SystemTime};
 
+/// Type alias for form state change listeners
+pub type ChangeListener = Box<dyn Fn(&FormStateSnapshot) + Send + Sync>;
+
 /// Form State Inspector for DevTools
 pub struct FormStateInspector<T: Form + Send + Sync + PartialEq> {
     form_handle: FormHandle<T>,
-    change_listeners: Vec<Box<dyn Fn(&FormStateSnapshot) + Send + Sync>>,
+    change_listeners: Vec<ChangeListener>,
 }
 
 /// Performance Monitor for DevTools

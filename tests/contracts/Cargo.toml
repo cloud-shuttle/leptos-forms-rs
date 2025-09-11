@@ -1,0 +1,16 @@
+[package]
+name = "leptos-forms-rs-contracts"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+leptos-forms-rs = { path = "../../leptos-forms-rs" }
+leptos = { version = "0.8", features = ["csr"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1.0", features = ["full"] }
+
+[dev-dependencies]
+criterion = "0.5"

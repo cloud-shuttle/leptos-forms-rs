@@ -36,6 +36,12 @@ pub struct FormSchema {
     pub field_metadata: Vec<FieldMetadata>,
 }
 
+impl Default for FormSchema {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FormSchema {
     pub fn new() -> Self {
         Self {

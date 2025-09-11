@@ -1,6 +1,6 @@
 [package]
 name = "leptos-forms-rs-macro"
-version = "1.1.1"
+version = "1.1.2"
 edition = "2021"
 authors = ["Cloud Shuttle <info@cloudshuttle.com>"]
 description = "Procedural macros for leptos-forms-rs"

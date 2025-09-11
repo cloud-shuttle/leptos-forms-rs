@@ -87,7 +87,7 @@ pub fn FileUploadInput(
                         <h4>"Selected Files"</h4>
                     </div>
                     <div class="file-grid">
-                        {current_files().iter().enumerate().map(|(_index, file)| {
+                        {current_files().iter().map(|file| {
                             match file {
                                 FieldValue::String(file_name) => {
                                     view! {

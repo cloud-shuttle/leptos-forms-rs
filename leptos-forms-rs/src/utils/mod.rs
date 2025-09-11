@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Utility functions for form operations
-
 /// Convert a form to a HashMap of field values
 pub fn form_to_map<T: Form>(form: &T) -> HashMap<String, FieldValue> {
     form.get_form_data()
@@ -91,9 +90,7 @@ pub fn validate_field_value<T: Form>(
 
     // Validate against field validators
     for validator in &field_meta.validators {
-        if let Err(error) = validate_value_against_validator(value, validator) {
-            return Err(error);
-        }
+        validate_value_against_validator(value, validator)?;
     }
 
     // Check if field is required
@@ -277,6 +274,12 @@ pub struct FormValidationResult {
     pub errors: ValidationErrors,
     pub field_count: usize,
     pub error_count: usize,
+}
+
+impl Default for FormValidationResult {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl FormValidationResult {

@@ -49,7 +49,7 @@ pub fn Input(
                 disabled=is_disabled
                 class=input_class
                 on:input=move |ev| {
-                    if let Some(on_change_callback) = on_change.clone() {
+                    if let Some(on_change_callback) = on_change {
                         if let Some(target) = ev.target() {
                             if let Some(input) = target.dyn_ref::<web_sys::HtmlInputElement>() {
                                 let value = input.value();

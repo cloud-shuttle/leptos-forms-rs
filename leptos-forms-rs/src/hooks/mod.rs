@@ -4,6 +4,15 @@ use crate::core::FormHandle;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 
+/// Type alias for wizard hook return type
+pub type WizardHookReturn = (
+    ReadSignal<usize>,
+    Callback<()>,
+    Callback<()>,
+    Callback<usize>,
+    Callback<()>,
+);
+
 /// Hook for managing form state
 pub fn use_form<T: Form + PartialEq + Clone + Send + Sync>(
     initial_values: T,
@@ -238,13 +247,7 @@ pub struct FieldArrayHandle<U: 'static> {
 /// Hook for form wizard functionality
 pub fn use_form_wizard<T: Form + PartialEq + Clone + Send + Sync>(
     steps: Vec<String>,
-) -> (
-    ReadSignal<usize>,
-    Callback<()>,
-    Callback<()>,
-    Callback<usize>,
-    Callback<()>,
-) {
+) -> WizardHookReturn {
     let current_step = RwSignal::new(0);
     let steps1 = steps.clone();
 
@@ -292,11 +295,11 @@ pub fn use_real_time_validation<T: Form + PartialEq + Clone + Send + Sync>(
 
     let form_clone = form_handle.clone();
     let field_name = field_name.to_string();
-    let set_error = validation_error.clone();
+    let set_error = validation_error;
     let validate_field = Callback::new(move |_value: FieldValue| {
         let form_clone = form_clone.clone();
         let field_name = field_name.clone();
-        let set_error = set_error.clone();
+        let set_error = set_error;
 
         spawn_local(async move {
             // Simulate validation delay
@@ -341,12 +344,12 @@ pub fn use_form_performance<T: Form + PartialEq + Clone + Send + Sync>(
     let metrics = RwSignal::new(crate::core::performance::FormPerformanceMetrics::new());
 
     let form_clone = form_handle.clone();
-    let metrics_clone = metrics.clone();
+    let metrics_clone = metrics;
 
     // Benchmark callback for measuring performance
     let benchmark = Callback::new(move |_| {
         let form_clone = form_clone.clone();
-        let metrics_clone = metrics_clone.clone();
+        let metrics_clone = metrics_clone;
 
         spawn_local(async move {
             let start = std::time::Instant::now();

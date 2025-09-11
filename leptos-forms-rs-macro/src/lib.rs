@@ -268,7 +268,7 @@ fn extract_number_from_tokens(tokens: &str, key: &str) -> Option<usize> {
     let pattern = format!("{} = ", key);
     if let Some(start) = tokens.find(&pattern) {
         let start = start + pattern.len();
-        if let Some(end) = tokens[start..].find(|c: char| !c.is_digit(10)) {
+        if let Some(end) = tokens[start..].find(|c: char| !c.is_ascii_digit()) {
             tokens[start..start + end].parse::<usize>().ok()
         } else {
             tokens[start..].parse::<usize>().ok()

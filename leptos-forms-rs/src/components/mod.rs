@@ -66,7 +66,7 @@ pub fn Form<T: Form + PartialEq + Clone + Send + Sync>(
 /// FormField component for rendering form fields
 #[component]
 pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
-    mut form: FormHandle<T>,
+    form: FormHandle<T>,
     name: String,
     #[prop(optional)] label: Option<String>,
     #[prop(optional)] placeholder: Option<String>,
@@ -85,11 +85,11 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
     let help_text_clone = help_text.clone();
     let field_type_clone = field_type.clone();
 
-    let _field_value = use_field_value(&mut form, &name);
-    let field_error = use_field_error(&mut form, &name);
-    let field_dirty = use_field_dirty(&mut form);
+    let _field_value = use_field_value(&form, &name);
+    let field_error = use_field_error(&form, &name);
+    let field_dirty = use_field_dirty(&form);
     let _ = &field_dirty;
-    let field_touched = use_field_touched(&mut form);
+    let field_touched = use_field_touched(&form);
 
     let field_class = class.unwrap_or_else(|| "form-field".to_string());
     let is_required = required.unwrap_or(false);
@@ -215,7 +215,7 @@ pub fn FormErrors(
 
 /// FormSubmit component for form submission
 #[component]
-pub fn FormSubmit<T: Form + PartialEq, F>(
+pub fn FormSubmit<T, F>(
     form: FormHandle<T>,
     on_submit: F,
     #[prop(optional)] class: Option<String>,

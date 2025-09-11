@@ -3,11 +3,20 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+/// Type alias for field validators
+pub type FieldValidator = Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>;
+
 /// Validation errors for a form
 #[derive(Debug, Clone, PartialEq)]
 pub struct ValidationErrors {
     pub field_errors: HashMap<String, Vec<String>>,
     pub form_errors: Vec<String>,
+}
+
+impl Default for ValidationErrors {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ValidationErrors {
@@ -21,7 +30,7 @@ impl ValidationErrors {
     pub fn add_field_error(&mut self, field_name: &str, error: String) {
         self.field_errors
             .entry(field_name.to_string())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(error);
     }
 
@@ -68,10 +77,7 @@ impl ValidationErrors {
 
     pub fn merge(&mut self, other: ValidationErrors) {
         for (field, errors) in other.field_errors {
-            self.field_errors
-                .entry(field)
-                .or_insert_with(Vec::new)
-                .extend(errors);
+            self.field_errors.entry(field).or_default().extend(errors);
         }
         self.form_errors.extend(other.form_errors);
     }
@@ -119,7 +125,13 @@ pub enum Validator {
 
 /// Validation rule engine
 pub struct ValidationRuleEngine {
-    validators: HashMap<String, Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>>,
+    validators: HashMap<String, FieldValidator>,
+}
+
+impl Default for ValidationRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ValidationRuleEngine {
@@ -204,8 +216,12 @@ impl ValidationRuleEngine {
             Box::new(|value| {
                 if let FieldValue::String(s) = value {
                     // Default pattern for password strength
-                    let pattern = Regex::new(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)").unwrap();
-                    if pattern.is_match(s) {
+                    // Check for lowercase, uppercase, and digit without look-ahead
+                    let has_lowercase = s.chars().any(|c| c.is_ascii_lowercase());
+                    let has_uppercase = s.chars().any(|c| c.is_ascii_uppercase());
+                    let has_digit = s.chars().any(|c| c.is_ascii_digit());
+
+                    if has_lowercase && has_uppercase && has_digit {
                         Ok(())
                     } else {
                         Err("Pattern validation failed".to_string())
@@ -357,11 +373,7 @@ impl ValidationRuleEngine {
         sum % 10 == 0
     }
 
-    pub fn register_validator(
-        &mut self,
-        name: &str,
-        validator: Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>,
-    ) {
+    pub fn register_validator(&mut self, name: &str, validator: FieldValidator) {
         self.validators.insert(name.to_string(), validator);
     }
 
@@ -654,7 +666,7 @@ impl Validators {
         if let FieldValue::String(card) = value {
             let digits: Vec<u32> = card
                 .chars()
-                .filter(|c| c.is_digit(10))
+                .filter(|c| c.is_ascii_digit())
                 .map(|c| c.to_digit(10).unwrap())
                 .collect();
 
@@ -756,14 +768,9 @@ impl Validators {
 }
 
 /// Conditional validation engine for field dependencies
+#[derive(Default)]
 pub struct ConditionalValidator {
     rules: Vec<ConditionalRule>,
-}
-
-impl Default for ConditionalValidator {
-    fn default() -> Self {
-        Self { rules: Vec::new() }
-    }
 }
 
 impl ConditionalValidator {
@@ -791,9 +798,7 @@ impl ConditionalValidator {
                     if condition_met {
                         // Apply the validation rule
                         for validator in &rule.validators {
-                            if let Err(error) = validator(field_value) {
-                                return Err(error);
-                            }
+                            validator(field_value)?;
                         }
                     }
                 }
@@ -802,6 +807,7 @@ impl ConditionalValidator {
         Ok(())
     }
 
+    #[allow(clippy::only_used_in_recursion)]
     fn evaluate_condition<T: crate::core::Form>(
         &self,
         form: &T,
@@ -855,7 +861,7 @@ impl ConditionalValidator {
 pub struct ConditionalRule {
     pub target_field: String,
     pub condition: Option<FieldCondition>,
-    pub validators: Vec<Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>>,
+    pub validators: Vec<FieldValidator>,
     pub error_message: Option<String>,
 }
 
@@ -874,10 +880,7 @@ impl ConditionalRule {
         self
     }
 
-    pub fn validate_with(
-        mut self,
-        validator: Box<dyn Fn(&FieldValue) -> Result<(), String> + Send + Sync>,
-    ) -> Self {
+    pub fn validate_with(mut self, validator: FieldValidator) -> Self {
         self.validators.push(validator);
         self
     }

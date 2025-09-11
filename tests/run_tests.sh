@@ -41,6 +41,7 @@ show_usage() {
     echo "TEST_TYPE:"
     echo "  unit           Run unit tests (default)"
     echo "  integration    Run integration tests"
+    echo "  contracts      Run API contract tests"
     echo "  e2e            Run end-to-end tests"
     echo "  benchmarks     Run performance benchmarks"
     echo "  all            Run all tests"
@@ -74,7 +75,7 @@ while [[ $# -gt 0 ]]; do
             CLEAN=true
             shift
             ;;
-        unit|integration|e2e|benchmarks|all)
+        unit|integration|contracts|e2e|benchmarks|all)
             TEST_TYPE="$1"
             shift
             ;;
@@ -123,6 +124,15 @@ run_integration_tests() {
     print_success "Integration tests completed"
 }
 
+# Function to run contract tests
+run_contract_tests() {
+    print_status "Running API contract tests..."
+    cd tests/contracts
+    run_cargo test
+    cd ../..
+    print_success "Contract tests completed"
+}
+
 # Function to run end-to-end tests
 run_e2e_tests() {
     print_status "Running end-to-end tests..."
@@ -169,6 +179,9 @@ main() {
         integration)
             run_integration_tests
             ;;
+        contracts)
+            run_contract_tests
+            ;;
         e2e)
             run_e2e_tests
             ;;
@@ -179,6 +192,7 @@ main() {
             print_status "Running all test types..."
             run_unit_tests
             run_integration_tests
+            run_contract_tests
             run_e2e_tests
             run_benchmarks
             print_success "All tests completed"

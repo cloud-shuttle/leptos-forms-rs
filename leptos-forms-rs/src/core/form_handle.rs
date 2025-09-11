@@ -55,31 +55,31 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
 
     /// Get the form values signal
     pub fn values(&self) -> Memo<T> {
-        let state = self.state.clone();
+        let state = self.state;
         Memo::new(move |_| state.get().values.clone())
     }
 
     /// Get the form errors signal
     pub fn errors(&self) -> Memo<ValidationErrors> {
-        let state = self.state.clone();
+        let state = self.state;
         Memo::new(move |_| state.get().errors.clone())
     }
 
     /// Get the form validity signal
     pub fn is_valid(&self) -> Memo<bool> {
-        let state = self.state.clone();
+        let state = self.state;
         Memo::new(move |_| state.get().is_valid())
     }
 
     /// Get the form dirty state signal
     pub fn is_dirty(&self) -> Memo<bool> {
-        let state = self.state.clone();
+        let state = self.state;
         Memo::new(move |_| state.get().is_dirty)
     }
 
     /// Get the form submitting state signal
     pub fn is_submitting(&self) -> Memo<bool> {
-        let state = self.state.clone();
+        let state = self.state;
         Memo::new(move |_| state.get().is_submitting)
     }
 
@@ -374,9 +374,7 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
 
 impl<T: Form + Send + Sync> Clone for FormHandle<T> {
     fn clone(&self) -> Self {
-        Self {
-            state: self.state.clone(),
-        }
+        Self { state: self.state }
     }
 }
 
