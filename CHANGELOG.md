@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2024-12-19
+
+### 🔧 **Leptos 0.8.x Compatibility Fix**
+
+This patch release fixes a critical compatibility issue with Leptos 0.8.x regarding conditional class attributes and the `IntoClass` trait.
+
+### 🐛 **Fixed**
+
+- **Leptos 0.8.x Compatibility**: Fixed conditional class attributes in form wizard component to work with all Leptos 0.8.x versions
+- **IntoClass Trait Issue**: Resolved compilation errors when using `Memo<bool>` types in conditional class attributes
+- **Form Wizard Component**: Updated to use closure-based conditional classes (`class:active=move || is_active.get()`)
+
+### ✨ **Added**
+
+- **Compatibility Documentation**: Added comprehensive Leptos 0.8.x compatibility guide
+- **Compatibility Tests**: Added test suite to verify conditional class attribute patterns work correctly
+- **Migration Guide**: Detailed documentation for upgrading from older versions
+
+### 📚 **Documentation**
+
+- Created `docs/migration/LEPTOS_0.8_COMPATIBILITY.md` with detailed compatibility information
+- Added examples of correct and incorrect patterns for conditional class attributes
+- Included troubleshooting guide for common compatibility issues
+
+### 🧪 **Testing**
+
+- Added `leptos_compatibility_tests.rs` to verify conditional class patterns
+- All existing tests continue to pass
+- Compatibility tests verify the fix works across different Leptos versions
+
+### 🔄 **Changed**
+
+- **Form Wizard**: Updated conditional class syntax from `class:active=is_active` to `class:active=move || is_active.get()`
+- **Best Practices**: Documented recommended patterns for conditional class attributes
+
+### 📋 **Migration Notes**
+
+If you're upgrading from v1.1.2 or earlier and encounter compilation errors with conditional classes:
+
+1. **Update to v1.1.3+**: This version includes the compatibility fix
+2. **Check custom components**: If you have custom components using `Memo<bool>` in conditional classes, update them to use closures
+3. **Test thoroughly**: Run your tests with different Leptos feature combinations
+
+### 🎯 **Impact**
+
+- **Severity**: HIGH - This was a blocking issue for users upgrading to Leptos 0.8.x
+- **Scope**: Affects form wizard components and any custom components using similar patterns
+- **Resolution**: Full compatibility with all Leptos 0.8.x versions restored
+
 ## [1.1.2] - 2024-12-19
 
 ### 🔧 **Code Quality Improvements**

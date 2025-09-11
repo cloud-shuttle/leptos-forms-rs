@@ -70,7 +70,7 @@ pub fn FormWizard(
                     let is_completed = Memo::new(move |_| current_step_index.get() > step_index);
 
                     view! {
-                        <div class="wizard-step" class:active=is_active class:completed=is_completed>
+                        <div class="wizard-step" class:active=move || is_active.get() class:completed=move || is_completed.get()>
                             <div class="step-indicator">
                                 {if is_completed.get() { "✓".to_string() } else { (step_index + 1).to_string() }}
                             </div>
