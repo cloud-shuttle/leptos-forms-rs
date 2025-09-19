@@ -2,11 +2,12 @@
 //!
 //! This module provides a comprehensive set of UI components for building forms
 //! with the Leptos Forms library, including core form components, input components,
-//! and specialized components.
+//! specialized components, and example implementations.
 
 pub mod checkbox;
 pub mod code_input;
 pub mod core;
+pub mod examples;
 pub mod field;
 pub mod field_array;
 pub mod file_input;
@@ -29,3 +30,6 @@ pub use file_upload_input::FileUploadInput;
 pub use input::*;
 pub use markdown_input::MarkdownInput;
 pub use rich_text_input::RichTextInput;
+
+// Re-export examples
+pub use examples::*;
