@@ -3,12 +3,12 @@
 //! This module provides comprehensive stress tests for the leptos-forms-rs library,
 //! including performance benchmarks, memory usage tests, and scalability validation.
 
-pub mod types;
-pub mod performance;
-pub mod memory;
 pub mod concurrency;
 pub mod edge_cases;
+pub mod memory;
+pub mod performance;
+pub mod types;
 
 // Re-export public API
-pub use types::*;
 pub use edge_cases::*;
+pub use types::*;

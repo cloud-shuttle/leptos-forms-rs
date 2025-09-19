@@ -135,6 +135,61 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
         let state = self.state.get_untracked();
         state.errors
     }
+
+    /// Internal method to validate a field against its validators
+    pub(crate) fn validate_field_internal(
+        &self,
+        form: &T,
+        field_name: &str,
+    ) -> Result<(), crate::validation::ValidationErrors> {
+        let schema = T::schema();
+        let field_meta = schema.get_field(field_name);
+
+        if let Some(field_meta) = field_meta {
+            let field_value = form.get_field_value(field_name);
+            let mut errors = crate::validation::ValidationErrors::new();
+
+            // Validate against field validators
+            for validator in &field_meta.validators {
+                if let Err(error) =
+                    self.validate_field_value_internal(field_value.clone(), validator)
+                {
+                    errors.add_field_error(field_name, error);
+                }
+            }
+
+            if errors.has_errors() {
+                Err(errors)
+            } else {
+                Ok(())
+            }
+        } else {
+            Ok(())
+        }
+    }
+
+    /// Internal method to validate a field value against a validator
+    pub(crate) fn validate_field_value_internal(
+        &self,
+        value: crate::core::types::FieldValue,
+        validator: &crate::validation::Validator,
+    ) -> Result<(), String> {
+        use crate::validation::ValidationRuleEngine;
+
+        let mut engine = ValidationRuleEngine::new();
+        engine.add_validator(validator.clone());
+
+        match engine.validate_value(value) {
+            Ok(_) => Ok(()),
+            Err(errors) => {
+                if let Some(error) = errors.get_field_error("").and_then(|v| v.first()) {
+                    Err(error.clone())
+                } else {
+                    Err("Validation failed".to_string())
+                }
+            }
+        }
+    }
 }
 
 impl<T: Form + Send + Sync> Clone for FormHandle<T> {

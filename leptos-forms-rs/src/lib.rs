@@ -7,6 +7,7 @@ pub mod components;
 pub mod core;
 pub mod devtools;
 pub mod error;
+pub mod events;
 pub mod hooks;
 pub mod utils;
 pub mod validation;
@@ -44,6 +45,13 @@ pub use utils::{
     get_form_field_names, get_form_stats, get_required_field_names, has_validation_errors,
     is_field_required, map_to_form, merge_validation_errors, serialize_form, validate_field_value,
     validate_form_detailed, FormStats, FormValidationResult,
+};
+
+// Re-export events
+pub use events::{
+    EventSystem, EventSystemBuilder, EventSystemUtils, FieldBlurHandler, FieldChangeHandler,
+    FieldEvent, FieldEventType, FieldFocusHandler, FieldInputHandler, FormEvent, FormEventType,
+    FormResetHandler, FormSubmitHandler,
 };
 
 // Re-export devtools

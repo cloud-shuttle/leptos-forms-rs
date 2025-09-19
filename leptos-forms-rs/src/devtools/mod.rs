@@ -4,13 +4,13 @@
 //! and inspecting forms during development. It includes form state inspection,
 //! performance monitoring, and debug utilities.
 
-pub mod types;
+pub mod debug;
 pub mod inspector;
 pub mod performance;
-pub mod debug;
+pub mod types;
 
 // Re-export public API
-pub use types::*;
+pub use debug::*;
 pub use inspector::*;
 pub use performance::*;
-pub use debug::*;
+pub use types::*;

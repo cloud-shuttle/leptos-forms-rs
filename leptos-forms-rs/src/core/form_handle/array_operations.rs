@@ -10,7 +10,7 @@ use leptos::prelude::{GetUntracked, Set};
 use super::core::FormHandle;
 
 impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
-    /// Helper function to update array field and set form state
+    /// Helper function to update array field and set form state with validation
     fn update_array_field<F>(&self, field_name: &str, mutator: F)
     where
         F: FnOnce(&mut Vec<FieldValue>),
@@ -24,11 +24,25 @@ impl<T: Form + Send + Sync + PartialEq> FormHandle<T> {
 
             new_values.set_field_value(field_name, FieldValue::Array(array));
 
+            // Validate the array field after updating
+            let mut new_errors = current_state.errors.clone();
+            if let Err(field_errors) = self.validate_field_internal(&new_values, field_name) {
+                // Update errors for this field
+                for (error_field, error_messages) in field_errors.field_errors {
+                    for error_message in error_messages {
+                        new_errors.add_field_error(&error_field, error_message);
+                    }
+                }
+            } else {
+                // Clear errors for this field if validation passes
+                new_errors.remove_field_error(field_name);
+            }
+
             let new_state = FormState {
                 values: new_values,
                 is_dirty: true,
                 is_submitting: current_state.is_submitting,
-                errors: current_state.errors,
+                errors: new_errors,
             };
 
             self.state.set(new_state);

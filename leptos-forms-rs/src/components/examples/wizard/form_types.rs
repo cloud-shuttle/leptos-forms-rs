@@ -4,8 +4,8 @@
 
 use crate::core::traits::Form;
 use crate::core::types::{FieldType, FieldValue};
-use crate::FieldMetadata;
 use crate::validation::ValidationErrors;
+use crate::FieldMetadata;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -64,14 +64,38 @@ impl Default for WizardForm {
 impl Form for WizardForm {
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
-        data.insert("first_name".to_string(), FieldValue::String(self.personal_info.first_name.clone()));
-        data.insert("last_name".to_string(), FieldValue::String(self.personal_info.last_name.clone()));
-        data.insert("email".to_string(), FieldValue::String(self.personal_info.email.clone()));
-        data.insert("theme".to_string(), FieldValue::String(self.preferences.theme.clone()));
-        data.insert("notifications".to_string(), FieldValue::Boolean(self.preferences.notifications));
-        data.insert("newsletter".to_string(), FieldValue::Boolean(self.preferences.newsletter));
-        data.insert("terms_accepted".to_string(), FieldValue::Boolean(self.confirmation.terms_accepted));
-        data.insert("privacy_accepted".to_string(), FieldValue::Boolean(self.confirmation.privacy_accepted));
+        data.insert(
+            "first_name".to_string(),
+            FieldValue::String(self.personal_info.first_name.clone()),
+        );
+        data.insert(
+            "last_name".to_string(),
+            FieldValue::String(self.personal_info.last_name.clone()),
+        );
+        data.insert(
+            "email".to_string(),
+            FieldValue::String(self.personal_info.email.clone()),
+        );
+        data.insert(
+            "theme".to_string(),
+            FieldValue::String(self.preferences.theme.clone()),
+        );
+        data.insert(
+            "notifications".to_string(),
+            FieldValue::Boolean(self.preferences.notifications),
+        );
+        data.insert(
+            "newsletter".to_string(),
+            FieldValue::Boolean(self.preferences.newsletter),
+        );
+        data.insert(
+            "terms_accepted".to_string(),
+            FieldValue::Boolean(self.confirmation.terms_accepted),
+        );
+        data.insert(
+            "privacy_accepted".to_string(),
+            FieldValue::Boolean(self.confirmation.privacy_accepted),
+        );
         data
     }
 
@@ -139,10 +163,16 @@ impl Form for WizardForm {
 
         // Validate confirmation
         if !self.confirmation.terms_accepted {
-            errors.add_field_error("terms_accepted", "You must accept the terms and conditions".to_string());
+            errors.add_field_error(
+                "terms_accepted",
+                "You must accept the terms and conditions".to_string(),
+            );
         }
         if !self.confirmation.privacy_accepted {
-            errors.add_field_error("privacy_accepted", "You must accept the privacy policy".to_string());
+            errors.add_field_error(
+                "privacy_accepted",
+                "You must accept the privacy policy".to_string(),
+            );
         }
 
         if errors.has_errors() {

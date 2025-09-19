@@ -46,8 +46,14 @@ impl Form for BenchmarkForm {
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
-        data.insert("field1".to_string(), FieldValue::String(self.field1.clone()));
-        data.insert("field2".to_string(), FieldValue::String(self.field2.clone()));
+        data.insert(
+            "field1".to_string(),
+            FieldValue::String(self.field1.clone()),
+        );
+        data.insert(
+            "field2".to_string(),
+            FieldValue::String(self.field2.clone()),
+        );
         data
     }
 

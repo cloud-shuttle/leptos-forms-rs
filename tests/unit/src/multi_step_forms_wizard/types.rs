@@ -71,7 +71,10 @@ impl Form for WizardForm {
         data.insert("name".to_string(), FieldValue::String(self.name.clone()));
         data.insert("email".to_string(), FieldValue::String(self.email.clone()));
         data.insert("age".to_string(), FieldValue::Number(self.age as f64));
-        data.insert("preferences".to_string(), FieldValue::String(self.preferences.clone()));
+        data.insert(
+            "preferences".to_string(),
+            FieldValue::String(self.preferences.clone()),
+        );
         data
     }
 

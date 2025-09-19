@@ -1,6 +1,6 @@
 //! Form handle comprehensive tests module
 
-pub mod types;
 pub mod handle_tests;
+pub mod types;
 
 pub use types::*;

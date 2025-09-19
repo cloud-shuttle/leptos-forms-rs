@@ -20,17 +20,15 @@ impl Default for RealTimeForm {
 
 impl Form for RealTimeForm {
     fn field_metadata() -> Vec<FieldMetadata> {
-        vec![
-            FieldMetadata {
-                name: "email".to_string(),
-                field_type: FieldType::Email,
-                is_required: true,
-                default_value: None,
-                dependencies: Vec::new(),
-                attributes: HashMap::new(),
-                validators: vec![Validator::Required, Validator::Email],
-            },
-        ]
+        vec![FieldMetadata {
+            name: "email".to_string(),
+            field_type: FieldType::Email,
+            is_required: true,
+            default_value: None,
+            dependencies: Vec::new(),
+            attributes: HashMap::new(),
+            validators: vec![Validator::Required, Validator::Email],
+        }]
     }
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {

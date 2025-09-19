@@ -147,14 +147,32 @@ impl Form for AdvancedValidationForm {
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
-        data.insert("password".to_string(), FieldValue::String(self.password.clone()));
-        data.insert("confirm_password".to_string(), FieldValue::String(self.confirm_password.clone()));
+        data.insert(
+            "password".to_string(),
+            FieldValue::String(self.password.clone()),
+        );
+        data.insert(
+            "confirm_password".to_string(),
+            FieldValue::String(self.confirm_password.clone()),
+        );
         data.insert("email".to_string(), FieldValue::String(self.email.clone()));
-        data.insert("username".to_string(), FieldValue::String(self.username.clone()));
+        data.insert(
+            "username".to_string(),
+            FieldValue::String(self.username.clone()),
+        );
         data.insert("age".to_string(), FieldValue::Number(self.age as f64));
-        data.insert("start_date".to_string(), FieldValue::String(self.start_date.clone()));
-        data.insert("end_date".to_string(), FieldValue::String(self.end_date.clone()));
-        data.insert("custom_field".to_string(), FieldValue::String(self.custom_field.clone()));
+        data.insert(
+            "start_date".to_string(),
+            FieldValue::String(self.start_date.clone()),
+        );
+        data.insert(
+            "end_date".to_string(),
+            FieldValue::String(self.end_date.clone()),
+        );
+        data.insert(
+            "custom_field".to_string(),
+            FieldValue::String(self.custom_field.clone()),
+        );
         data
     }
 
@@ -297,7 +315,7 @@ impl Form for AdvancedValidationForm {
             .is_match(&self.end_date)
         {
             errors.add_field_error("end_date", "Invalid date format (YYYY-MM-DD)".to_string());
-        } else if !self.start_date.is_empty() && self.end_date < self.start_date {
+        } else if !self.start_date.is_empty() && self.end_date <= self.start_date {
             errors.add_field_error("end_date", "End date must be after start date".to_string());
         }
 

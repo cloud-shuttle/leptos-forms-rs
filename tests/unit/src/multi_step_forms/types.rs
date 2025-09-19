@@ -147,14 +147,29 @@ impl Form for MultiStepTestForm {
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
-        data.insert("first_name".to_string(), FieldValue::String(self.first_name.clone()));
-        data.insert("last_name".to_string(), FieldValue::String(self.last_name.clone()));
+        data.insert(
+            "first_name".to_string(),
+            FieldValue::String(self.first_name.clone()),
+        );
+        data.insert(
+            "last_name".to_string(),
+            FieldValue::String(self.last_name.clone()),
+        );
         data.insert("email".to_string(), FieldValue::String(self.email.clone()));
         data.insert("phone".to_string(), FieldValue::String(self.phone.clone()));
-        data.insert("address".to_string(), FieldValue::String(self.address.clone()));
+        data.insert(
+            "address".to_string(),
+            FieldValue::String(self.address.clone()),
+        );
         data.insert("city".to_string(), FieldValue::String(self.city.clone()));
-        data.insert("newsletter".to_string(), FieldValue::Boolean(self.newsletter));
-        data.insert("notifications".to_string(), FieldValue::Boolean(self.notifications));
+        data.insert(
+            "newsletter".to_string(),
+            FieldValue::Boolean(self.newsletter),
+        );
+        data.insert(
+            "notifications".to_string(),
+            FieldValue::Boolean(self.notifications),
+        );
         data.insert("theme".to_string(), FieldValue::String(self.theme.clone()));
         data
     }
@@ -217,13 +232,19 @@ impl Form for MultiStepTestForm {
         if self.first_name.is_empty() {
             errors.add_field_error("first_name", "First name is required".to_string());
         } else if self.first_name.len() < 2 {
-            errors.add_field_error("first_name", "First name must be at least 2 characters".to_string());
+            errors.add_field_error(
+                "first_name",
+                "First name must be at least 2 characters".to_string(),
+            );
         }
 
         if self.last_name.is_empty() {
             errors.add_field_error("last_name", "Last name is required".to_string());
         } else if self.last_name.len() < 2 {
-            errors.add_field_error("last_name", "Last name must be at least 2 characters".to_string());
+            errors.add_field_error(
+                "last_name",
+                "Last name must be at least 2 characters".to_string(),
+            );
         }
 
         if self.email.is_empty() {
@@ -248,7 +269,10 @@ impl Form for MultiStepTestForm {
         if self.address.is_empty() {
             errors.add_field_error("address", "Address is required".to_string());
         } else if self.address.len() < 10 {
-            errors.add_field_error("address", "Address must be at least 10 characters".to_string());
+            errors.add_field_error(
+                "address",
+                "Address must be at least 10 characters".to_string(),
+            );
         }
 
         if self.city.is_empty() {
@@ -258,9 +282,10 @@ impl Form for MultiStepTestForm {
         }
 
         // Step 3 validation
-        if !self.theme.is_empty() && !regex::Regex::new(r"^(light|dark)$")
-            .unwrap()
-            .is_match(&self.theme)
+        if !self.theme.is_empty()
+            && !regex::Regex::new(r"^(light|dark)$")
+                .unwrap()
+                .is_match(&self.theme)
         {
             errors.add_field_error("theme", "Theme must be 'light' or 'dark'".to_string());
         }

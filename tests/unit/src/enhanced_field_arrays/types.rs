@@ -57,9 +57,33 @@ impl Form for ArrayTestForm {
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
-        data.insert("items".to_string(), FieldValue::Array(self.items.iter().map(|s| FieldValue::String(s.clone())).collect()));
-        data.insert("tags".to_string(), FieldValue::Array(self.tags.iter().map(|s| FieldValue::String(s.clone())).collect()));
-        data.insert("numbers".to_string(), FieldValue::Array(self.numbers.iter().map(|n| FieldValue::Number(*n as f64)).collect()));
+        data.insert(
+            "items".to_string(),
+            FieldValue::Array(
+                self.items
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+        );
+        data.insert(
+            "tags".to_string(),
+            FieldValue::Array(
+                self.tags
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+        );
+        data.insert(
+            "numbers".to_string(),
+            FieldValue::Array(
+                self.numbers
+                    .iter()
+                    .map(|n| FieldValue::Number(*n as f64))
+                    .collect(),
+            ),
+        );
         data
     }
 
@@ -67,35 +91,44 @@ impl Form for ArrayTestForm {
         match field_name {
             "items" => {
                 if let FieldValue::Array(arr) = value {
-                    self.items = arr.into_iter().filter_map(|v| {
-                        if let FieldValue::String(s) = v {
-                            Some(s)
-                        } else {
-                            None
-                        }
-                    }).collect();
+                    self.items = arr
+                        .into_iter()
+                        .filter_map(|v| {
+                            if let FieldValue::String(s) = v {
+                                Some(s)
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
                 }
             }
             "tags" => {
                 if let FieldValue::Array(arr) = value {
-                    self.tags = arr.into_iter().filter_map(|v| {
-                        if let FieldValue::String(s) = v {
-                            Some(s)
-                        } else {
-                            None
-                        }
-                    }).collect();
+                    self.tags = arr
+                        .into_iter()
+                        .filter_map(|v| {
+                            if let FieldValue::String(s) = v {
+                                Some(s)
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
                 }
             }
             "numbers" => {
                 if let FieldValue::Array(arr) = value {
-                    self.numbers = arr.into_iter().filter_map(|v| {
-                        if let FieldValue::Number(n) = v {
-                            Some(n as i32)
-                        } else {
-                            None
-                        }
-                    }).collect();
+                    self.numbers = arr
+                        .into_iter()
+                        .filter_map(|v| {
+                            if let FieldValue::Number(n) = v {
+                                Some(n as i32)
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
                 }
             }
             _ => {}

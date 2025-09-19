@@ -5,6 +5,7 @@
 use leptos_forms_rs::core::{FieldMetadata, FieldType, FieldValue, NumberType};
 use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::{Form, ValidationErrors};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -203,21 +204,66 @@ impl Form for ValidationTestForm {
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
-        data.insert("required_field".to_string(), FieldValue::String(self.required_field.clone()));
-        data.insert("email_field".to_string(), FieldValue::String(self.email_field.clone()));
-        data.insert("url_field".to_string(), FieldValue::String(self.url_field.clone()));
-        data.insert("phone_field".to_string(), FieldValue::String(self.phone_field.clone()));
-        data.insert("min_length_field".to_string(), FieldValue::String(self.min_length_field.clone()));
-        data.insert("max_length_field".to_string(), FieldValue::String(self.max_length_field.clone()));
-        data.insert("exact_length_field".to_string(), FieldValue::String(self.exact_length_field.clone()));
-        data.insert("min_value".to_string(), FieldValue::Number(self.min_value as f64));
-        data.insert("max_value".to_string(), FieldValue::Number(self.max_value as f64));
-        data.insert("range_value".to_string(), FieldValue::Number(self.range_value));
-        data.insert("regex_field".to_string(), FieldValue::String(self.regex_field.clone()));
-        data.insert("alphanumeric_field".to_string(), FieldValue::String(self.alphanumeric_field.clone()));
-        data.insert("custom_validation_field".to_string(), FieldValue::String(self.custom_validation_field.clone()));
-        data.insert("conditional_required".to_string(), FieldValue::String(self.conditional_required.clone()));
-        data.insert("dependency_trigger".to_string(), FieldValue::Boolean(self.dependency_trigger));
+        data.insert(
+            "required_field".to_string(),
+            FieldValue::String(self.required_field.clone()),
+        );
+        data.insert(
+            "email_field".to_string(),
+            FieldValue::String(self.email_field.clone()),
+        );
+        data.insert(
+            "url_field".to_string(),
+            FieldValue::String(self.url_field.clone()),
+        );
+        data.insert(
+            "phone_field".to_string(),
+            FieldValue::String(self.phone_field.clone()),
+        );
+        data.insert(
+            "min_length_field".to_string(),
+            FieldValue::String(self.min_length_field.clone()),
+        );
+        data.insert(
+            "max_length_field".to_string(),
+            FieldValue::String(self.max_length_field.clone()),
+        );
+        data.insert(
+            "exact_length_field".to_string(),
+            FieldValue::String(self.exact_length_field.clone()),
+        );
+        data.insert(
+            "min_value".to_string(),
+            FieldValue::Number(self.min_value as f64),
+        );
+        data.insert(
+            "max_value".to_string(),
+            FieldValue::Number(self.max_value as f64),
+        );
+        data.insert(
+            "range_value".to_string(),
+            FieldValue::Number(self.range_value),
+        );
+        data.insert(
+            "regex_field".to_string(),
+            FieldValue::String(self.regex_field.clone()),
+        );
+        data.insert(
+            "alphanumeric_field".to_string(),
+            FieldValue::String(self.alphanumeric_field.clone()),
+        );
+        data.insert(
+            "custom_validation_field".to_string(),
+            FieldValue::String(self.custom_validation_field.clone()),
+        );
+        data.insert(
+            "conditional_required".to_string(),
+            FieldValue::String(self.conditional_required.clone()),
+        );
+        data.insert(
+            "dependency_trigger".to_string(),
+            FieldValue::Boolean(self.dependency_trigger),
+        );
         data
     }
 
@@ -321,21 +367,35 @@ impl Form for ValidationTestForm {
         }
 
         // Phone validation
-        if !self.phone_field.is_empty() && !self.phone_field.matches(r"^\d{3}-\d{3}-\d{4}$").any(|_| true) {
+        if !self.phone_field.is_empty()
+            && !self
+                .phone_field
+                .matches(r"^\d{3}-\d{3}-\d{4}$")
+                .any(|_| true)
+        {
             errors.add_field_error("phone_field", "Invalid phone format".to_string());
         }
 
         // Length validations
         if !self.min_length_field.is_empty() && self.min_length_field.len() < 5 {
-            errors.add_field_error("min_length_field", "Minimum length is 5 characters".to_string());
+            errors.add_field_error(
+                "min_length_field",
+                "Minimum length is 5 characters".to_string(),
+            );
         }
 
         if !self.max_length_field.is_empty() && self.max_length_field.len() > 10 {
-            errors.add_field_error("max_length_field", "Maximum length is 10 characters".to_string());
+            errors.add_field_error(
+                "max_length_field",
+                "Maximum length is 10 characters".to_string(),
+            );
         }
 
-        if !self.exact_length_field.is_empty() && self.exact_length_field.len() != 7 {
-            errors.add_field_error("exact_length_field", "Must be exactly 7 characters".to_string());
+        if !self.exact_length_field.is_empty() && self.exact_length_field.len() != 3 {
+            errors.add_field_error(
+                "exact_length_field",
+                "Must be exactly 3 characters".to_string(),
+            );
         }
 
         // Number validations
@@ -347,27 +407,48 @@ impl Form for ValidationTestForm {
             errors.add_field_error("max_value", "Maximum value is 100".to_string());
         }
 
-        if self.range_value < 20.0 || self.range_value > 80.0 {
-            errors.add_field_error("range_value", "Value must be between 20.0 and 80.0".to_string());
+        if self.range_value < 1.0 || self.range_value > 10.0 {
+            errors.add_field_error(
+                "range_value",
+                "Value must be between 1.0 and 10.0".to_string(),
+            );
         }
 
         // Pattern validations
-        if !self.regex_field.is_empty() && !self.regex_field.matches(r"^[A-Z]{3}\d{3}$").any(|_| true) {
-            errors.add_field_error("regex_field", "Must match pattern ^[A-Z]{3}\\d{3}$".to_string());
+        if !self.regex_field.is_empty() {
+            let regex = regex::Regex::new(r"^[A-Z][a-z]+$").unwrap();
+            if !regex.is_match(&self.regex_field) {
+                errors.add_field_error(
+                    "regex_field",
+                    "Must match pattern ^[A-Z][a-z]+$".to_string(),
+                );
+            }
         }
 
-        if !self.alphanumeric_field.is_empty() && !self.alphanumeric_field.matches(r"^[a-zA-Z0-9]+$").any(|_| true) {
-            errors.add_field_error("alphanumeric_field", "Must contain only alphanumeric characters".to_string());
+        if !self.alphanumeric_field.is_empty() {
+            let regex = Regex::new(r"^[a-zA-Z0-9]+$").unwrap();
+            if !regex.is_match(&self.alphanumeric_field) {
+                errors.add_field_error(
+                    "alphanumeric_field",
+                    "Must contain only alphanumeric characters".to_string(),
+                );
+            }
         }
 
         // Custom validation
         if !self.custom_validation_field.is_empty() && self.custom_validation_field != "valid" {
-            errors.add_field_error("custom_validation_field", "Custom validation failed".to_string());
+            errors.add_field_error(
+                "custom_validation_field",
+                "Custom validation failed".to_string(),
+            );
         }
 
         // Conditional validation
         if self.dependency_trigger && self.conditional_required.trim().is_empty() {
-            errors.add_field_error("conditional_required", "This field is required when dependency_trigger is true".to_string());
+            errors.add_field_error(
+                "conditional_required",
+                "This field is required when dependency_trigger is true".to_string(),
+            );
         }
 
         if errors.has_errors() {

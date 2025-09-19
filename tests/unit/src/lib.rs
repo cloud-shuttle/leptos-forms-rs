@@ -6,8 +6,8 @@
 // Test modules
 mod additional_input_types_tests;
 mod advanced_validation;
-mod conditional_validation_hook_tests;
 mod conditional_validation;
+mod conditional_validation_hook_tests;
 mod devtools_integration_tests;
 mod enhanced_field_arrays;
 mod enhanced_field_arrays_advanced;

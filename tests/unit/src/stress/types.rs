@@ -106,39 +106,79 @@ impl Form for LargeStressForm {
         data.insert("name".to_string(), FieldValue::String(self.name.clone()));
         data.insert("email".to_string(), FieldValue::String(self.email.clone()));
         data.insert("age".to_string(), FieldValue::Number(self.age as f64));
-        
+
         // Add all text fields
         for i in 1..=20 {
             let field_name = format!("field_{}", i);
             let field_value = match i {
-                1 => &self.field_1, 2 => &self.field_2, 3 => &self.field_3, 4 => &self.field_4, 5 => &self.field_5,
-                6 => &self.field_6, 7 => &self.field_7, 8 => &self.field_8, 9 => &self.field_9, 10 => &self.field_10,
-                11 => &self.field_11, 12 => &self.field_12, 13 => &self.field_13, 14 => &self.field_14, 15 => &self.field_15,
-                16 => &self.field_16, 17 => &self.field_17, 18 => &self.field_18, 19 => &self.field_19, 20 => &self.field_20,
+                1 => &self.field_1,
+                2 => &self.field_2,
+                3 => &self.field_3,
+                4 => &self.field_4,
+                5 => &self.field_5,
+                6 => &self.field_6,
+                7 => &self.field_7,
+                8 => &self.field_8,
+                9 => &self.field_9,
+                10 => &self.field_10,
+                11 => &self.field_11,
+                12 => &self.field_12,
+                13 => &self.field_13,
+                14 => &self.field_14,
+                15 => &self.field_15,
+                16 => &self.field_16,
+                17 => &self.field_17,
+                18 => &self.field_18,
+                19 => &self.field_19,
+                20 => &self.field_20,
                 _ => continue,
             };
             data.insert(field_name, FieldValue::String(field_value.clone()));
         }
-        
+
         // Add number fields
         data.insert("number_1".to_string(), FieldValue::Number(self.number_1));
         data.insert("number_2".to_string(), FieldValue::Number(self.number_2));
         data.insert("number_3".to_string(), FieldValue::Number(self.number_3));
         data.insert("number_4".to_string(), FieldValue::Number(self.number_4));
         data.insert("number_5".to_string(), FieldValue::Number(self.number_5));
-        
+
         // Add boolean fields
         data.insert("bool_1".to_string(), FieldValue::Boolean(self.bool_1));
         data.insert("bool_2".to_string(), FieldValue::Boolean(self.bool_2));
         data.insert("bool_3".to_string(), FieldValue::Boolean(self.bool_3));
         data.insert("bool_4".to_string(), FieldValue::Boolean(self.bool_4));
         data.insert("bool_5".to_string(), FieldValue::Boolean(self.bool_5));
-        
+
         // Add array fields
-        data.insert("tags".to_string(), FieldValue::Array(self.tags.iter().map(|s| FieldValue::String(s.clone())).collect()));
-        data.insert("categories".to_string(), FieldValue::Array(self.categories.iter().map(|s| FieldValue::String(s.clone())).collect()));
-        data.insert("items".to_string(), FieldValue::Array(self.items.iter().map(|s| FieldValue::String(s.clone())).collect()));
-        
+        data.insert(
+            "tags".to_string(),
+            FieldValue::Array(
+                self.tags
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+        );
+        data.insert(
+            "categories".to_string(),
+            FieldValue::Array(
+                self.categories
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+        );
+        data.insert(
+            "items".to_string(),
+            FieldValue::Array(
+                self.items
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+        );
+
         data
     }
 
@@ -211,20 +251,41 @@ impl Form for LargeStressForm {
                     }
                 } else if field_name == "tags" {
                     if let FieldValue::Array(arr) = value {
-                        self.tags = arr.into_iter()
-                            .filter_map(|v| if let FieldValue::String(s) = v { Some(s) } else { None })
+                        self.tags = arr
+                            .into_iter()
+                            .filter_map(|v| {
+                                if let FieldValue::String(s) = v {
+                                    Some(s)
+                                } else {
+                                    None
+                                }
+                            })
                             .collect();
                     }
                 } else if field_name == "categories" {
                     if let FieldValue::Array(arr) = value {
-                        self.categories = arr.into_iter()
-                            .filter_map(|v| if let FieldValue::String(s) = v { Some(s) } else { None })
+                        self.categories = arr
+                            .into_iter()
+                            .filter_map(|v| {
+                                if let FieldValue::String(s) = v {
+                                    Some(s)
+                                } else {
+                                    None
+                                }
+                            })
                             .collect();
                     }
                 } else if field_name == "items" {
                     if let FieldValue::Array(arr) = value {
-                        self.items = arr.into_iter()
-                            .filter_map(|v| if let FieldValue::String(s) = v { Some(s) } else { None })
+                        self.items = arr
+                            .into_iter()
+                            .filter_map(|v| {
+                                if let FieldValue::String(s) = v {
+                                    Some(s)
+                                } else {
+                                    None
+                                }
+                            })
                             .collect();
                     }
                 }

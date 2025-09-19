@@ -47,7 +47,10 @@ impl Form for ConditionalForm {
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
         data.insert("trigger".to_string(), FieldValue::Boolean(self.trigger));
-        data.insert("conditional_field".to_string(), FieldValue::String(self.conditional_field.clone()));
+        data.insert(
+            "conditional_field".to_string(),
+            FieldValue::String(self.conditional_field.clone()),
+        );
         data
     }
 
@@ -71,7 +74,10 @@ impl Form for ConditionalForm {
         let mut errors = ValidationErrors::new();
 
         if self.trigger && self.conditional_field.is_empty() {
-            errors.add_field_error("conditional_field", "Field is required when trigger is true".to_string());
+            errors.add_field_error(
+                "conditional_field",
+                "Field is required when trigger is true".to_string(),
+            );
         }
 
         if errors.has_errors() {

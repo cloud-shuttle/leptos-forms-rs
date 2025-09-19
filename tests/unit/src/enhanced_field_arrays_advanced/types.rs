@@ -20,22 +20,28 @@ impl Default for AdvancedArrayForm {
 
 impl Form for AdvancedArrayForm {
     fn field_metadata() -> Vec<FieldMetadata> {
-        vec![
-            FieldMetadata {
-                name: "complex_items".to_string(),
-                field_type: FieldType::Array(Box::new(FieldType::Text)),
-                is_required: false,
-                default_value: None,
-                dependencies: Vec::new(),
-                attributes: HashMap::new(),
-                validators: vec![],
-            },
-        ]
+        vec![FieldMetadata {
+            name: "complex_items".to_string(),
+            field_type: FieldType::Array(Box::new(FieldType::Text)),
+            is_required: false,
+            default_value: None,
+            dependencies: Vec::new(),
+            attributes: HashMap::new(),
+            validators: vec![],
+        }]
     }
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
         let mut data = HashMap::new();
-        data.insert("complex_items".to_string(), FieldValue::Array(self.complex_items.iter().map(|s| FieldValue::String(s.clone())).collect()));
+        data.insert(
+            "complex_items".to_string(),
+            FieldValue::Array(
+                self.complex_items
+                    .iter()
+                    .map(|s| FieldValue::String(s.clone()))
+                    .collect(),
+            ),
+        );
         data
     }
 
@@ -43,13 +49,16 @@ impl Form for AdvancedArrayForm {
         match field_name {
             "complex_items" => {
                 if let FieldValue::Array(arr) = value {
-                    self.complex_items = arr.into_iter().filter_map(|v| {
-                        if let FieldValue::String(s) = v {
-                            Some(s)
-                        } else {
-                            None
-                        }
-                    }).collect();
+                    self.complex_items = arr
+                        .into_iter()
+                        .filter_map(|v| {
+                            if let FieldValue::String(s) = v {
+                                Some(s)
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
                 }
             }
             _ => {}

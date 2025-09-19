@@ -32,7 +32,7 @@ pub fn FormField<T: Form + PartialEq + Clone + Send + Sync>(
     let field_error = use_field_error(&form, &name);
     let field_dirty = use_field_dirty(&form);
     let _ = &field_dirty;
-    let field_touched = use_field_touched(&form);
+    let field_touched = use_field_touched(&form, &name);
 
     let field_class = class.unwrap_or_else(|| "form-field".to_string());
     let is_required = required.unwrap_or(false);

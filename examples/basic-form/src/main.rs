@@ -5,6 +5,7 @@ use leptos_forms_rs::core::types::{FieldType, FieldValue};
 use leptos_forms_rs::validation::ValidationErrors;
 use leptos_forms_rs::validation::Validator;
 use leptos_forms_rs::*;
+// use leptos_forms_rs::components::{Input, FormSubmit, FormReset};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
@@ -103,21 +104,14 @@ impl Form for LoginForm {
 
 #[component]
 fn LoginPage() -> impl IntoView {
-    let (form, submit_callback, reset_callback) = use_form(LoginForm::default_values());
+    let (form, _submit_callback, _reset_callback) = use_form(LoginForm::default_values());
 
-    let form_clone = form.clone();
-    let handle_submit = move |_| {
-        let form_data = form_clone.values().get();
-        log::info!("Form submitted: {:?}", form_data);
-        // In a real app, you would send this to your backend
-        if let Some(window) = web_sys::window() {
-            let _ =
-                window.alert_with_message(&format!("Login successful for: {}", form_data.email));
-        }
-    };
-
+    let form_clone1 = form.clone();
     let form_clone2 = form.clone();
     let form_clone3 = form.clone();
+    let form_clone4 = form.clone();
+    let form_clone5 = form.clone();
+    let form_clone6 = form.clone();
 
     view! {
         <div class="container">
@@ -132,6 +126,13 @@ fn LoginPage() -> impl IntoView {
                         id="email"
                         placeholder="Enter your email"
                         required=true
+                        on:input=move |ev| {
+                            if let Some(target) = ev.target() {
+                                if let Some(input) = target.dyn_ref::<web_sys::HtmlInputElement>() {
+                                    let _ = form_clone1.set_field_value("email", FieldValue::String(input.value()));
+                                }
+                            }
+                        }
                     />
                     <small>"We'll never share your email with anyone else."</small>
                 </div>
@@ -143,31 +144,58 @@ fn LoginPage() -> impl IntoView {
                         id="password"
                         placeholder="Enter your password"
                         required=true
+                        on:input=move |ev| {
+                            if let Some(target) = ev.target() {
+                                if let Some(input) = target.dyn_ref::<web_sys::HtmlInputElement>() {
+                                    let _ = form_clone2.set_field_value("password", FieldValue::String(input.value()));
+                                }
+                            }
+                        }
                     />
                     <small>"Must be at least 8 characters long."</small>
                 </div>
 
                 <div class="form-field">
                     <label>
-                        <input type="checkbox" id="remember_me" />
+                        <input
+                            type="checkbox"
+                            id="remember_me"
+                            on:change=move |ev| {
+                                if let Some(target) = ev.target() {
+                                    if let Some(input) = target.dyn_ref::<web_sys::HtmlInputElement>() {
+                                        let _ = form_clone3.set_field_value("remember_me", FieldValue::Boolean(input.checked()));
+                                    }
+                                }
+                            }
+                        />
                         "Remember me"
                     </label>
                 </div>
 
                 <div class="form-actions">
-                    <button class="btn btn-primary" on:click=move |_| {
-                        handle_submit(());
-                    }>
+                    <button
+                        class="btn btn-primary"
+                        on:click=move |_| {
+                            let form_data = form_clone4.values().get();
+                            log::info!("Form submitted: {:?}", form_data);
+                            if let Some(window) = web_sys::window() {
+                                let _ = window.alert_with_message(&format!("Login successful for: {}", form_data.email));
+                            }
+                        }
+                    >
                         "Login"
                     </button>
 
-                    <button class="btn btn-secondary" on:click=move |_| {
-                        // Reset form to default values
-                        let default_values = LoginForm::default_values();
-                        let _ = form_clone2.set_field_value("email", FieldValue::String(default_values.email));
-                        let _ = form_clone2.set_field_value("password", FieldValue::String(default_values.password));
-                        let _ = form_clone2.set_field_value("remember_me", FieldValue::Boolean(default_values.remember_me));
-                    }>
+                    <button
+                        class="btn btn-secondary"
+                        on:click=move |_| {
+                            let default_values = LoginForm::default_values();
+                            let _ = form_clone5.set_field_value("email", FieldValue::String(default_values.email));
+                            let _ = form_clone5.set_field_value("password", FieldValue::String(default_values.password));
+                            let _ = form_clone5.set_field_value("remember_me", FieldValue::Boolean(default_values.remember_me));
+                            log::info!("Form reset to default values");
+                        }
+                    >
                         "Reset"
                     </button>
                 </div>
@@ -175,7 +203,7 @@ fn LoginPage() -> impl IntoView {
                 <div class="form-debug">
                     <h3>"Form Debug Info"</h3>
                     <p>"Form is working! This demonstrates the current API."</p>
-                    <p>"Form values: " {move || format!("{:?}", form_clone3.values().get())}</p>
+                    <p>"Form values: " {move || format!("{:?}", form_clone6.values().get())}</p>
                 </div>
             </div>
         </div>

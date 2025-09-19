@@ -15,16 +15,16 @@ fn test_wizard_form_initialization() {
 #[test]
 fn test_wizard_form_validation() {
     let mut form = WizardForm::default();
-    
+
     // Test empty form
     let result = form.validate();
     assert!(result.is_err());
-    
+
     // Test valid form
     form.name = "John Doe".to_string();
     form.email = "john@example.com".to_string();
     form.age = 25;
-    
+
     let result = form.validate();
     assert!(result.is_ok());
 }

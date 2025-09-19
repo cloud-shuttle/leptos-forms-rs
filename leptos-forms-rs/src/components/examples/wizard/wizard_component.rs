@@ -7,7 +7,7 @@ use crate::hooks::use_form;
 use leptos::prelude::*;
 
 use super::form_types::WizardForm;
-use super::step_components::{PersonalInfoStep, PreferencesStep, ConfirmationStep};
+use super::step_components::{ConfirmationStep, PersonalInfoStep, PreferencesStep};
 
 /// Main form wizard example component
 #[component]

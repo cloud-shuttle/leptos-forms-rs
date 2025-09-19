@@ -7,7 +7,7 @@ use leptos_forms_rs::Form;
 fn test_persistence_form() {
     let form = PersistenceForm::default();
     assert_eq!(form.data, "");
-    
+
     let result = form.validate();
     assert!(result.is_ok());
 }

@@ -20,17 +20,15 @@ impl Default for PersistenceForm {
 
 impl Form for PersistenceForm {
     fn field_metadata() -> Vec<FieldMetadata> {
-        vec![
-            FieldMetadata {
-                name: "data".to_string(),
-                field_type: FieldType::Text,
-                is_required: false,
-                default_value: None,
-                dependencies: Vec::new(),
-                attributes: HashMap::new(),
-                validators: vec![],
-            },
-        ]
+        vec![FieldMetadata {
+            name: "data".to_string(),
+            field_type: FieldType::Text,
+            is_required: false,
+            default_value: None,
+            dependencies: Vec::new(),
+            attributes: HashMap::new(),
+            validators: vec![],
+        }]
     }
 
     fn get_form_data(&self) -> HashMap<String, FieldValue> {
