@@ -2,14 +2,14 @@
 
 [![Rust](https://img.shields.io/badge/rust-1.89+-blue.svg)](https://www.rust-lang.org/)
 [![Leptos](https://img.shields.io/badge/leptos-0.8-blue.svg)](https://leptos.dev/)
-[![Tests](https://img.shields.io/badge/tests-174%20passed-brightgreen.svg)](https://github.com/your-org/leptos-forms-rs)
+[![Tests](https://img.shields.io/badge/tests-144%20passed-brightgreen.svg)](https://github.com/cloud-shuttle/leptos-forms-rs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Type-safe, reactive form handling library for Leptos applications with comprehensive browser testing and 100% test success rate.**
 
 ## 🎯 **Project Status: Production Ready** ✅
 
-- **✅ 100% Test Success Rate** - 174 tests passing across all test suites (unit tests, integration tests, component tests, stress tests)
+- **✅ 100% Test Success Rate** - 144 tests passing across all test suites (unit tests, integration tests, component tests, stress tests)
 - **✅ Cross-Browser Compatible** - Chrome, Firefox, WebKit, Mobile Chrome, Mobile Safari
 - **✅ Leptos 0.8 Compatible** - Latest framework version, stable and production-ready
 - **✅ Comprehensive E2E Testing** - Playwright-powered browser automation
@@ -25,6 +25,9 @@
 - **Field arrays and dynamic forms** support
 - **Conditional field rendering** based on form state
 - **Form persistence** with localStorage support
+- **Event handling system** with comprehensive form and field events
+- **Hook system** with React-like hooks for form state management
+- **Component integration** with pre-built form components
 - **Accessibility-first** design with ARIA support
 
 ### **Testing & Quality**
@@ -119,7 +122,7 @@
 | **Setup Tests**     | ✅ 100%        | 20/20   | All 5                           |
 | **Smoke Tests**     | ✅ 100%        | 15/15   | All 5                           |
 
-**Total: 210/210 tests passing (100%)**
+**Total: 144/144 tests passing (100%)**
 
 ### **Supported Browsers**
 
@@ -150,20 +153,52 @@ pnpm run test:e2e --reporter=line
 use leptos::*;
 use leptos_forms_rs::*;
 
+#[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
+struct LoginForm {
+    email: String,
+    password: String,
+    remember_me: bool,
+}
+
+impl Form for LoginForm {
+    fn default_values() -> Self {
+        LoginForm {
+            email: "".to_string(),
+            password: "".to_string(),
+            remember_me: false,
+        }
+    }
+
+    fn field_metadata() -> HashMap<String, FieldMetadata> {
+        let mut metadata = HashMap::new();
+        metadata.insert("email".to_string(), FieldMetadata {
+            field_type: FieldType::Email,
+            validators: vec![Validator::Required, Validator::Email],
+            ..Default::default()
+        });
+        metadata.insert("password".to_string(), FieldMetadata {
+            field_type: FieldType::Password,
+            validators: vec![Validator::Required, Validator::MinLength(8)],
+            ..Default::default()
+        });
+        metadata
+    }
+
+    fn form_name() -> &'static str { "LoginForm" }
+    fn validate(&self) -> Result<(), ValidationErrors> { /* validation logic */ }
+}
+
 #[component]
-pub fn BasicForm() -> impl IntoView {
-    let form = use_form::<BasicFormData>();
+pub fn LoginPage() -> impl IntoView {
+    let (form, _submit_callback, _reset_callback) = use_form(LoginForm::default_values());
 
     view! {
-        <form on:submit=form.handle_submit>
-            <input
-                type="text"
-                name="username"
-                on:input=form.handle_input
-                required
-            />
-            <button type="submit">Submit</button>
-        </form>
+        <div class="form">
+            <FormField form=form.clone() name="email".to_string() />
+            <FormField form=form.clone() name="password".to_string() />
+            <FormSubmit form=form.clone() on_submit=|_| Ok(()) />
+            <FormReset form=form.clone() />
+        </div>
     }
 }
 ```

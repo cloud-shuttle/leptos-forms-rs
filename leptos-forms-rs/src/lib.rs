@@ -1,7 +1,70 @@
 //! Leptos Forms - A comprehensive form management library for Leptos
 //!
 //! This library provides a complete solution for building forms in Leptos applications,
-//! including form state management, validation, field arrays, and more.
+//! including form state management, validation, field arrays, event handling, and more.
+//!
+//! ## Features
+//!
+//! - **Type-safe forms** with compile-time validation
+//! - **Reactive state management** using Leptos signals
+//! - **Event handling system** with comprehensive form and field events
+//! - **Hook system** with React-like hooks for form state management
+//! - **Component integration** with pre-built form components
+//! - **Field arrays and dynamic forms** support
+//! - **Form persistence** with localStorage support
+//! - **WASM-powered** for high performance
+//!
+//! ## Quick Start
+//!
+//! ```rust
+//! use leptos::*;
+//! use leptos_forms_rs::*;
+//! use serde::{Deserialize, Serialize};
+//!
+//! #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
+//! struct LoginForm {
+//!     email: String,
+//!     password: String,
+//! }
+//!
+//! impl Form for LoginForm {
+//!     fn default_values() -> Self {
+//!         LoginForm {
+//!             email: "".to_string(),
+//!             password: "".to_string(),
+//!         }
+//!     }
+//!
+//!     fn field_metadata() -> Vec<FieldMetadata> {
+//!         vec![
+//!             FieldMetadata {
+//!                 field_name: "email".to_string(),
+//!                 field_type: FieldType::Email,
+//!                 ..Default::default()
+//!             },
+//!             FieldMetadata {
+//!                 field_name: "password".to_string(),
+//!                 field_type: FieldType::Password,
+//!                 ..Default::default()
+//!             }
+//!         ]
+//!     }
+//!
+//!     fn validate(&self) -> Result<(), ValidationErrors> { Ok(()) }
+//! }
+//!
+//! #[component]
+//! pub fn LoginPage() -> impl IntoView {
+//!     let (form, _submit_callback, _reset_callback) = use_form(LoginForm::default_values());
+//!
+//!     view! {
+//!         <div class="form">
+//!             <FormField form=form.clone() name="email".to_string() />
+//!             <FormField form=form.clone() name="password".to_string() />
+//!         </div>
+//!     }
+//! }
+//! ```
 
 pub mod components;
 pub mod core;
