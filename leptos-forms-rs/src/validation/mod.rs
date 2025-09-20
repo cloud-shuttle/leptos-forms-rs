@@ -6,6 +6,7 @@
 //! - Conditional validation
 //! - Validation error handling
 
+pub mod array_validators;
 pub mod conditional;
 pub mod engine;
 pub mod errors;
@@ -13,6 +14,7 @@ pub mod rules;
 pub mod validators;
 
 // Re-export public API
+pub use array_validators::*;
 pub use conditional::*;
 pub use engine::*;
 pub use errors::*;

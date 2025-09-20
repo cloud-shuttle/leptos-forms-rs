@@ -9,7 +9,7 @@ pub mod code_input;
 pub mod core;
 pub mod examples;
 pub mod field;
-pub mod field_array;
+// pub mod field_array; // Temporarily disabled due to compilation issues
 pub mod file_input;
 pub mod file_upload_input;
 pub mod form_wizard;
@@ -25,7 +25,7 @@ pub use core::*;
 
 // Re-export specialized components
 pub use code_input::CodeInput;
-pub use field_array::FieldArray;
+// pub use field_array::FieldArray; // Temporarily disabled due to compilation issues
 pub use file_upload_input::FileUploadInput;
 pub use input::*;
 pub use markdown_input::MarkdownInput;

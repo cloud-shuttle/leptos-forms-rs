@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 use leptos_forms_rs::core::traits::{FieldMetadata, FormSchema};
-use leptos_forms_rs::core::types::FieldError;
+// use leptos_forms_rs::core::types::FieldError; // Not needed for this example
+use leptos_forms_rs::components::{FormField, FormSubmit}; // Using actual library components!
 use leptos_forms_rs::core::types::{FieldType, FieldValue};
 use leptos_forms_rs::validation::ValidationErrors;
 use leptos_forms_rs::validation::Validator;
@@ -293,58 +294,67 @@ impl Form for UserRegistrationForm {
 
 #[component]
 fn UserRegistrationPage() -> impl IntoView {
-    let (form, submit_callback, reset_callback) = use_form(UserRegistrationForm::default_values());
+    let (form, _submit_callback, _reset_callback) =
+        use_form(UserRegistrationForm::default_values());
 
-    let form_clone = form.clone();
-    let handle_submit = move |_| {
-        let form_data = form_clone.values().get();
-        log::info!("Form submitted: {:?}", form_data);
-        // In a real app, you would send this to your backend
-        if let Some(window) = web_sys::window() {
-            let _ = window.alert_with_message(&format!(
-                "Registration successful for: {} {}",
-                form_data.first_name, form_data.last_name
-            ));
-        }
-    };
+    // Create clones for different closures
+    let form_clone1 = form.clone();
+    let form_clone2 = form.clone();
+    let form_clone3 = form.clone();
+    let form_clone4 = form.clone();
 
     view! {
         <div class="container">
             <h1>"User Registration Form Example"</h1>
-            <p>"This demonstrates the complex functionality of Leptos Forms RS with Leptos 0.8."</p>
+            <p>"This demonstrates the complex functionality of Leptos Forms RS with Leptos 0.8 using actual library components!"</p>
 
             <div class="form">
                 <div class="form-section">
                     <h2>"Personal Information"</h2>
 
                     <div class="form-row">
-                        <div class="form-field">
-                            <label for="first_name">"First Name *"</label>
-                            <input type="text" id="first_name" required=true />
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="first_name".to_string()
+                            label="First Name".to_string()
+                            required=true
+                            field_type=FieldType::Text
+                        />
 
-                        <div class="form-field">
-                            <label for="last_name">"Last Name *"</label>
-                            <input type="text" id="last_name" required=true />
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="last_name".to_string()
+                            label="Last Name".to_string()
+                            required=true
+                            field_type=FieldType::Text
+                        />
                     </div>
 
-                    <div class="form-field">
-                        <label for="email">"Email Address *"</label>
-                        <input type="email" id="email" required=true />
-                    </div>
+                    <FormField
+                        form=form.clone()
+                        name="email".to_string()
+                        label="Email Address".to_string()
+                        required=true
+                        field_type=FieldType::Email
+                    />
 
                     <div class="form-row">
-                        <div class="form-field">
-                            <label for="password">"Password *"</label>
-                            <input type="password" id="password" required=true />
-                            <small>"Must be at least 8 characters long."</small>
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="password".to_string()
+                            label="Password".to_string()
+                            help_text="Must be at least 8 characters long.".to_string()
+                            required=true
+                            field_type=FieldType::Password
+                        />
 
-                        <div class="form-field">
-                            <label for="confirm_password">"Confirm Password *"</label>
-                            <input type="password" id="confirm_password" required=true />
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="confirm_password".to_string()
+                            label="Confirm Password".to_string()
+                            required=true
+                            field_type=FieldType::Password
+                        />
                     </div>
                 </div>
 
@@ -352,100 +362,127 @@ fn UserRegistrationPage() -> impl IntoView {
                     <h2>"Contact Information"</h2>
 
                     <div class="form-row">
-                        <div class="form-field">
-                            <label for="phone">"Phone Number"</label>
-                            <input type="tel" id="phone" />
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="phone".to_string()
+                            label="Phone Number".to_string()
+                            field_type=FieldType::Text
+                        />
 
-                        <div class="form-field">
-                            <label for="website">"Website"</label>
-                            <input type="url" id="website" />
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="website".to_string()
+                            label="Website".to_string()
+                            field_type=FieldType::Text
+                        />
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h2>"Address Information"</h2>
 
-                    <div class="form-field">
-                        <label for="street_address">"Street Address *"</label>
-                        <input type="text" id="street_address" required=true />
+                    <FormField
+                        form=form.clone()
+                        name="street_address".to_string()
+                        label="Street Address".to_string()
+                        required=true
+                        field_type=FieldType::Text
+                    />
+
+                    <div class="form-row">
+                        <FormField
+                            form=form.clone()
+                            name="city".to_string()
+                            label="City".to_string()
+                            required=true
+                            field_type=FieldType::Text
+                        />
+
+                        <FormField
+                            form=form.clone()
+                            name="state".to_string()
+                            label="State/Province".to_string()
+                            required=true
+                            field_type=FieldType::Text
+                        />
                     </div>
 
                     <div class="form-row">
-                        <div class="form-field">
-                            <label for="city">"City *"</label>
-                            <input type="text" id="city" required=true />
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="postal_code".to_string()
+                            label="Postal Code".to_string()
+                            required=true
+                            field_type=FieldType::Text
+                        />
 
-                        <div class="form-field">
-                            <label for="state">"State/Province *"</label>
-                            <input type="text" id="state" required=true />
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label for="postal_code">"Postal Code *"</label>
-                            <input type="text" id="postal_code" required=true />
-                        </div>
-
-                        <div class="form-field">
-                            <label for="country">"Country *"</label>
-                            <input type="text" id="country" required=true />
-                        </div>
+                        <FormField
+                            form=form.clone()
+                            name="country".to_string()
+                            label="Country".to_string()
+                            required=true
+                            field_type=FieldType::Text
+                        />
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h2>"Preferences"</h2>
 
-                    <div class="form-field">
-                        <label>
-                            <input type="checkbox" id="newsletter" />
-                            "Subscribe to newsletter"
-                        </label>
-                    </div>
+                    <FormField
+                        form=form.clone()
+                        name="newsletter".to_string()
+                        label="Subscribe to newsletter".to_string()
+                        field_type=FieldType::Boolean
+                    />
 
-                    <div class="form-field">
-                        <label>
-                            <input type="checkbox" id="marketing_emails" />
-                            "Receive marketing emails"
-                        </label>
-                    </div>
+                    <FormField
+                        form=form.clone()
+                        name="marketing_emails".to_string()
+                        label="Receive marketing emails".to_string()
+                        field_type=FieldType::Boolean
+                    />
 
-                    <div class="form-field">
-                        <label for="language">"Preferred Language"</label>
-                        <select id="language">
-                            <option value="en" selected=true>"English"</option>
-                            <option value="es">"Spanish"</option>
-                            <option value="fr">"French"</option>
-                            <option value="de">"German"</option>
-                        </select>
-                    </div>
+                    <FormField
+                        form=form.clone()
+                        name="language".to_string()
+                        label="Preferred Language".to_string()
+                        field_type=FieldType::Text
+                    />
                 </div>
 
                 <div class="form-actions">
-                    <button class="btn btn-primary" on:click=move |_| {
-                        handle_submit(());
-                    }>
-                        "Register"
-                    </button>
+                    <FormSubmit
+                        form=form.clone()
+                        on_submit=move |form_data| {
+                            log::info!("Form submitted: {:?}", form_data);
+                            if let Some(window) = web_sys::window() {
+                                let _ = window.alert_with_message(&format!(
+                                    "Registration successful for: {} {}",
+                                    form_data.first_name, form_data.last_name
+                                ));
+                            }
+                            Ok(())
+                        }
+                    />
 
-                    <button class="btn btn-secondary" on:click=move |_| {
-                        // Reset form to default values
-                        let _default_values = UserRegistrationForm::default_values();
-                        // In a real implementation, you would reset all form fields
-                        log::info!("Form reset to default values");
-                    }>
+                    <button
+                        class="btn btn-secondary"
+                        on:click=move |_| {
+                            form_clone1.reset();
+                            log::info!("Form reset to default values");
+                        }
+                    >
                         "Reset"
                     </button>
                 </div>
 
                 <div class="form-debug">
                     <h3>"Form Debug Info"</h3>
-                    <p>"Form is working! This demonstrates the current API."</p>
-                    <p>"Form values: " {move || format!("{:?}", form.values().get())}</p>
+                    <p>"Form is working! This demonstrates the actual library API with proper components."</p>
+                    <p>"Form values: " {move || format!("{:?}", form_clone2.values().get())}</p>
+                    <p>"Form is valid: " {move || format!("{}", form_clone3.is_valid().get())}</p>
+                    <p>"Form is dirty: " {move || format!("{}", form_clone4.is_dirty().get())}</p>
                 </div>
             </div>
         </div>

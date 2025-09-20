@@ -8,6 +8,7 @@
 //! - Validator configuration
 //! - Form options and settings
 
+pub mod array_state;
 pub mod field_config;
 pub mod field_types;
 pub mod field_value;
@@ -17,6 +18,7 @@ pub mod form_options;
 pub mod validator_config;
 
 // Re-export public API
+pub use array_state::*;
 pub use field_config::*;
 pub use field_types::*;
 pub use field_value::*;

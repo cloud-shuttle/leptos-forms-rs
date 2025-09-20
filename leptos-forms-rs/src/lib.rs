@@ -18,7 +18,9 @@
 //!
 //! ```rust
 //! use leptos::*;
+//! use leptos::prelude::{ElementChild, ClassAttribute};
 //! use leptos_forms_rs::*;
+//! use leptos_forms_rs::core::types::FieldType;
 //! use serde::{Deserialize, Serialize};
 //!
 //! #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
@@ -38,12 +40,12 @@
 //!     fn field_metadata() -> Vec<FieldMetadata> {
 //!         vec![
 //!             FieldMetadata {
-//!                 field_name: "email".to_string(),
+//!                 name: "email".to_string(),
 //!                 field_type: FieldType::Email,
 //!                 ..Default::default()
 //!             },
 //!             FieldMetadata {
-//!                 field_name: "password".to_string(),
+//!                 name: "password".to_string(),
 //!                 field_type: FieldType::Password,
 //!                 ..Default::default()
 //!             }
@@ -71,6 +73,7 @@ pub mod core;
 pub mod devtools;
 pub mod error;
 pub mod events;
+pub mod examples;
 pub mod hooks;
 pub mod utils;
 pub mod validation;
@@ -91,15 +94,15 @@ pub use error::{FieldError, FormError};
 
 // Re-export hooks
 pub use hooks::{
-    use_conditional_validation, use_field_array, use_field_dirty, use_field_error,
-    use_field_touched, use_field_value, use_form, use_form_analytics, use_form_performance,
-    use_form_persistence, use_form_submission, use_form_validation, use_form_wizard,
-    use_real_time_validation, FieldArrayHandle,
+    use_conditional_validation, use_field_array, use_field_array_values, use_field_dirty,
+    use_field_error, use_field_touched, use_field_value, use_form, use_form_analytics,
+    use_form_performance, use_form_persistence, use_form_submission, use_form_validation,
+    use_form_wizard, use_real_time_validation, FieldArrayHandle,
 };
 
 // Re-export components
 pub use components::{
-    form_wizard as FormWizard, FieldArray, Form as FormComponent, FormDebug, FormField, FormReset,
+    form_wizard as FormWizard, Form as FormComponent, FormDebug, FormField, FormReset,
 };
 
 // Re-export utility functions
@@ -122,3 +125,6 @@ pub use devtools::{
     DebugUtilities, FieldChange, FieldState, FormSnapshot, FormStateInspector, FormStateSnapshot,
     IntegrityCheck, PerformanceMetrics, PerformanceMonitor, SnapshotDiff,
 };
+
+#[cfg(test)]
+mod tests;
